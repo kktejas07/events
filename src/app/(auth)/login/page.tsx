@@ -151,7 +151,7 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="••••••••"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
