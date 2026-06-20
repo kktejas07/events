@@ -3,22 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/forms/password-input";
 import { toast } from "sonner";
-import {
-  CreditCard,
-  Shield,
-  Link2,
-  Settings2,
-  Mail,
-  ChevronRight,
-  Image,
-  Upload,
-} from "lucide-react";
+import { CreditCard, Shield, Link2, Settings2, Mail, ChevronRight, Upload } from "lucide-react";
 
 interface Settings {
   NEXT_PUBLIC_APP_NAME: string;
@@ -196,7 +188,14 @@ export default function AdminSettingsPage() {
               </div>
               {settings.LOGO_URL && (
                 <div className="mt-2 inline-block rounded-md border bg-card p-2">
-                  <img src={settings.LOGO_URL} alt="Logo preview" className="h-10 object-contain" />
+                  <Image
+                    src={settings.LOGO_URL}
+                    alt="Logo preview"
+                    width={160}
+                    height={40}
+                    className="h-10 w-auto object-contain"
+                    unoptimized
+                  />
                 </div>
               )}
             </div>
@@ -232,10 +231,13 @@ export default function AdminSettingsPage() {
               </div>
               {settings.FAVICON_URL && (
                 <div className="mt-2 inline-block rounded-md border bg-card p-2">
-                  <img
+                  <Image
                     src={settings.FAVICON_URL}
                     alt="Favicon preview"
+                    width={32}
+                    height={32}
                     className="h-8 w-8 object-contain"
+                    unoptimized
                   />
                 </div>
               )}
