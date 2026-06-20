@@ -9,10 +9,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/forms/password-input";
 import { toast } from "sonner";
-import { CreditCard, Shield, Link2, Settings2, Mail, ChevronRight } from "lucide-react";
+import {
+  CreditCard,
+  Shield,
+  Link2,
+  Settings2,
+  Mail,
+  ChevronRight,
+  Image,
+  Upload,
+} from "lucide-react";
 
 interface Settings {
   NEXT_PUBLIC_APP_NAME: string;
+  LOGO_URL: string;
+  FAVICON_URL: string;
   RAZORPAY_KEY_ID: string;
   RAZORPAY_KEY_SECRET: string;
   RAZORPAY_WEBHOOK_SECRET: string;
@@ -33,6 +44,8 @@ interface Settings {
 
 const defaults: Settings = {
   NEXT_PUBLIC_APP_NAME: "Events Platform",
+  LOGO_URL: "",
+  FAVICON_URL: "",
   RAZORPAY_KEY_ID: "",
   RAZORPAY_KEY_SECRET: "",
   RAZORPAY_WEBHOOK_SECRET: "",
@@ -143,13 +156,89 @@ export default function AdminSettingsPage() {
           <CardHeader>
             <CardTitle>General Settings</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div className="space-y-1">
               <Label>Platform Name</Label>
               <Input
                 value={settings.NEXT_PUBLIC_APP_NAME}
                 onChange={(e) => update("NEXT_PUBLIC_APP_NAME", e.target.value)}
               />
+            </div>
+
+            <div className="space-y-1">
+              <Label>Logo</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  placeholder="Paste logo URL or upload below"
+                  value={settings.LOGO_URL}
+                  onChange={(e) => update("LOGO_URL", e.target.value)}
+                  className="flex-1"
+                />
+                <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        const dataUrl = ev.target?.result as string;
+                        update("LOGO_URL", dataUrl);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+              </div>
+              {settings.LOGO_URL && (
+                <div className="mt-2 inline-block rounded-md border bg-card p-2">
+                  <img src={settings.LOGO_URL} alt="Logo preview" className="h-10 object-contain" />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <Label>Favicon</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  placeholder="Paste favicon URL or upload below"
+                  value={settings.FAVICON_URL}
+                  onChange={(e) => update("FAVICON_URL", e.target.value)}
+                  className="flex-1"
+                />
+                <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        const dataUrl = ev.target?.result as string;
+                        update("FAVICON_URL", dataUrl);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+              </div>
+              {settings.FAVICON_URL && (
+                <div className="mt-2 inline-block rounded-md border bg-card p-2">
+                  <img
+                    src={settings.FAVICON_URL}
+                    alt="Favicon preview"
+                    className="h-8 w-8 object-contain"
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

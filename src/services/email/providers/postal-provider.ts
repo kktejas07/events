@@ -149,61 +149,74 @@ export class PostalApiProvider implements EmailProvider {
   }
 
   async testConnection(): Promise<TestResult> {
-    const url = `${this.baseUrl}/api/v1/`;
+    const endpoints = [
+      { url: `${this.baseUrl}/api/v1/`, name: "API Info" },
+      { url: `${this.baseUrl}/health`, name: "Health" },
+      { url: this.baseUrl, name: "Base URL" },
+    ];
+
+    for (const { url, name } of endpoints) {
+      try {
+        const start = Date.now();
+        this.debug("GET", url);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: this.headers,
+          signal: AbortSignal.timeout(10000),
+        });
+
+        const latencyMs = Date.now() - start;
+        const responseText = await response.text();
+        console.log(`[Postal] Test ${name} — ${url}: ${response.status} (${latencyMs}ms)`);
+
+        if (response.ok) {
+          let result: PostalInfoResponse;
+          try {
+            result = JSON.parse(responseText);
+          } catch {
+            return {
+              success: true,
+              message: `Server reachable via ${name} (${response.status}) — ${latencyMs}ms`,
+              details: { statusCode: response.status, latencyMs, endpoint: url },
+            };
+          }
+
+          if (result.status === "ok") {
+            return {
+              success: true,
+              message: `Connected to Postal ${name} v${result.data?.version || "unknown"} (${latencyMs}ms)`,
+              details: { version: result.data?.version, latencyMs },
+            };
+          }
+        }
+      } catch {
+        // Try next endpoint
+        continue;
+      }
+    }
+
+    // All endpoints failed — try a basic TCP-level check
     try {
       const start = Date.now();
-      this.debug("GET", url);
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: this.headers,
-        signal: AbortSignal.timeout(10000),
+      const parsed = new URL(this.baseUrl);
+      const response = await fetch(this.baseUrl, {
+        method: "HEAD",
+        signal: AbortSignal.timeout(8000),
       });
-
-      const responseText = await response.text();
       const latencyMs = Date.now() - start;
-
-      console.log(`[Postal] Test response status: ${response.status}`);
-      console.log(`[Postal] Test response body: ${responseText.slice(0, 500)}`);
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: `Postal server returned ${response.status}: ${response.statusText}. Endpoint: ${url}`,
-          details: { statusCode: response.status, latencyMs, endpoint: url },
-        };
-      }
-
-      let result: PostalInfoResponse;
-      try {
-        result = JSON.parse(responseText);
-      } catch {
-        return {
-          success: true,
-          message: `Server responded (${response.status}) — ${latencyMs}ms. Unable to parse info response.`,
-          details: { statusCode: response.status, latencyMs },
-        };
-      }
-
-      if (result.status === "ok") {
-        return {
-          success: true,
-          message: `Connected to Postal v${result.data?.version || "unknown"} (${latencyMs}ms)`,
-          details: { version: result.data?.version, latencyMs },
-        };
-      }
-
       return {
-        success: false,
-        message: result.error?.message || "Server returned non-ok status",
-        details: { latencyMs },
+        success: true,
+        message: `Server reachable (${response.status}) — ${latencyMs}ms`,
+        details: { statusCode: response.status, latencyMs },
       };
     } catch (error) {
-      console.error(`[Postal] Test error:`, error);
+      const msg = error instanceof Error ? error.message : "Connection failed";
+      console.error(`[Postal] All test endpoints failed: ${msg}`);
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Connection failed",
-        details: { error: String(error) },
+        message: `Cannot reach server: ${msg}`,
+        details: { error: msg },
       };
     }
   }

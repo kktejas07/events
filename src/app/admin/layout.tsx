@@ -10,7 +10,6 @@ import {
   Settings,
   LogOut,
   BarChart3,
-  ShieldCheck,
   Mail,
 } from "lucide-react";
 
@@ -29,15 +28,14 @@ const sidebarLinks = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r bg-card lg:block">
-        <div className="flex h-16 items-center gap-2 border-b px-6">
+    <div className="flex min-h-screen bg-[#0a0a1a]">
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-white/10 bg-[#0a0a1a] lg:block">
+        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-6">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-lg font-bold text-primary-foreground">E</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 shadow-lg shadow-purple-600/30">
+              <span className="text-lg font-bold text-white">E</span>
             </div>
-            <span className="text-lg font-bold">Admin</span>
+            <span className="text-lg font-bold text-white">Admin</span>
           </Link>
         </div>
         <nav
@@ -46,16 +44,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           {sidebarLinks.map((link) => (
             <Link key={link.href} href={link.href}>
-              <Button variant="ghost" className="w-full justify-start gap-3">
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 text-gray-400 hover:bg-white/10 hover:text-white"
+              >
                 <link.icon className="h-4 w-4" />
                 {link.label}
               </Button>
             </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-64 border-t bg-card p-3">
+        <div className="absolute bottom-0 w-64 border-t border-white/10 bg-[#0a0a1a] p-3">
           <Link href="/api/auth/signout">
-            <Button variant="ghost" className="w-full justify-start gap-3 text-red-500">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+            >
               <LogOut className="h-4 w-4" />
               Sign Out
             </Button>
@@ -63,18 +67,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background px-6">
-          <h1 className="text-lg font-semibold">Admin Dashboard</h1>
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/10 bg-[#0a0a1a]/80 px-6 backdrop-blur-xl">
+          <h1 className="text-lg font-semibold text-white">Admin Dashboard</h1>
           <div className="flex items-center gap-3">
             <Link href="/admin/settings">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
                 <Settings className="h-4 w-4" />
               </Button>
             </Link>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">A</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-cyan-600">
+              <span className="text-sm font-bold text-white">A</span>
             </div>
           </div>
         </header>

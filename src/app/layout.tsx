@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Events Platform",
   description: "Discover and register for amazing events",
+  icons: [{ rel: "icon", url: "/favicon.svg", type: "image/svg+xml" }],
 };
 
 export default function RootLayout({
@@ -17,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
