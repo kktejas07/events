@@ -11,10 +11,11 @@ export function useSiteContent() {
     fetch("/api/site-content")
       .then((r) => r.json())
       .then((data) => {
+        console.log("[useSiteContent] API response hero.title:", data?.hero?.title);
         setContent(data);
       })
-      .catch(() => {
-        // Use defaults on error
+      .catch((err) => {
+        console.error("[useSiteContent] fetch error:", err);
       })
       .finally(() => setLoading(false));
   }, []);

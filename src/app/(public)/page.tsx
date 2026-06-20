@@ -31,6 +31,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useSiteContent } from "@/hooks/use-site-content";
+import { defaultContent } from "@/lib/landing-defaults";
 import { toast } from "sonner";
 
 const fadeInUp = {
@@ -213,10 +214,18 @@ function CountdownTimer({ target: targetDate }: { target?: string }) {
 }
 
 export default function HomePage() {
-  const { content } = useSiteContent();
+  const [content, setContent] = useState<Record<string, unknown>>(defaultContent);
   const [activeDay, setActiveDay] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch("/api/site-content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data) setContent(data);
+      });
+  }, []);
 
   const hero = content.hero as Record<string, string>;
   const benefitsFromContent =
