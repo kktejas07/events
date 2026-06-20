@@ -67,6 +67,9 @@ model User {
   firstName     String?
   lastName      String?
   phone         String?
+  college       String?
+  graduationYear Int?
+  gender        String?
   company       String?
   jobTitle      String?
   avatarUrl     String?

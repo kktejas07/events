@@ -12,21 +12,47 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Github, Linkedin, Sparkles, ArrowRight } from "lucide-react";
 
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  college: string;
+  graduationYear: string;
+  gender: string;
+  password: string;
+  confirmPassword: string;
+}
+
+const emptyForm: FormData = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  college: "",
+  graduationYear: "",
+  gender: "",
+  password: "",
+  confirmPassword: "",
+};
+
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [form, setForm] = useState<FormData>(emptyForm);
+
+  function update<K extends keyof FormData>(key: K, value: FormData[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match");
+      return;
+    }
+    if (form.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
       return;
     }
     setLoading(true);
@@ -38,6 +64,10 @@ export default function RegisterPage() {
           firstName: form.firstName,
           lastName: form.lastName,
           email: form.email,
+          phone: form.phone,
+          college: form.college,
+          graduationYear: form.graduationYear ? parseInt(form.graduationYear) : undefined,
+          gender: form.gender,
           password: form.password,
         }),
       });
@@ -75,7 +105,7 @@ export default function RegisterPage() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative w-full max-w-md"
+        className="relative w-full max-w-lg"
       >
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-xl">
           <motion.div
@@ -88,9 +118,7 @@ export default function RegisterPage() {
               <span className="text-2xl font-bold text-white">E</span>
             </div>
             <h1 className="text-2xl font-bold text-white">Create Account</h1>
-            <p className="mt-1 text-sm text-gray-400">
-              Register to purchase tickets and manage events
-            </p>
+            <p className="mt-1 text-sm text-gray-400">Fill in your details to get started</p>
           </motion.div>
 
           <motion.div
@@ -154,73 +182,147 @@ export default function RegisterPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label htmlFor="firstName" className="text-sm text-gray-300">
-                    First Name
+                    First Name *
                   </Label>
                   <Input
                     id="firstName"
                     placeholder="John"
                     value={form.firstName}
-                    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                    onChange={(e) => update("firstName", e.target.value)}
                     required
                     className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
                   />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="lastName" className="text-sm text-gray-300">
-                    Last Name
+                    Last Name *
                   </Label>
                   <Input
                     id="lastName"
                     placeholder="Doe"
                     value={form.lastName}
-                    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                    onChange={(e) => update("lastName", e.target.value)}
                     required
                     className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
                   />
                 </div>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="email" className="text-sm text-gray-300">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  required
-                  className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                />
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="email" className="text-sm text-gray-300">
+                    Email *
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={form.email}
+                    onChange={(e) => update("email", e.target.value)}
+                    required
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="phone" className="text-sm text-gray-300">
+                    Phone
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+91 98765 43210"
+                    value={form.phone}
+                    onChange={(e) => update("phone", e.target.value)}
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="password" className="text-sm text-gray-300">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Min 8 characters"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  required
-                  minLength={8}
-                  className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                />
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="college" className="text-sm text-gray-300">
+                    College / Institution
+                  </Label>
+                  <Input
+                    id="college"
+                    placeholder="Your college name"
+                    value={form.college}
+                    onChange={(e) => update("college", e.target.value)}
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="graduationYear" className="text-sm text-gray-300">
+                    Graduation Year
+                  </Label>
+                  <Input
+                    id="graduationYear"
+                    type="number"
+                    placeholder="2026"
+                    value={form.graduationYear}
+                    onChange={(e) => update("graduationYear", e.target.value)}
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
               </div>
+
               <div className="space-y-1">
-                <Label htmlFor="confirmPassword" className="text-sm text-gray-300">
-                  Confirm Password
+                <Label htmlFor="gender" className="text-sm text-gray-300">
+                  Gender
                 </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={form.confirmPassword}
-                  onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-                  required
-                  className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                />
+                <select
+                  id="gender"
+                  value={form.gender}
+                  onChange={(e) => update("gender", e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-0"
+                >
+                  <option value="" className="bg-[#0a0a1a]">
+                    Prefer not to say
+                  </option>
+                  <option value="male" className="bg-[#0a0a1a]">
+                    Male
+                  </option>
+                  <option value="female" className="bg-[#0a0a1a]">
+                    Female
+                  </option>
+                  <option value="other" className="bg-[#0a0a1a]">
+                    Other
+                  </option>
+                </select>
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="password" className="text-sm text-gray-300">
+                    Password *
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Min 8 characters"
+                    value={form.password}
+                    onChange={(e) => update("password", e.target.value)}
+                    required
+                    minLength={8}
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="confirmPassword" className="text-sm text-gray-300">
+                    Confirm *
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Re-enter password"
+                    value={form.confirmPassword}
+                    onChange={(e) => update("confirmPassword", e.target.value)}
+                    required
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"

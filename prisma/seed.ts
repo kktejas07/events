@@ -257,7 +257,7 @@ async function main() {
     prisma.sponsor.create({
       data: {
         name: "TechCorp",
-        logoUrl: "https://via.placeholder.com/200x80/6C5CE7/FFFFFF?text=TechCorp",
+        logoUrl: "",
         websiteUrl: "https://techcorp.com",
         tier: SponsorTier.PLATINUM,
         sortOrder: 1,
@@ -266,7 +266,7 @@ async function main() {
     prisma.sponsor.create({
       data: {
         name: "DataFlow",
-        logoUrl: "https://via.placeholder.com/200x80/00CEC9/FFFFFF?text=DataFlow",
+        logoUrl: "",
         websiteUrl: "https://dataflow.com",
         tier: SponsorTier.GOLD,
         sortOrder: 2,
@@ -275,7 +275,7 @@ async function main() {
     prisma.sponsor.create({
       data: {
         name: "CloudNine",
-        logoUrl: "https://via.placeholder.com/200x80/FDCB6E/000000?text=CloudNine",
+        logoUrl: "",
         websiteUrl: "https://cloudnine.com",
         tier: SponsorTier.SILVER,
         sortOrder: 3,

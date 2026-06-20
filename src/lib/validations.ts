@@ -42,6 +42,10 @@ export const registerSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  phone: z.string().optional(),
+  college: z.string().optional(),
+  graduationYear: z.coerce.number().int().min(1900).max(2100).optional(),
+  gender: z.enum(["male", "female", "other", ""]).optional(),
 });
 
 export const orderCreateSchema = z.object({
