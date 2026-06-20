@@ -11,6 +11,7 @@ import {
   LogOut,
   BarChart3,
   Mail,
+  Globe,
 } from "lucide-react";
 
 const sidebarLinks = [
@@ -18,6 +19,7 @@ const sidebarLinks = [
   { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/tickets", label: "Tickets", icon: Ticket },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/landing", label: "Landing Page", icon: Globe },
   { href: "/admin/sponsors", label: "Sponsors", icon: BarChart3 },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/scan", label: "Scan Tickets", icon: ScanLine },

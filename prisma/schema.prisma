@@ -428,3 +428,17 @@ model AuditLog {
 
   createdAt DateTime @default(now())
 }
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  section   String   @unique
+  data      Json
+  updatedAt DateTime @updatedAt
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

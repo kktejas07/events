@@ -28,8 +28,10 @@ import {
   Mail,
   Send,
 } from "lucide-react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
+import { useSiteContent } from "@/hooks/use-site-content";
+import { toast } from "sonner";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -58,244 +60,30 @@ const scaleIn = {
   transition: { duration: 0.6 },
 };
 
-const speakers = [
-  {
-    name: "Joshua Henry",
-    role: "Chief AI Scientist",
-    company: "OpenAI",
-    initials: "JH",
-    color: "from-purple-500 to-pink-500",
-  },
-  {
-    name: "Leila Zhang",
-    role: "VP of Machine Learning",
-    company: "Google",
-    initials: "LZ",
-    color: "from-cyan-500 to-blue-500",
-  },
-  {
-    name: "Carlos Rivera",
-    role: "Founder & CEO",
-    company: "NeuralCore",
-    initials: "CR",
-    color: "from-amber-500 to-orange-500",
-  },
-];
-
-const scheduleDays = [
-  {
-    day: "Day 1",
-    date: "Oct 1, 2026",
-    sessions: [
-      {
-        time: "08:00 - 10:00",
-        title: "Opening Keynote - The State of AI 2026",
-        speaker: "Joshua Henry",
-        type: "Keynote",
-      },
-      {
-        time: "12:00 - 14:00",
-        title: "Building Human-Centered AI Products",
-        speaker: "Leila Zhang",
-        type: "Workshop",
-      },
-      {
-        time: "16:00 - 18:00",
-        title: "AI Policy & Regulation - A Global Overview",
-        speaker: "Carlos Rivera",
-        type: "Panel",
-      },
-    ],
-  },
-  {
-    day: "Day 2",
-    date: "Oct 2, 2026",
-    sessions: [
-      {
-        time: "09:00 - 10:30",
-        title: "Ethical AI - From Theory to Practice",
-        speaker: "Leila Zhang",
-        type: "Session",
-      },
-      {
-        time: "11:00 - 12:30",
-        title: "Bias in Data - Hidden Dangers",
-        speaker: "Lisa Zhang",
-        type: "Session",
-      },
-      {
-        time: "14:00 - 15:30",
-        title: "Generative Models Beyond Text",
-        speaker: "Markus Blom",
-        type: "Workshop",
-      },
-    ],
-  },
-  {
-    day: "Day 3",
-    date: "Oct 3, 2026",
-    sessions: [
-      {
-        time: "09:00 - 10:30",
-        title: "Transformers in 2026 - What's Next?",
-        speaker: "Sofia Romero",
-        type: "Session",
-      },
-      {
-        time: "14:00 - 15:30",
-        title: "Panel: AI Regulation & Global Policy",
-        speaker: "Aisha Mensah",
-        type: "Panel",
-      },
-      {
-        time: "16:00 - 17:30",
-        title: "Embodied AI in Robotics",
-        speaker: "Leo Tanaka",
-        type: "Session",
-      },
-    ],
-  },
-];
-
-const ticketTiers = [
-  {
-    name: "Standard",
-    price: 299,
-    features: [
-      "Access to keynotes and sessions",
-      "Admission to exhibitions and demos",
-      "Networking opportunities",
-      "Digital materials and recordings",
-    ],
-    color: "from-purple-600 to-purple-400",
-    highlighted: false,
-  },
-  {
-    name: "VIP",
-    price: 699,
-    features: [
-      "All Standard benefits",
-      "VIP lounge and exclusive events",
-      "Front-row seating",
-      "VIP swag bag and exclusive content",
-    ],
-    color: "from-cyan-600 to-cyan-400",
-    highlighted: true,
-  },
-  {
-    name: "Full Access",
-    price: 1199,
-    features: [
-      "All VIP benefits",
-      "All workshops and breakout sessions",
-      "Personalized session scheduling",
-      "Speaker meet-and-greet & after party",
-    ],
-    color: "from-amber-500 to-orange-400",
-    highlighted: false,
-  },
-  {
-    name: "Virtual",
-    price: 99,
-    features: [
-      "Live-streamed keynotes and workshops",
-      "On-demand session recordings",
-      "Interactive Q&A with speakers",
-      "Virtual networking and digital swag",
-    ],
-    color: "from-emerald-600 to-emerald-400",
-    highlighted: false,
-  },
-];
-
-const sponsors = [
-  { name: "TechCorp", tier: "Platinum", initials: "TC", color: "#7C3AED" },
-  { name: "DataFlow", tier: "Gold", initials: "DF", color: "#06B6D4" },
-  { name: "CloudNine", tier: "Silver", initials: "C9", color: "#F59E0B" },
-  { name: "NeuralCore", tier: "Platinum", initials: "NC", color: "#8B5CF6" },
-  { name: "SynthMind", tier: "Gold", initials: "SM", color: "#10B981" },
-  { name: "VisionFlow", tier: "Silver", initials: "VF", color: "#EC4899" },
-  { name: "QuantumLeap", tier: "Platinum", initials: "QL", color: "#3B82F6" },
-  { name: "DataSphere", tier: "Gold", initials: "DS", color: "#F97316" },
-];
-
-const faqs = [
-  {
-    q: "What is the AI Summit 2026?",
-    a: "A premier event gathering leading AI experts, thought leaders, and innovators featuring keynotes, workshops, panels, and networking opportunities.",
-  },
-  {
-    q: "How can I register for the event?",
-    a: "You can register through our website. Simply choose your ticket type and fill out the registration form. After payment confirmation, you'll receive your tickets via email.",
-  },
-  {
-    q: "Can I transfer my ticket?",
-    a: "Tickets are transferable up to 7 days before the event. Please contact our support team for assistance with the transfer process.",
-  },
-  {
-    q: "Will there be virtual participation?",
-    a: "Yes! Virtual tickets are available providing access to live-streamed sessions, workshops, and networking opportunities online.",
-  },
-  {
-    q: "What is the refund policy?",
-    a: "Full refunds are available up to 14 days before the event. Partial refunds (50%) are available up to 7 days before the event.",
-  },
-  {
-    q: "Is there parking at the venue?",
-    a: "Yes, complimentary parking is available for all attendees. The venue is also accessible via public transit.",
-  },
-];
-
-const testimonials = [
-  {
-    quote:
-      "Artificial intelligence is advancing rapidly, and while it offers immense opportunity, it also poses significant risks. If not properly regulated and aligned with human values, AI could become a fundamental threat to civilization.",
-    name: "Elon Musk",
-    role: "Technologist & Entrepreneur",
-    initials: "EM",
-    color: "from-purple-500 to-pink-500",
-    rating: 5,
-  },
-  {
-    quote:
-      "AI is going to change the world more than anything in the history of mankind. More than electricity. We need to make sure that it's a force for good and benefits all of humanity.",
-    name: "Dr. Fei-Fei Li",
-    role: "AI Researcher & Professor",
-    initials: "FL",
-    color: "from-cyan-500 to-blue-500",
-    rating: 5,
-  },
-  {
-    quote:
-      "The development of full artificial intelligence could spell the end of the human race. We must proceed with extreme caution while continuing to push the boundaries of what's possible.",
-    name: "Stephen Hawking",
-    role: "Theoretical Physicist",
-    initials: "SH",
-    color: "from-amber-500 to-orange-500",
-    rating: 5,
-  },
-  {
-    quote:
-      "Machine intelligence is the last invention that humanity will ever need to make. The key is ensuring it remains aligned with human values and serves as an extension of our collective will.",
-    name: "Nick Bostrom",
-    role: "Director, Future of Humanity Institute",
-    initials: "NB",
-    color: "from-emerald-500 to-teal-500",
-    rating: 5,
-  },
-];
-
-function TestimonialCarousel() {
+function TestimonialCarousel({
+  testimonials,
+}: {
+  testimonials: {
+    quote: string;
+    name: string;
+    role: string;
+    initials: string;
+    color: string;
+    rating: number;
+  }[];
+}) {
   const [active, setActive] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || !testimonials.length) return;
     const id = setInterval(() => {
       setActive((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(id);
-  }, [isPaused]);
+  }, [isPaused, testimonials.length]);
+
+  if (!testimonials.length) return null;
 
   return (
     <div
@@ -386,57 +174,11 @@ function FAQItem({
   );
 }
 
-function FloatingOrb({
-  className,
-  delay = 0,
-  size = "h-64 w-64",
-}: {
-  className: string;
-  delay?: number;
-  size?: string;
-}) {
-  return (
-    <div
-      className={`animate-float absolute rounded-full blur-3xl ${size} ${className}`}
-      style={{ animationDelay: `${delay}s` }}
-    />
-  );
-}
-
-function CodePattern() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  const symbols = ["{", "}", "<", "/>", "AI", "ML", "API", "[]", "()", "=>"];
-  return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.03]">
-      <div className="flex flex-wrap gap-8">
-        {Array.from({ length: 30 }).map((_, i) => (
-          <span
-            key={i}
-            className="text-6xl font-bold text-white"
-            style={
-              mounted
-                ? {
-                    animation: `pulse-glow ${3 + Math.random() * 4}s infinite ${Math.random() * 4}s`,
-                  }
-                : undefined
-            }
-          >
-            {symbols[i % 10]}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function CountdownTimer() {
+function CountdownTimer({ target: targetDate }: { target?: string }) {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const target = new Date("2026-10-01T09:00:00");
+    const target = targetDate ? new Date(targetDate) : new Date("2026-10-01T09:00:00");
     const tick = () => {
       const diff = Math.max(0, target.getTime() - Date.now());
       setTime({
@@ -449,7 +191,7 @@ function CountdownTimer() {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [targetDate]);
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -471,108 +213,149 @@ function CountdownTimer() {
 }
 
 export default function HomePage() {
+  const { content } = useSiteContent();
   const [activeDay, setActiveDay] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95]);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (heroRef.current) {
-        const rect = heroRef.current.getBoundingClientRect();
-        setMousePos({
-          x: ((e.clientX - rect.left) / rect.width - 0.5) * 2,
-          y: ((e.clientY - rect.top) / rect.height - 0.5) * 2,
-        });
+  const hero = content.hero as Record<string, string>;
+  const benefitsFromContent =
+    (
+      content.whyAttend as {
+        benefits?: Array<{ icon: string; title: string; description: string }>;
       }
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    )?.benefits ?? [];
+  const statsFromContent =
+    (content.stats as Array<{ icon: string; value: string; label: string }>) ?? [];
+  const speakersFromContent =
+    (
+      content.speakers as {
+        badge?: string;
+        title?: string;
+        description?: string;
+        items?: Array<{
+          name: string;
+          role: string;
+          company: string;
+          initials: string;
+          color: string;
+        }>;
+      }
+    )?.items ?? [];
+  const scheduleFromContent =
+    (
+      content.schedule as {
+        badge?: string;
+        title?: string;
+        days?: Array<{
+          day: string;
+          date: string;
+          sessions: Array<{ time: string; title: string; speaker: string; type: string }>;
+        }>;
+      }
+    )?.days ?? [];
+  const ticketsFromContent =
+    (
+      content.tickets as {
+        badge?: string;
+        title?: string;
+        description?: string;
+        tiers?: Array<{
+          name: string;
+          price: number;
+          features: string[];
+          color: string;
+          highlighted: boolean;
+        }>;
+      }
+    )?.tiers ?? [];
+  const sponsorsFromContent =
+    (
+      content.sponsors as {
+        badge?: string;
+        title?: string;
+        description?: string;
+        items?: Array<{ name: string; tier: string; initials: string; color: string }>;
+      }
+    )?.items ?? [];
+  const faqsFromContent =
+    (content.faq as { badge?: string; title?: string; items?: Array<{ q: string; a: string }> })
+      ?.items ?? [];
+  const testimonialsFromContent =
+    (content.testimonials as Array<{
+      quote: string;
+      name: string;
+      role: string;
+      initials: string;
+      color: string;
+      rating: number;
+    }>) ?? [];
+  const aboutContent = content.about as Record<string, string>;
+  const whyAttendContent = content.whyAttend as Record<string, string>;
+  const ticketHeader = content.tickets as { badge?: string; title?: string; description?: string };
+  const sponsorHeader = content.sponsors as {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
+  const faqHeader = content.faq as { badge?: string; title?: string };
+  const speakerHeader = content.speakers as {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
+  const scheduleHeader = content.schedule as { badge?: string; title?: string };
+  const newsletterContent = content.newsletter as Record<string, string>;
+  const ctaContent = content.cta as Record<string, string>;
+  const marqueeTexts = (content.marquee as string[]) ?? [];
+  const quoteMarqueeTexts =
+    ((content.quoteMarquee as { texts?: string[] })?.texts as string[]) ?? [];
 
-  const benefits = [
-    {
-      icon: Lightbulb,
-      title: "Cutting-Edge Knowledge",
-      description:
-        "Stay ahead of the curve with insights from AI leaders shaping tomorrow's technology.",
-    },
-    {
-      icon: FlaskConical,
-      title: "Hands-On Learning",
-      description:
-        "Join live workshops and labs to build practical skills in AI and machine learning.",
-    },
-    {
-      icon: Globe,
-      title: "Global Networking",
-      description:
-        "Meet developers, founders, and researchers from around the world to collaborate.",
-    },
-    {
-      icon: Monitor,
-      title: "Startup Showcase",
-      description:
-        "Explore the latest AI tools and ideas from promising startups and research labs.",
-    },
-    {
-      icon: Briefcase,
-      title: "AI Career Boost",
-      description: "Access exclusive job fairs, mentorship sessions, and recruiting events.",
-    },
-    {
-      icon: HeartHandshake,
-      title: "Ethics & Future",
-      description:
-        "Engage in vital conversations around AI ethics, policy, and the future of intelligence.",
-    },
-  ];
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    Lightbulb,
+    FlaskConical,
+    Globe,
+    Monitor,
+    Briefcase,
+    HeartHandshake,
+    Users,
+    Mic,
+    Calendar,
+    Star,
+    MapPin,
+  };
 
-  const stats = [
-    { icon: Users, value: "5,000+", label: "Attendees" },
-    { icon: Mic, value: "50+", label: "Speakers" },
-    { icon: Calendar, value: "5 Days", label: "Conference" },
-    { icon: Star, value: "100+", label: "Sessions" },
-  ];
+  const stats = statsFromContent.map((s) => ({ ...s, Icon: iconMap[s.icon] }));
+  const benefits = benefitsFromContent.map((b) => ({
+    ...b,
+    Icon: iconMap[b.icon as keyof typeof iconMap] || Lightbulb,
+  }));
 
   return (
     <>
-      <motion.section
+      <section
         ref={heroRef}
-        style={{ opacity: heroOpacity }}
-        className="relative flex min-h-screen items-center overflow-hidden bg-[#0a0a1a]"
+        className="relative -mt-16 flex h-dvh items-center justify-center overflow-hidden bg-[#0a0a1a]"
       >
-        <div className="animate-hero-mesh absolute inset-0" />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source src="/videos/hero-background.mp4" type="video/mp4" />
+        </video>
 
-        <FloatingOrb className="left-1/4 top-1/4 bg-purple-500/20" delay={0} />
-        <FloatingOrb className="right-1/4 top-1/3 bg-cyan-500/10" delay={2} size="h-96 w-96" />
-        <FloatingOrb className="bottom-1/4 left-1/3 bg-pink-500/10" delay={4} />
-        <FloatingOrb className="right-1/3 top-2/3 bg-violet-500/10" delay={6} />
-        <FloatingOrb className="bottom-1/3 left-2/3 bg-amber-500/10" delay={3} size="h-48 w-48" />
-        <FloatingOrb className="right-1/2 top-1/2 bg-emerald-500/10" delay={5} size="h-56 w-56" />
-
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a1a] via-transparent to-[#0a0a1a]/30" />
 
         <motion.div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            background: `radial-gradient(circle at ${50 + mousePos.x * 10}% ${50 + mousePos.y * 10}%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)`,
-            transition: "background 0.3s ease",
-          }}
-        />
-
-        <CodePattern />
-
-        <motion.div className="container relative z-10" style={{ scale: heroScale }}>
+          className="container relative z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <motion.div
               initial={{ opacity: 0, x: -60 }}
@@ -600,7 +383,7 @@ export default function HomePage() {
                 </span>
               </motion.h1>
               <motion.p
-                className="mt-4 max-w-lg text-lg leading-relaxed text-gray-400"
+                className="mt-4 max-w-lg text-lg leading-relaxed text-gray-300"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
@@ -659,7 +442,7 @@ export default function HomePage() {
                     key={stat.label}
                     className="rounded-lg border border-white/10 bg-white/5 p-3 text-center backdrop-blur-sm transition-all duration-300 hover:border-purple-500/30 hover:bg-white/10"
                   >
-                    <stat.icon className="mx-auto h-5 w-5 text-purple-400" />
+                    <stat.Icon className="mx-auto h-5 w-5 text-purple-400" />
                     <div className="mt-1 text-xl font-bold text-white">{stat.value}</div>
                     <div className="text-xs text-gray-400">{stat.label}</div>
                   </div>
@@ -709,7 +492,7 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0a1a] to-transparent" />
 
         <motion.div
           className="absolute bottom-6 left-0 right-0 z-20 hidden px-4 lg:block"
@@ -724,7 +507,7 @@ export default function HomePage() {
               </p>
               <p className="text-sm text-gray-400">Book Your Seat Now</p>
             </div>
-            <CountdownTimer />
+            <CountdownTimer target={hero?.countdownTarget} />
             <div className="hidden items-center gap-3 sm:flex">
               <MapPin className="h-5 w-5 shrink-0 text-purple-400" />
               <p className="text-sm text-gray-400">121 AI Blvd, San Francisco, CA 94107</p>
@@ -746,24 +529,27 @@ export default function HomePage() {
             </motion.div>
           </div>
         </motion.a>
-      </motion.section>
+      </section>
 
       <motion.section
         id="about"
         className="overflow-hidden border-y border-white/5 bg-[#0a0a1a] py-5"
         {...fadeInUp}
       >
-        <div className="flex whitespace-nowrap">
+        <div className="w-full overflow-hidden whitespace-nowrap">
           <div className="animate-marquee flex gap-16 text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
             {Array.from({ length: 2 }).flatMap((_, setIdx) =>
-              [
-                "Next Intelligence",
-                "Future Now",
-                "Empowering Innovation",
-                "Smarter Tomorrow",
-                "Think Forward",
-                "Cognitive Shift",
-              ].map((text, i) => (
+              (marqueeTexts.length
+                ? marqueeTexts
+                : [
+                    "Next Intelligence",
+                    "Future Now",
+                    "Empowering Innovation",
+                    "Smarter Tomorrow",
+                    "Think Forward",
+                    "Cognitive Shift",
+                  ]
+              ).map((text, i) => (
                 <span key={`${setIdx}-${i}`} className="flex items-center gap-16">
                   <span>{text}</span>
                   <span className="h-2 w-2 rounded-full bg-purple-500/50" />
@@ -847,17 +633,18 @@ export default function HomePage() {
       </section>
 
       <section className="bg-[#0a0a1a] py-4">
-        <div className="bg-gradient-to-r from-purple-600/20 via-cyan-600/20 to-purple-600/20 py-4">
+        <div className="w-full overflow-hidden bg-gradient-to-r from-purple-600/20 via-cyan-600/20 to-purple-600/20 py-4">
           <div className="animate-marquee-reverse flex whitespace-nowrap text-3xl font-bold uppercase tracking-widest text-white/10">
             {Array.from({ length: 3 }).flatMap((_, setIdx) =>
-              ["Next Intelligence", "Future Now", "Empowering Innovation", "Smarter Tomorrow"].map(
-                (text, i) => (
-                  <span key={`${setIdx}-${i}`} className="mx-8 flex items-center gap-8">
-                    <span>{text}</span>
-                    <span className="h-3 w-3 rounded-full bg-purple-500/30" />
-                  </span>
-                )
-              )
+              (quoteMarqueeTexts.length
+                ? quoteMarqueeTexts
+                : ["Next Intelligence", "Future Now", "Empowering Innovation", "Smarter Tomorrow"]
+              ).map((text, i) => (
+                <span key={`${setIdx}-${i}`} className="mx-8 flex items-center gap-8">
+                  <span>{text}</span>
+                  <span className="h-3 w-3 rounded-full bg-purple-500/30" />
+                </span>
+              ))
             )}
           </div>
         </div>
@@ -895,7 +682,7 @@ export default function HomePage() {
                 <Card className="group h-full border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10">
                   <CardContent className="p-6">
                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400 transition-all duration-300 group-hover:scale-110 group-hover:bg-purple-500/20">
-                      <item.icon className="h-5 w-5" />
+                      <item.Icon className="h-5 w-5" />
                     </div>
                     <h3 className="text-lg font-semibold">{item.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
@@ -937,7 +724,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <TestimonialCarousel />
+            <TestimonialCarousel testimonials={testimonialsFromContent} />
           </motion.div>
         </div>
       </motion.section>
@@ -968,7 +755,7 @@ export default function HomePage() {
             whileInView="whileInView"
             viewport={{ once: true, margin: "-80px" }}
           >
-            {speakers.map((s) => (
+            {speakersFromContent.map((s) => (
               <motion.div
                 key={s.name}
                 variants={staggerItem}
@@ -1012,7 +799,7 @@ export default function HomePage() {
             </h2>
           </motion.div>
           <div className="mt-10 flex flex-wrap justify-center gap-2">
-            {scheduleDays.map((d, i) => (
+            {scheduleFromContent.map((d, i) => (
               <button
                 key={i}
                 onClick={() => setActiveDay(i)}
@@ -1032,7 +819,7 @@ export default function HomePage() {
               transition={{ duration: 0.3 }}
               className="mt-8 space-y-4"
             >
-              {scheduleDays[activeDay].sessions.map((session, i) => (
+              {scheduleFromContent[activeDay].sessions.map((session, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, x: -20 }}
@@ -1073,7 +860,7 @@ export default function HomePage() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#0a0a1a] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#0a0a1a] to-transparent" />
             <div className="animate-marquee flex gap-16 hover:[animation-play-state:paused]">
-              {[...sponsors, ...sponsors].map((sp, i) => (
+              {[...sponsorsFromContent, ...sponsorsFromContent].map((sp, i) => (
                 <div
                   key={i}
                   className="flex shrink-0 items-center gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-6 py-3 transition-all duration-300 hover:border-purple-500/30 hover:bg-white/[0.06]"
@@ -1120,7 +907,7 @@ export default function HomePage() {
             whileInView="whileInView"
             viewport={{ once: true, margin: "-80px" }}
           >
-            {ticketTiers.map((tier) => (
+            {ticketsFromContent.map((tier) => (
               <motion.div
                 key={tier.name}
                 variants={staggerItem}
@@ -1189,7 +976,7 @@ export default function HomePage() {
             whileInView="whileInView"
             viewport={{ once: true, margin: "-80px" }}
           >
-            {sponsors.slice(0, 8).map((sp) => (
+            {sponsorsFromContent.slice(0, 8).map((sp) => (
               <motion.div
                 key={sp.name}
                 variants={staggerItem}
@@ -1247,7 +1034,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {faqs.map((faq, i) => (
+            {faqsFromContent.map((faq, i) => (
               <FAQItem
                 key={i}
                 q={faq.q}
@@ -1274,23 +1061,43 @@ export default function HomePage() {
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-cyan-600 shadow-lg shadow-purple-600/20">
                   <Mail className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="mt-4 text-2xl font-bold text-white sm:text-3xl">Stay in the Loop</h2>
+                <h2 className="mt-4 text-2xl font-bold text-white sm:text-3xl">
+                  {newsletterContent?.title || "Stay in the Loop"}
+                </h2>
                 <p className="mt-2 text-sm text-gray-400">
-                  Get the latest event updates, speaker announcements, and exclusive offers
-                  delivered straight to your inbox.
+                  {newsletterContent?.description ||
+                    "Get the latest event updates, speaker announcements, and exclusive offers delivered straight to your inbox."}
                 </p>
               </div>
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  alert("Thanks for subscribing! (Demo)");
+                  const email = (e.currentTarget.elements.namedItem("email") as HTMLInputElement)
+                    ?.value;
+                  try {
+                    const res = await fetch("/api/newsletter/subscribe", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email }),
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      toast.success(data.message || "Subscribed!");
+                      (e.target as HTMLFormElement).reset();
+                    } else {
+                      toast.error(data.error || "Subscription failed");
+                    }
+                  } catch {
+                    toast.error("Network error. Please try again.");
+                  }
                 }}
                 className="mt-6 space-y-4"
               >
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <input
+                    name="email"
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder={newsletterContent?.placeholder || "Enter your email address"}
                     required
                     className="flex-1 rounded-lg border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition-all duration-300 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20"
                   />
@@ -1298,15 +1105,15 @@ export default function HomePage() {
                     type="submit"
                     className="gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
                   >
-                    Subscribe
+                    {newsletterContent?.buttonText || "Subscribe"}
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
                 <label className="flex items-start gap-2 text-left text-xs text-gray-500">
                   <input type="checkbox" required className="mt-0.5 accent-purple-500" />{" "}
                   <span>
-                    I agree to receive event updates and acknowledge the Privacy Policy. You can
-                    unsubscribe at any time.
+                    {newsletterContent?.consentLabel ||
+                      "I agree to receive event updates and acknowledge the Privacy Policy. You can unsubscribe at any time."}
                   </span>
                 </label>
               </form>
