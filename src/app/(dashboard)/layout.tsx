@@ -4,14 +4,14 @@ import { Ticket, User, LayoutDashboard, LogOut } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen">
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r bg-card lg:block">
-        <div className="flex h-16 items-center gap-2 border-b px-6">
+    <div className="flex min-h-screen bg-[#0a0a1a]">
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-white/10 bg-[#0a0a1a] lg:block">
+        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-6">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-lg font-bold text-primary-foreground">E</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 shadow-lg shadow-purple-600/30">
+              <span className="text-lg font-bold text-white">E</span>
             </div>
-            <span className="text-lg font-bold">Events</span>
+            <span className="text-lg font-bold text-white">Events</span>
           </Link>
         </div>
         <nav
@@ -19,24 +19,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           style={{ height: "calc(100vh - 64px)" }}
         >
           <Link href="/my-tickets">
-            <Button variant="ghost" className="w-full justify-start gap-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-gray-400 hover:bg-white/10 hover:text-white"
+            >
               <Ticket className="h-4 w-4" /> My Tickets
             </Button>
           </Link>
           <Link href="/profile">
-            <Button variant="ghost" className="w-full justify-start gap-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-gray-400 hover:bg-white/10 hover:text-white"
+            >
               <User className="h-4 w-4" /> Profile
             </Button>
           </Link>
           <Link href="/admin">
-            <Button variant="ghost" className="w-full justify-start gap-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-gray-400 hover:bg-white/10 hover:text-white"
+            >
               <LayoutDashboard className="h-4 w-4" /> Admin
             </Button>
           </Link>
         </nav>
-        <div className="absolute bottom-0 w-64 border-t bg-card p-3">
+        <div className="absolute bottom-0 w-64 border-t border-white/10 bg-[#0a0a1a] p-3">
           <Link href="/api/auth/signout">
-            <Button variant="ghost" className="w-full justify-start gap-3 text-red-500">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+            >
               <LogOut className="h-4 w-4" /> Sign Out
             </Button>
           </Link>

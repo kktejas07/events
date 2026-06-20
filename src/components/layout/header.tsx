@@ -19,13 +19,13 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#0a0a1a]/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-lg font-bold text-primary-foreground">E</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 shadow-lg shadow-purple-600/30">
+            <span className="text-lg font-bold text-white">E</span>
           </div>
-          <span className="text-xl font-bold text-foreground">Events</span>
+          <span className="text-xl font-bold text-white">Events</span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -33,7 +33,7 @@ export function Header() {
             <Link
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm font-medium text-gray-400 transition-colors hover:text-white"
             >
               {link.label}
             </Link>
@@ -42,19 +42,28 @@ export function Header() {
 
         <div className="hidden items-center gap-3 md:flex">
           <Link href="/login">
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 hover:bg-white/10 hover:text-white"
+            >
               Sign In
             </Button>
           </Link>
           <Link href="/register">
-            <Button size="sm">Get Tickets</Button>
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl"
+            >
+              Get Tickets
+            </Button>
           </Link>
         </div>
 
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="text-white hover:bg-white/10 md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -62,13 +71,13 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t bg-background md:hidden">
+        <div className="border-t border-white/10 bg-[#0a0a1a] md:hidden">
           <nav className="container flex flex-col gap-2 py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="rounded-md px-3 py-2 text-sm font-medium text-gray-400 hover:bg-white/10 hover:text-white"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
@@ -76,12 +85,19 @@ export function Header() {
             ))}
             <div className="flex gap-2 pt-2">
               <Link href="/login" className="flex-1">
-                <Button variant="outline" className="w-full" size="sm">
+                <Button
+                  variant="outline"
+                  className="w-full border-white/10 text-white hover:bg-white/10"
+                  size="sm"
+                >
                   Sign In
                 </Button>
               </Link>
               <Link href="/register" className="flex-1">
-                <Button className="w-full" size="sm">
+                <Button
+                  className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+                  size="sm"
+                >
                   Get Tickets
                 </Button>
               </Link>
