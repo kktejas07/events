@@ -545,7 +545,7 @@ export default function HomePage() {
         style={{ opacity: heroOpacity }}
         className="relative flex min-h-screen items-center overflow-hidden bg-[#0a0a1a]"
       >
-        <div className="animate-gradient absolute inset-0 bg-gradient-to-br from-purple-900/40 via-[#0a0a1a] to-cyan-900/30" />
+        <div className="animate-hero-mesh absolute inset-0" />
 
         <FloatingOrb className="left-1/4 top-1/4 bg-purple-500/20" delay={0} />
         <FloatingOrb className="right-1/4 top-1/3 bg-cyan-500/10" delay={2} size="h-96 w-96" />
@@ -731,6 +731,21 @@ export default function HomePage() {
             </div>
           </div>
         </motion.div>
+
+        <motion.a
+          href="#about"
+          className="absolute bottom-2 left-1/2 z-20 -translate-x-1/2 lg:hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.6 }}
+        >
+          <div className="flex flex-col items-center gap-1 text-gray-500">
+            <span className="text-[10px] uppercase tracking-widest">Scroll</span>
+            <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+              <ChevronDown className="h-5 w-5" />
+            </motion.div>
+          </div>
+        </motion.a>
       </motion.section>
 
       <motion.section
