@@ -16,7 +16,7 @@ import {
   Sparkles,
   MoveRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 interface EventData {
   id: string;
@@ -78,6 +78,21 @@ const staggerItem = {
 
 export default function EventDetailClient({ event }: { event: EventData }) {
   const [activeDay, setActiveDay] = useState(0);
+  const ticketScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ticketScrollRef.current;
+    if (!el) return;
+    let pos = 0;
+    const cardW = 324;
+    const interval = setInterval(() => {
+      const max = el.scrollWidth - el.clientWidth;
+      pos += cardW;
+      if (pos > max) pos = 0;
+      el.scrollTo({ left: pos, behavior: "smooth" });
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
 
   const start = new Date(event.startDate);
   const end = new Date(event.endDate);
@@ -292,6 +307,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#0a0a1a] to-transparent" />
 
             <div
+              ref={ticketScrollRef}
               className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
@@ -300,10 +316,10 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                 return (
                   <motion.div
                     key={tier.id}
-                    className={`group relative flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] self-stretch ${
+                    className={`group relative flex w-[280px] shrink-0 snap-start flex-col self-stretch overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] ${
                       isHighlighted
                         ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
-                        : "border border-white/10 bg-white/[0.02] hover:border-purple-500/30 hover:bg-white/[0.04]"
+                        : "border border-white/10 bg-white/[0.02] opacity-70 hover:border-purple-500/30 hover:bg-white/[0.04] hover:opacity-100"
                     }`}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
