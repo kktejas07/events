@@ -770,34 +770,18 @@ export default function HomePageClient({
         className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
         {...fadeInUp}
       >
-        {/* Background illustration */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
-          <div className="absolute -left-20 top-10 h-80 w-80 rounded-full bg-purple-500 blur-3xl" />
-          <div className="absolute -right-20 bottom-10 h-96 w-96 rounded-full bg-cyan-500 blur-3xl" />
-          <svg
-            className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2"
-            viewBox="0 0 200 200"
-          >
-            <circle
-              cx="100"
-              cy="100"
-              r="80"
-              fill="none"
-              stroke="white"
-              strokeWidth="0.3"
-              strokeDasharray="4 8"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r="60"
-              fill="none"
-              stroke="white"
-              strokeWidth="0.2"
-              strokeDasharray="2 6"
-            />
-            <circle cx="100" cy="100" r="40" fill="none" stroke="white" strokeWidth="0.4" />
-          </svg>
+        {/* Background pattern */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-20 top-10 h-80 w-80 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="absolute -right-20 bottom-10 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, rgba(168, 85, 247, 0.15) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
+          />
         </div>
         <div className="container relative">
           <motion.div
@@ -1062,23 +1046,18 @@ export default function HomePageClient({
         className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
         {...fadeInUp}
       >
-        {/* Background illustration */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.04]">
-          <div className="absolute left-1/4 top-0 h-64 w-64 rounded-full bg-purple-500 blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 h-48 w-48 rounded-full bg-cyan-500 blur-3xl" />
-          <svg className="absolute left-0 top-0 h-full w-full" viewBox="0 0 400 200">
-            <pattern
-              id="sponsorGrid"
-              x="0"
-              y="0"
-              width="60"
-              height="60"
-              patternUnits="userSpaceOnUse"
-            >
-              <circle cx="30" cy="30" r="1" fill="white" opacity="0.5" />
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#sponsorGrid)" />
-          </svg>
+        {/* Background pattern */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/4 top-0 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-15"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, rgba(255,255,255,0.08) 0.5px, transparent 0.5px)",
+              backgroundSize: "30px 30px",
+            }}
+          />
         </div>
         <div className="container relative">
           <motion.div
@@ -1249,29 +1228,18 @@ export default function HomePageClient({
       </motion.section>
 
       <motion.section id="newsletter" className="relative bg-[#0a0a1a] py-24" {...fadeInUp}>
-        {/* Background illustration */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.04]">
-          <div className="absolute -left-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-purple-500 blur-3xl" />
-          <div className="absolute -right-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-cyan-500 blur-3xl" />
-          <svg
-            className="absolute left-1/2 top-0 h-full w-[800px] -translate-x-1/2"
-            viewBox="0 0 400 300"
-          >
-            <path
-              d="M0 150 Q100 50 200 150 T400 150"
-              fill="none"
-              stroke="white"
-              strokeWidth="0.3"
-              opacity="0.5"
-            />
-            <path
-              d="M0 180 Q100 80 200 180 T400 180"
-              fill="none"
-              stroke="white"
-              strokeWidth="0.2"
-              opacity="0.3"
-            />
-          </svg>
+        {/* Background pattern */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="absolute -right-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(168,85,247,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,0.05) 1px, transparent 1px)",
+              backgroundSize: "80px 80px",
+            }}
+          />
         </div>
         <div className="container relative">
           <div className="mx-auto max-w-2xl">
