@@ -772,10 +772,8 @@ export default function HomePageClient({
       >
         {/* Background layers */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-[#0a0a1a] to-cyan-900/10" />
-          <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-purple-600/10 blur-[120px]" />
-          <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-cyan-600/10 blur-[120px]" />
-          <div className="absolute left-1/3 top-1/4 h-[300px] w-[300px] rounded-full bg-violet-500/8 blur-[100px]" />
+          <div className="absolute -left-20 top-10 h-80 w-80 rounded-full bg-purple-500/5 blur-3xl" />
+          <div className="absolute -right-20 bottom-10 h-96 w-96 rounded-full bg-cyan-500/5 blur-3xl" />
         </div>
         <div className="container relative">
           <motion.div
@@ -1037,14 +1035,19 @@ export default function HomePageClient({
 
       <motion.section
         id="sponsors"
-        className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
+        className="relative border-y border-white/5 py-24"
+        style={{
+          backgroundImage: "url('/images/bg-sponsors.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
         {...fadeInUp}
       >
         {/* Background layers */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/15 via-[#0a0a1a] to-purple-900/10" />
-          <div className="absolute -right-20 -top-20 h-[400px] w-[400px] rounded-full bg-purple-500/10 blur-[100px]" />
-          <div className="absolute -bottom-20 -left-20 h-[400px] w-[400px] rounded-full bg-cyan-500/10 blur-[100px]" />
+          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-purple-500/5 blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-cyan-500/5 blur-3xl" />
         </div>
         <div className="container relative">
           <motion.div
@@ -1108,8 +1111,14 @@ export default function HomePageClient({
       {featuredEvent && (
         <motion.section
           id="venue"
-          className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
-          {...fadeInUp}
+        className="relative border-y border-white/5 py-24"
+        style={{
+          backgroundImage: "url('/images/bg-testimonials.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+        {...fadeInUp}
         >
           <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
             <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
@@ -1214,17 +1223,21 @@ export default function HomePageClient({
         </div>
       </motion.section>
 
-      <motion.section id="newsletter" className="relative bg-[#0a0a1a] py-24" {...fadeInUp}>
+      <motion.section
+        id="newsletter"
+        className="relative py-24"
+        style={{
+          backgroundImage: "url('/images/bg-newsletter.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+        {...fadeInUp}
+      >
         {/* Background pattern */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-purple-500/15 blur-[100px]" />
-          <div className="absolute -right-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-cyan-500/15 blur-[100px]" />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: "linear-gradient(180deg, rgba(10,10,26,0) 0%, rgba(168,85,247,0.04) 50%, rgba(10,10,26,0) 100%)",
-            }}
-          />
+          <div className="absolute -left-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
+          <div className="absolute -right-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-cyan-500/5 blur-3xl" />
         </div>
         <div className="container relative">
           <div className="mx-auto max-w-2xl">
