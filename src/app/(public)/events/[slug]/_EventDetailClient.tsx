@@ -82,17 +82,22 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
   useEffect(() => {
     const el = ticketScrollRef.current;
-    if (!el) return;
-    let pos = 0;
+    if (!el || event.ticketTypes.length < 2) return;
+    const duplicated = [...event.ticketTypes, ...event.ticketTypes];
     const cardW = 324;
-    const interval = setInterval(() => {
-      const max = el.scrollWidth - el.clientWidth;
-      pos += cardW;
-      if (pos > max) pos = 0;
-      el.scrollTo({ left: pos, behavior: "smooth" });
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
+    const totalW = duplicated.length * cardW;
+    let pos = 0;
+    let rafId: number;
+    const speed = 0.4;
+    const animate = () => {
+      pos += speed;
+      if (pos >= totalW / 2) pos = 0;
+      el.scrollLeft = pos;
+      rafId = requestAnimationFrame(animate);
+    };
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [event.ticketTypes]);
 
   const start = new Date(event.startDate);
   const end = new Date(event.endDate);
@@ -308,15 +313,15 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
             <div
               ref={ticketScrollRef}
-              className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
+              className="flex gap-6 overflow-hidden"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {event.ticketTypes.map((tier, i) => {
+              {[...event.ticketTypes, ...event.ticketTypes].map((tier, i) => {
                 const isHighlighted = i === 1;
                 return (
                   <motion.div
-                    key={tier.id}
-                    className={`group relative flex w-[280px] shrink-0 snap-start flex-col self-stretch overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] ${
+                    key={`${tier.id}-${i}`}
+                    className={`group relative flex w-[280px] shrink-0 flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 sm:w-[300px] ${
                       isHighlighted
                         ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
                         : "border border-white/10 bg-white/[0.02] opacity-70 hover:border-purple-500/30 hover:bg-white/[0.04] hover:opacity-100"

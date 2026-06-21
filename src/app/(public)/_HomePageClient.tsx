@@ -225,20 +225,6 @@ export default function HomePageClient({
   const ticketScrollRef = useRef<HTMLDivElement>(null);
   const eventTicketScrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const el = ticketScrollRef.current;
-    if (!el) return;
-    let pos = 0;
-    const cardW = 324;
-    const interval = setInterval(() => {
-      const max = el.scrollWidth - el.clientWidth;
-      pos += cardW;
-      if (pos > max) pos = 0;
-      el.scrollTo({ left: pos, behavior: "smooth" });
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
-
   const hero = content.hero as Record<string, string>;
   const benefitsFromContent =
     (
@@ -368,6 +354,25 @@ export default function HomePageClient({
             : ["#7C3AED", "#06B6D4", "#F59E0B", "#8B5CF6", "#10B981", "#EC4899"][s.name.length % 6],
         }))
       : sponsorsFromContent;
+
+  useEffect(() => {
+    const el = ticketScrollRef.current;
+    if (!el || displayTickets.length < 2) return;
+    const duplicated = [...displayTickets, ...displayTickets];
+    const cardW = 324;
+    const totalW = duplicated.length * cardW;
+    let pos = 0;
+    let rafId: number;
+    const speed = 0.4;
+    const animate = () => {
+      pos += speed;
+      if (pos >= totalW / 2) pos = 0;
+      el.scrollLeft = pos;
+      rafId = requestAnimationFrame(animate);
+    };
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [displayTickets]);
 
   const marqueeTexts = (content.marquee as string[]) ?? [];
   const quoteMarqueeTexts =
@@ -940,13 +945,13 @@ export default function HomePageClient({
 
             <div
               ref={ticketScrollRef}
-              className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
+              className="flex gap-6 overflow-hidden"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {displayTickets.map((tier, idx) => (
+              {[...displayTickets, ...displayTickets].map((tier, idx) => (
                 <motion.div
-                  key={tier.name}
-                  className={`group relative flex w-[280px] shrink-0 snap-start flex-col self-stretch overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] ${
+                  key={`${tier.name}-${idx}`}
+                  className={`group relative flex w-[280px] shrink-0 flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 sm:w-[300px] ${
                     tier.highlighted
                       ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
                       : "border border-white/10 bg-white/[0.02] opacity-70 hover:border-purple-500/30 hover:bg-white/[0.04] hover:opacity-100"
