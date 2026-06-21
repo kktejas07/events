@@ -391,6 +391,7 @@ export default function HomePageClient({
         return [...m.entries()].map(([d, sessions]) => ({ day: `Day ${d}`, date: `Oct ${d}, 2026`, sessions }));
       })()
     : ((content.schedule as { days?: { day: string; date: string; sessions: { time: string; title: string; speaker: string; type: string }[] }[] })?.days ?? []);
+  const ticketH = content.tickets as { badge?: string; title?: string; description?: string };
   const tixCMS = ((
     content.tickets as {
       tiers?: {
