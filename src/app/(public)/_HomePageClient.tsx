@@ -202,6 +202,68 @@ function TestimonialCarousel({
 }
 
 // ──────────────────────────────────────────────
+// Animated Benefit Card with cursor glow
+// ──────────────────────────────────────────────
+function BenefitCard({
+  title,
+  description,
+  icon: Icon,
+  accent,
+}: {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  accent: string;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ x: 50, y: 50 });
+  const [hover, setHover] = useState(false);
+
+  const handleMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const r = cardRef.current.getBoundingClientRect();
+    setPos({
+      x: ((e.clientX - r.left) / r.width) * 100,
+      y: ((e.clientY - r.top) / r.height) * 100,
+    });
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMove}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => {
+        setHover(false);
+        setPos({ x: 50, y: 50 });
+      }}
+      className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-white/[0.12] hover:shadow-xl hover:shadow-purple-500/5"
+    >
+      {/* Cursor glow */}
+      <div
+        className="pointer-events-none absolute -inset-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(circle 300px at ${pos.x}% ${pos.y}%, rgba(139,92,246,0.12) 0%, transparent 60%)`,
+        }}
+      />
+      {/* Animated border line */}
+      <div
+        className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${accent} transition-all duration-500 ${hover ? "w-full" : "w-0"}`}
+      />
+      {/* Icon */}
+      <div
+        className={`relative mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${accent} bg-opacity-20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg`}
+        style={{ boxShadow: hover ? `0 0 20px rgba(139,92,246,0.3)` : "none" }}
+      >
+        <Icon className="h-5 w-5 text-white" />
+      </div>
+      <h3 className="relative text-base font-semibold text-white">{title}</h3>
+      <p className="relative mt-2 text-sm leading-relaxed text-gray-400">{description}</p>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────
 // Main Page
 // ──────────────────────────────────────────────
 export default function HomePageClient({
@@ -553,21 +615,25 @@ export default function HomePageClient({
             </p>
           </div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {benefits.map((b) => {
+            {benefits.map((b, idx) => {
               const Icon = iconMap[b.icon] || Lightbulb;
+              const gradients = [
+                "from-purple-500 to-pink-500",
+                "from-cyan-500 to-blue-500",
+                "from-amber-500 to-orange-500",
+                "from-emerald-500 to-teal-500",
+                "from-violet-500 to-purple-500",
+                "from-rose-500 to-pink-500",
+              ];
+              const accent = gradients[idx % gradients.length];
               return (
-                <Card
+                <BenefitCard
                   key={b.title}
-                  className="group border-white/[0.07] bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:border-purple-500/20 hover:bg-white/[0.04]"
-                >
-                  <CardContent className="p-6">
-                    <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400 transition-transform group-hover:scale-110">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-base font-semibold text-white">{b.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-400">{b.description}</p>
-                  </CardContent>
-                </Card>
+                  title={b.title}
+                  description={b.description}
+                  icon={Icon}
+                  accent={accent}
+                />
               );
             })}
           </div>
