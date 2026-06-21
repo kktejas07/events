@@ -61,7 +61,13 @@ export default async function HomePage() {
     // Fetch featured event for hero
     const featuredEvent = await db.event.findFirst({
       where: { isFeatured: true, status: "PUBLISHED" },
-      include: { venue: true, ticketTypes: { orderBy: { sortOrder: "asc" }, take: 1 } },
+      include: {
+        venue: true,
+        ticketTypes: {
+          where: { isActive: true },
+          orderBy: { sortOrder: "asc" },
+        },
+      },
     });
     if (featuredEvent) {
       mergedContent["_featuredEvent"] = {
@@ -76,9 +82,12 @@ export default async function HomePage() {
         venueCity: featuredEvent.venue?.city,
         venueCountry: featuredEvent.venue?.country,
         venueAddress: featuredEvent.venue?.address,
-        lowestPrice: featuredEvent.ticketTypes[0]
-          ? Number(featuredEvent.ticketTypes[0].price)
-          : null,
+        ticketTypes: featuredEvent.ticketTypes.map((tt) => ({
+          name: tt.name,
+          price: Number(tt.price),
+          perks: tt.perks,
+          color: tt.color,
+        })),
       };
     }
   } catch (error) {

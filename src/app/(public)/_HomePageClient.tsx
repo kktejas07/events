@@ -323,7 +323,24 @@ export default function HomePageClient({
     }>) ?? [];
   const featuredEvent = content._featuredEvent as Record<string, unknown> | undefined;
 
-  // Use DB sponsors for the section if available, otherwise use CMS data
+  // Use DB ticket types from featured event if available, otherwise use CMS data
+  const dbTicketTypes =
+    (featuredEvent?.ticketTypes as Array<{
+      name: string;
+      price: number;
+      perks: string[];
+      color: string;
+    }>) ?? [];
+  const displayTickets =
+    dbTicketTypes.length > 0
+      ? dbTicketTypes.map((tt, i) => ({
+          name: tt.name,
+          price: tt.price,
+          features: tt.perks,
+          color: tt.color || "from-purple-600 to-cyan-600",
+          highlighted: i === 1,
+        }))
+      : ticketsFromContent;
   const displaySponsors =
     dbSponsors.length > 0
       ? dbSponsors.map((s) => ({
@@ -909,7 +926,7 @@ export default function HomePageClient({
               className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {ticketsFromContent.map((tier) => (
+              {displayTickets.map((tier) => (
                 <motion.div
                   key={tier.name}
                   className={`group relative w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] ${
