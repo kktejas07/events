@@ -364,6 +364,18 @@ export default function EventFormPage() {
                   className="border-white/10 bg-white/[0.03] text-white"
                 />
               </div>
+              <div className="flex items-center gap-2 pt-6">
+                <input
+                  type="checkbox"
+                  id="isFeatured"
+                  checked={form.isFeatured}
+                  onChange={(e) => setForm((prev) => ({ ...prev, isFeatured: e.target.checked }))}
+                  className="h-4 w-4 rounded accent-purple-500"
+                />
+                <Label htmlFor="isFeatured" className="text-gray-300 cursor-pointer">
+                  Featured Event (display on landing page)
+                </Label>
+              </div>
             </div>
             <div className="space-y-1">
               <Label className="text-gray-300">Short Description</Label>
