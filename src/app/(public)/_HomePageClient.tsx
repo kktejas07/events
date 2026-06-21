@@ -202,6 +202,40 @@ function TestimonialCarousel({
 }
 
 // ──────────────────────────────────────────────
+// Professional Speaker Card with cursor glow
+// ──────────────────────────────────────────────
+function SpeakerCard({ name, role, company, initials, accent }: { name: string; role: string; company: string; initials: string; accent: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ x: 50, y: 50 });
+  const [hover, setHover] = useState(false);
+
+  const handleMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const r = cardRef.current.getBoundingClientRect();
+    setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+  };
+
+  return (
+    <div ref={cardRef} onMouseMove={handleMove} onMouseEnter={() => setHover(true)} onMouseLeave={() => { setHover(false); setPos({ x: 50, y: 50 }); }}
+      className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.02] p-7 text-center transition-all duration-500 hover:-translate-y-1.5 hover:border-white/[0.12] hover:shadow-xl hover:shadow-purple-500/5">
+      {/* Cursor glow */}
+      <div className="pointer-events-none absolute -inset-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{ background: `radial-gradient(circle 250px at ${pos.x}% ${pos.y}%, rgba(139,92,246,0.1) 0%, transparent 60%)` }} />
+      {/* Bottom accent line */}
+      <div className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${accent} transition-all duration-500 ${hover ? "w-full" : "w-0"}`} />
+      {/* Avatar */}
+      <div className={`relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-lg font-bold text-white shadow-lg transition-all duration-500 group-hover:scale-110`}
+        style={{ boxShadow: hover ? "0 0 25px rgba(139,92,246,0.35)" : "0 4px 15px rgba(0,0,0,0.3)" }}>
+        {initials}
+      </div>
+      <h3 className="relative mt-4 text-base font-semibold text-white">{name}</h3>
+      <p className="relative text-sm font-medium text-purple-400">{role}</p>
+      <p className="relative text-sm text-gray-500">{company}</p>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────
 // Animated Benefit Card with cursor glow
 // ──────────────────────────────────────────────
 function BenefitCard({
@@ -686,21 +720,10 @@ export default function HomePageClient({
             </p>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {speakers.map((s) => (
-              <div
-                key={s.name}
-                className="group rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-purple-500/20"
-              >
-                <div
-                  className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${s.color} text-lg font-bold text-white shadow-lg`}
-                >
-                  {s.initials}
-                </div>
-                <h3 className="mt-4 text-base font-semibold text-white">{s.name}</h3>
-                <p className="text-sm text-purple-400">{s.role}</p>
-                <p className="text-sm text-gray-500">{s.company}</p>
-              </div>
-            ))}
+            {speakers.map((s, idx) => {
+              const accents = ["from-purple-500 to-pink-500", "from-cyan-500 to-blue-500", "from-amber-500 to-orange-500", "from-emerald-500 to-teal-500", "from-violet-500 to-purple-500", "from-rose-500 to-pink-500"];
+              return <SpeakerCard key={s.name} name={s.name} role={s.role} company={s.company} initials={s.initials} accent={s.color || accents[idx % accents.length]} />;
+            })}
           </div>
         </div>
       </section>

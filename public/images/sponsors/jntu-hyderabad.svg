@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="40" viewBox="0 0 140 40">
+  <defs><linearGradient id="jn" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ea580c"/><stop offset="100%" style="stop-color:#f97316"/></linearGradient></defs>
+  <rect x="6" y="6" width="28" height="28" rx="8" fill="url(#jn)"/>
+  <text x="20" y="27" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" font-weight="bold">J</text>
+  <text x="42" y="19" fill="white" font-size="9" font-family="sans-serif" font-weight="bold">JNTU</text>
+  <text x="42" y="31" fill="#fdba74" font-size="8" font-family="sans-serif">Hyderabad</text>
+</svg>
