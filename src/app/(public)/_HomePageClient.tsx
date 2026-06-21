@@ -1138,6 +1138,80 @@ export default function HomePageClient({
         </div>
       </motion.section>
 
+      {/* Venue / Location Section */}
+      {featuredEvent && (
+        <motion.section
+          id="venue"
+          className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
+          {...fadeInUp}
+        >
+          <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
+            <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
+            <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5" />
+            <div className="absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5" />
+          </div>
+          <div className="container relative">
+            <motion.div
+              className="mx-auto max-w-2xl text-center"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
+                Event Location
+              </span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Location & Venue
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                Join us in the heart of innovation — surrounded by top hotels, transit, and culture.
+              </p>
+            </motion.div>
+
+            <div className="mx-auto mt-12 max-w-4xl">
+              <div className="grid gap-8 sm:grid-cols-3">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 text-center backdrop-blur-sm transition-all hover:border-purple-500/30">
+                  <MapPin className="mx-auto h-8 w-8 text-purple-400" />
+                  <h4 className="mt-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+                    Address
+                  </h4>
+                  <p className="mt-2 text-sm text-white">
+                    {featuredEvent.venueAddress
+                      ? String(featuredEvent.venueAddress)
+                      : `${String(featuredEvent.venueCity || "")}, ${String(featuredEvent.venueCountry || "")}`}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 text-center backdrop-blur-sm transition-all hover:border-purple-500/30">
+                  <Calendar className="mx-auto h-8 w-8 text-purple-400" />
+                  <h4 className="mt-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+                    Date & Time
+                  </h4>
+                  <p className="mt-2 text-sm text-white">
+                    {featuredEvent.startDate
+                      ? new Date(String(featuredEvent.startDate)).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "TBA"}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 text-center backdrop-blur-sm transition-all hover:border-purple-500/30">
+                  <Mic className="mx-auto h-8 w-8 text-purple-400" />
+                  <h4 className="mt-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+                    Event
+                  </h4>
+                  <p className="mt-2 text-sm text-white">
+                    {String(featuredEvent.category || "Technology")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+      )}
+
       <motion.section id="faq" className="bg-[#0a0a1a] py-24" {...fadeInUp}>
         <div className="container">
           <motion.div
