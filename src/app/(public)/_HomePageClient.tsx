@@ -770,11 +770,6 @@ export default function HomePageClient({
         className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
         {...fadeInUp}
       >
-        {/* Background layers */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 top-10 h-80 w-80 rounded-full bg-purple-500/5 blur-3xl" />
-          <div className="absolute -right-20 bottom-10 h-96 w-96 rounded-full bg-cyan-500/5 blur-3xl" />
-        </div>
         <div className="container relative">
           <motion.div
             className="mx-auto max-w-2xl text-center"
@@ -804,15 +799,6 @@ export default function HomePageClient({
           </motion.div>
         </div>
       </motion.section>
-
-      {/* Diagonal divider */}
-      <div
-        className="-mb-px h-24 w-full"
-        style={{
-          backgroundImage: "url('/images/divider-down.svg')",
-          backgroundSize: "100% 100%",
-        }}
-      />
 
       <motion.section id="speakers" className="bg-[#0a0a1a] py-24" {...fadeInUp}>
         <div className="container">
@@ -1042,15 +1028,6 @@ export default function HomePageClient({
         </div>
       </motion.section>
 
-      {/* Diagonal divider */}
-      <div
-        className="-mb-px h-24 w-full"
-        style={{
-          backgroundImage: "url('/images/divider-up.svg')",
-          backgroundSize: "100% 100%",
-        }}
-      />
-
       <motion.section
         id="sponsors"
         className="relative border-y border-white/5 py-24"
@@ -1062,11 +1039,6 @@ export default function HomePageClient({
         }}
         {...fadeInUp}
       >
-        {/* Background layers */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-purple-500/5 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-cyan-500/5 blur-3xl" />
-        </div>
         <div className="container relative">
           <motion.div
             className="mx-auto max-w-2xl text-center"
@@ -1252,11 +1224,6 @@ export default function HomePageClient({
         }}
         {...fadeInUp}
       >
-        {/* Background pattern */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
-          <div className="absolute -right-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-cyan-500/5 blur-3xl" />
-        </div>
         <div className="container relative">
           <div className="mx-auto max-w-2xl">
             <motion.div
