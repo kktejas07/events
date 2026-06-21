@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="40" viewBox="0 0 130 40">
+  <defs><linearGradient id="nc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8B5CF6"/><stop offset="100%" style="stop-color:#C084FC"/></linearGradient></defs>
+  <rect x="8" y="8" width="24" height="24" rx="6" fill="url(#nc)"/>
+  <text x="22" y="26" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" font-weight="bold">N</text>
+  <text x="40" y="26" fill="white" font-size="13" font-family="sans-serif" font-weight="bold">NEURALCORE</text>
+</svg>

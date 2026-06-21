@@ -55,6 +55,8 @@ export default async function HomePage() {
         tier: s.tier,
         logoUrl: s.logoUrl,
         websiteUrl: s.websiteUrl,
+        initials: s.name.slice(0, 2).toUpperCase(),
+        color: s.logoUrl ? "#6C5CE7" : ["#7C3AED", "#06B6D4", "#F59E0B"][dbSponsors.indexOf(s) % 3],
       }));
     }
 

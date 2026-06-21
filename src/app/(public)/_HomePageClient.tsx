@@ -369,8 +369,10 @@ export default function HomePageClient({
     content.sponsors as {
       items?: { name: string; tier: string; initials: string; color: string }[];
     }
-  )?.items ?? []) as { name: string; tier: string; initials: string; color: string }[];
-  const displaySponsors = dbSponsors.length ? dbSponsors : spCMS;
+  )?.items ?? []) as { name: string; tier: string; initials: string; color: string; logoUrl?: string }[];
+  const displaySponsors = dbSponsors.length
+    ? (dbSponsors as { name: string; tier: string; initials: string; color: string; logoUrl?: string }[])
+    : spCMS;
   const sponsorH = content.sponsors as { badge?: string; title?: string; description?: string };
   const faqs = ((content.faq as { items?: { q: string; a: string }[] })?.items ?? []) as {
     q: string;
@@ -875,14 +877,22 @@ export default function HomePageClient({
             {displaySponsors.slice(0, 8).map((s) => (
               <div
                 key={s.name}
-                className="group rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.15]"
+                className="group flex flex-col items-center rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.15]"
               >
-                <div
-                  className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl text-lg font-bold text-white shadow-lg"
-                  style={{ background: `linear-gradient(135deg, ${s.color}, ${s.color}88)` }}
-                >
-                  {s.initials}
-                </div>
+                {s.logoUrl ? (
+                  <img
+                    src={String(s.logoUrl)}
+                    alt={s.name}
+                    className="h-12 w-auto object-contain opacity-80 transition-opacity group-hover:opacity-100"
+                  />
+                ) : (
+                  <div
+                    className="flex h-14 w-14 items-center justify-center rounded-xl text-lg font-bold text-white shadow-lg"
+                    style={{ background: `linear-gradient(135deg, ${s.color}, ${s.color}88)` }}
+                  >
+                    {s.initials}
+                  </div>
+                )}
                 <h3 className="mt-3 text-sm font-semibold text-white">{s.name}</h3>
                 <span
                   className="mt-1.5 inline-block rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
