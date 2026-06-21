@@ -396,7 +396,6 @@ export default function AdminSettingsPage() {
               />
             </CardContent>
           </Card>
-
         </div>
       )}
     </div>
