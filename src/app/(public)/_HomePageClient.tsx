@@ -204,7 +204,19 @@ function TestimonialCarousel({
 // ──────────────────────────────────────────────
 // Professional Speaker Card with cursor glow
 // ──────────────────────────────────────────────
-function SpeakerCard({ name, role, company, initials, accent }: { name: string; role: string; company: string; initials: string; accent: string }) {
+function SpeakerCard({
+  name,
+  role,
+  company,
+  initials,
+  accent,
+}: {
+  name: string;
+  role: string;
+  company: string;
+  initials: string;
+  accent: string;
+}) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ x: 50, y: 50 });
   const [hover, setHover] = useState(false);
@@ -212,20 +224,41 @@ function SpeakerCard({ name, role, company, initials, accent }: { name: string; 
   const handleMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return;
     const r = cardRef.current.getBoundingClientRect();
-    setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+    setPos({
+      x: ((e.clientX - r.left) / r.width) * 100,
+      y: ((e.clientY - r.top) / r.height) * 100,
+    });
   };
 
   return (
-    <div ref={cardRef} onMouseMove={handleMove} onMouseEnter={() => setHover(true)} onMouseLeave={() => { setHover(false); setPos({ x: 50, y: 50 }); }}
-      className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.02] p-7 text-center transition-all duration-500 hover:-translate-y-1.5 hover:border-white/[0.12] hover:shadow-xl hover:shadow-purple-500/5">
+    <div
+      ref={cardRef}
+      onMouseMove={handleMove}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => {
+        setHover(false);
+        setPos({ x: 50, y: 50 });
+      }}
+      className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.02] p-7 text-center transition-all duration-500 hover:-translate-y-1.5 hover:border-white/[0.12] hover:shadow-xl hover:shadow-purple-500/5"
+    >
       {/* Cursor glow */}
-      <div className="pointer-events-none absolute -inset-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{ background: `radial-gradient(circle 250px at ${pos.x}% ${pos.y}%, rgba(139,92,246,0.1) 0%, transparent 60%)` }} />
+      <div
+        className="pointer-events-none absolute -inset-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(circle 250px at ${pos.x}% ${pos.y}%, rgba(139,92,246,0.1) 0%, transparent 60%)`,
+        }}
+      />
       {/* Bottom accent line */}
-      <div className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${accent} transition-all duration-500 ${hover ? "w-full" : "w-0"}`} />
+      <div
+        className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${accent} transition-all duration-500 ${hover ? "w-full" : "w-0"}`}
+      />
       {/* Avatar */}
-      <div className={`relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-lg font-bold text-white shadow-lg transition-all duration-500 group-hover:scale-110`}
-        style={{ boxShadow: hover ? "0 0 25px rgba(139,92,246,0.35)" : "0 4px 15px rgba(0,0,0,0.3)" }}>
+      <div
+        className={`relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-lg font-bold text-white shadow-lg transition-all duration-500 group-hover:scale-110`}
+        style={{
+          boxShadow: hover ? "0 0 25px rgba(139,92,246,0.35)" : "0 4px 15px rgba(0,0,0,0.3)",
+        }}
+      >
         {initials}
       </div>
       <h3 className="relative mt-4 text-base font-semibold text-white">{name}</h3>
@@ -346,21 +379,17 @@ export default function HomePageClient({
     color: string;
   }[];
   const speakerH = content.speakers as { badge?: string; title?: string; description?: string };
-  const schedDays = ((
-    content.schedule as {
-      days?: {
-        day: string;
-        date: string;
-        sessions: { time: string; title: string; speaker: string; type: string }[];
-      }[];
-    }
-  )?.days ?? []) as {
-    day: string;
-    date: string;
-    sessions: { time: string; title: string; speaker: string; type: string }[];
-  }[];
-  const schedH = content.schedule as { badge?: string; title?: string };
-  const ticketH = content.tickets as { badge?: string; title?: string; description?: string };
+
+  // Schedule: prefer featured event DB sessions, fallback to CMS
+  const dbSessions = (featured?.sessions as { day: number; time: string; title: string; speaker: string; type: string }[]) ?? [];
+  const schedH = { badge: "Schedule", title: dbSessions.length > 0 ? "Event Schedule" : (content.schedule as { badge?: string; title?: string })?.title || "Schedule" };
+  const schedDays: { day: string; date: string; sessions: { time: string; title: string; speaker: string; type: string }[] }[] = dbSessions.length > 0
+    ? (() => {
+        const m = new Map<number, typeof dbSessions>();
+        dbSessions.forEach((s) => { if (!m.has(s.day)) m.set(s.day, []); m.get(s.day)!.push(s); });
+        return [...m.entries()].map(([d, sessions]) => ({ day: `Day ${d}`, date: `Oct ${d}, 2026`, sessions }));
+      })()
+    : ((content.schedule as { days?: { day: string; date: string; sessions: { time: string; title: string; speaker: string; type: string }[] }[] })?.days ?? []);
   const tixCMS = ((
     content.tickets as {
       tiers?: {
@@ -398,14 +427,27 @@ export default function HomePageClient({
     tier: string;
     initials: string;
     color: string;
+    logoUrl?: string;
   }[];
   const spCMS = ((
     content.sponsors as {
       items?: { name: string; tier: string; initials: string; color: string }[];
     }
-  )?.items ?? []) as { name: string; tier: string; initials: string; color: string; logoUrl?: string }[];
+  )?.items ?? []) as {
+    name: string;
+    tier: string;
+    initials: string;
+    color: string;
+    logoUrl?: string;
+  }[];
   const displaySponsors = dbSponsors.length
-    ? (dbSponsors as { name: string; tier: string; initials: string; color: string; logoUrl?: string }[])
+    ? (dbSponsors as {
+        name: string;
+        tier: string;
+        initials: string;
+        color: string;
+        logoUrl?: string;
+      }[])
     : spCMS;
   const sponsorH = content.sponsors as { badge?: string; title?: string; description?: string };
   const faqs = ((content.faq as { items?: { q: string; a: string }[] })?.items ?? []) as {
@@ -721,8 +763,24 @@ export default function HomePageClient({
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {speakers.map((s, idx) => {
-              const accents = ["from-purple-500 to-pink-500", "from-cyan-500 to-blue-500", "from-amber-500 to-orange-500", "from-emerald-500 to-teal-500", "from-violet-500 to-purple-500", "from-rose-500 to-pink-500"];
-              return <SpeakerCard key={s.name} name={s.name} role={s.role} company={s.company} initials={s.initials} accent={s.color || accents[idx % accents.length]} />;
+              const accents = [
+                "from-purple-500 to-pink-500",
+                "from-cyan-500 to-blue-500",
+                "from-amber-500 to-orange-500",
+                "from-emerald-500 to-teal-500",
+                "from-violet-500 to-purple-500",
+                "from-rose-500 to-pink-500",
+              ];
+              return (
+                <SpeakerCard
+                  key={s.name}
+                  name={s.name}
+                  role={s.role}
+                  company={s.company}
+                  initials={s.initials}
+                  accent={s.color || accents[idx % accents.length]}
+                />
+              );
             })}
           </div>
         </div>

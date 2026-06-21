@@ -18,7 +18,6 @@ type SectionKey =
   | "whyAttend"
   | "testimonials"
   | "speakers"
-  | "schedule"
   | "tickets"
   | "sponsors"
   | "faq"
@@ -35,7 +34,6 @@ const sections: { key: SectionKey; label: string }[] = [
   { key: "whyAttend", label: "Benefits" },
   { key: "testimonials", label: "Testimonials" },
   { key: "speakers", label: "Speakers" },
-  { key: "schedule", label: "Schedule" },
   { key: "tickets", label: "Tickets" },
   { key: "sponsors", label: "Sponsors" },
   { key: "faq", label: "FAQ" },
@@ -373,62 +371,6 @@ export default function AdminLandingPage() {
                 { key: "color", label: "Color" },
               ]}
               onChange={(items) => updateNested("speakers", "items", items)}
-            />
-          </div>
-        );
-
-      case "schedule":
-        return (
-          <div className="space-y-6">
-            <Field label="Badge" value={d.badge} onChange={(v) => updateNested("schedule", "badge", v)} />
-            <Field label="Title" value={d.title} onChange={(v) => updateNested("schedule", "title", v)} />
-            <Label className="text-xs text-gray-400 mt-4">Days & Sessions</Label>
-            <ListEditor
-              items={((d.days as Record<string, unknown>[]) || []).map((day) => ({
-                ...day,
-                sessionsJson: String(day.sessionsJson || JSON.stringify(day.sessions || [], null, 2)),
-              }))}
-              fields={[
-                { key: "day", label: "Day Label" },
-                { key: "date", label: "Date" },
-              ]}
-              onChange={(items) => updateNested("schedule", "days", items)}
-              renderExtra={(item, index, fieldUpdate) => {
-                const sessions = (item.sessions as Record<string, string>[]) || [];
-                const updateSessions = (newSessions: Record<string, string>[]) => {
-                  fieldUpdate("sessions", newSessions);
-                  fieldUpdate("sessionsJson", JSON.stringify(newSessions, null, 2));
-                };
-                return (
-                  <div className="mt-3 border-t border-white/5 pt-3">
-                    <Label className="mb-2 text-xs text-gray-400">Sessions</Label>
-                    <div className="space-y-2">
-                      {sessions.map((s, si) => (
-                        <div key={si} className="grid grid-cols-4 gap-2">
-                          <Input placeholder="Time" value={s.time || ""} onChange={(e) => {
-                            const updated = [...sessions]; updated[si] = { ...s, time: e.target.value }; updateSessions(updated);
-                          }} className="border-white/10 bg-white/[0.05] text-xs text-white" />
-                          <Input placeholder="Title" value={s.title || ""} onChange={(e) => {
-                            const updated = [...sessions]; updated[si] = { ...s, title: e.target.value }; updateSessions(updated);
-                          }} className="border-white/10 bg-white/[0.05] text-xs text-white" />
-                          <Input placeholder="Speaker" value={s.speaker || ""} onChange={(e) => {
-                            const updated = [...sessions]; updated[si] = { ...s, speaker: e.target.value }; updateSessions(updated);
-                          }} className="border-white/10 bg-white/[0.05] text-xs text-white" />
-                          <div className="flex gap-1">
-                            <Input placeholder="Type" value={s.type || ""} onChange={(e) => {
-                              const updated = [...sessions]; updated[si] = { ...s, type: e.target.value }; updateSessions(updated);
-                            }} className="flex-1 border-white/10 bg-white/[0.05] text-xs text-white" />
-                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-red-400 hover:text-red-300"
-                              onClick={() => updateSessions(sessions.filter((_, j) => j !== si))}>×</Button>
-                          </div>
-                        </div>
-                      ))}
-                      <Button variant="outline" size="sm" className="w-full border-dashed border-white/20 text-xs text-gray-400"
-                        onClick={() => updateSessions([...sessions, { time: "", title: "", speaker: "", type: "Session" }])}>+ Add Session</Button>
-                    </div>
-                  </div>
-                );
-              }}
             />
           </div>
         );
