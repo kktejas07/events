@@ -929,7 +929,7 @@ export default function HomePageClient({
               {displayTickets.map((tier) => (
                 <motion.div
                   key={tier.name}
-                  className={`group relative w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] ${
+                  className={`group relative flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] self-stretch ${
                     tier.highlighted
                       ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
                       : "border border-white/10 bg-white/[0.02] hover:border-purple-500/30 hover:bg-white/[0.04]"
@@ -957,7 +957,7 @@ export default function HomePageClient({
                   </div>
 
                   {/* Content */}
-                  <div className="relative p-6 pt-4">
+                  <div className="relative flex flex-1 flex-col p-6 pt-4">
                     <div
                       className={`mb-4 h-1 w-16 rounded-full bg-gradient-to-r ${tier.color || "from-purple-600 to-cyan-600"}`}
                     />
@@ -986,7 +986,7 @@ export default function HomePageClient({
                       ))}
                     </ul>
 
-                    <Link href="/events" className="mt-6 block">
+                    <Link href="/events" className="mt-auto block pt-6">
                       <Button
                         className={`w-full text-sm transition-all duration-300 ${
                           tier.highlighted
