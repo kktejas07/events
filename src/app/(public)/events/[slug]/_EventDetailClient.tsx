@@ -4,7 +4,18 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Clock, Users, Mic, ChevronRight, Check, Sparkles } from "lucide-react";
+import { BarcodeBars } from "@/components/ui/barcode-bars";
+import {
+  Calendar,
+  MapPin,
+  Clock,
+  Users,
+  Mic,
+  ChevronRight,
+  Check,
+  Sparkles,
+  MoveRight,
+} from "lucide-react";
 import { useState } from "react";
 
 interface EventData {
@@ -86,13 +97,6 @@ export default function EventDetailClient({ event }: { event: EventData }) {
   const venueStr = event.venue
     ? `${event.venue.name}, ${event.venue.city}, ${event.venue.country}`
     : "";
-
-  const formatPrice = (p: number) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(p);
 
   return (
     <div className="min-h-screen bg-[#0a0a1a]">
@@ -278,69 +282,118 @@ export default function EventDetailClient({ event }: { event: EventData }) {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
-              Tickets
+              Ticket Options
             </span>
             <h2 className="mt-4 text-3xl font-bold text-white">Choose Your Pass</h2>
             <p className="mt-2 text-gray-400">Select the perfect ticket for your needs.</p>
           </div>
-          <motion.div
-            className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="whileInView"
-            viewport={{ once: true, margin: "-80px" }}
-          >
-            {event.ticketTypes.map((tier, i) => {
-              const isHighlighted = i === 1;
-              return (
-                <motion.div
-                  key={tier.id}
-                  variants={staggerItem}
-                  className={`relative rounded-xl border p-6 transition-all duration-300 hover:-translate-y-2 ${
-                    isHighlighted
-                      ? "border-purple-500/50 bg-purple-500/10 shadow-lg shadow-purple-500/10"
-                      : "border-white/10 bg-white/[0.03] hover:border-purple-500/30"
-                  }`}
-                >
-                  {isHighlighted && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-3 py-1 text-xs font-semibold text-white">
-                        Most Popular
-                      </span>
+          <div className="relative mt-12">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#0a0a1a] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#0a0a1a] to-transparent" />
+
+            <div
+              className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {event.ticketTypes.map((tier, i) => {
+                const isHighlighted = i === 1;
+                return (
+                  <motion.div
+                    key={tier.id}
+                    className={`group relative w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] ${
+                      isHighlighted
+                        ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
+                        : "border border-white/10 bg-white/[0.02] hover:border-purple-500/30 hover:bg-white/[0.04]"
+                    }`}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {isHighlighted && (
+                      <div className="absolute right-0 top-0 z-10 rounded-bl-xl bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
+                        POPULAR
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between px-6 pt-5">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 text-sm font-bold text-white shadow-lg shadow-purple-600/30">
+                          E
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-white">
+                            {event.title.slice(0, 10).toUpperCase()}
+                          </p>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500">
+                            {new Date(event.startDate).getFullYear()}
+                          </p>
+                        </div>
+                      </div>
+                      <BarcodeBars value={`${tier.name}-${tier.price}`} className="h-12" />
                     </div>
-                  )}
-                  <div className="text-center">
-                    <h3 className="text-lg font-semibold text-white">{tier.name}</h3>
-                    <div className="mt-3">
-                      <span className="text-4xl font-bold text-white">
-                        {formatPrice(Number(tier.price))}
-                      </span>
-                    </div>
-                    <div className="my-5 h-px bg-white/10" />
-                    <ul className="space-y-3 text-left">
-                      {tier.perks.map((perk) => (
-                        <li key={perk} className="flex items-start gap-2 text-sm text-gray-400">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-purple-400" />
-                          {perk}
-                        </li>
-                      ))}
-                    </ul>
-                    <Link href={`/checkout?event=${event.slug}&ticket=${tier.id}`}>
-                      <Button
-                        className={`mt-4 w-full ${
-                          isHighlighted
-                            ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg"
-                            : "border-white/10 bg-white/5 text-white hover:bg-white/10"
-                        }`}
+
+                    <div className="relative p-6 pt-4">
+                      <div
+                        className={`mb-4 h-1 w-16 rounded-full bg-gradient-to-r ${tier.color || "from-purple-600 to-cyan-600"}`}
+                      />
+                      <div className="flex items-end justify-between">
+                        <h3 className="text-lg font-bold text-white">{tier.name}</h3>
+                        <div className="flex items-baseline gap-0.5">
+                          <span className="text-xs text-gray-500">₹</span>
+                          <span className="text-3xl font-bold text-white">
+                            {Number(tier.price).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs text-gray-500">
+                        <Calendar className="h-3.5 w-3.5 shrink-0 text-purple-400" />
+                        <span>
+                          {new Date(event.startDate).toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                          })}{" "}
+                          to{" "}
+                          {new Date(event.endDate).toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                          })}{" "}
+                          -{" "}
+                          {new Date(event.startDate).toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      <div className="my-5 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                      <ul className="space-y-2.5">
+                        {tier.perks.map((perk) => (
+                          <li key={perk} className="flex items-start gap-2 text-xs text-gray-400">
+                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-purple-400" />
+                            <span>{perk}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Link
+                        href={`/checkout?event=${event.slug}&ticket=${tier.id}`}
+                        className="mt-6 block"
                       >
-                        Buy Ticket
-                      </Button>
-                    </Link>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
+                        <Button
+                          className={`w-full text-sm transition-all duration-300 ${
+                            isHighlighted
+                              ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
+                              : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                          }`}
+                        >
+                          Buy Ticket <MoveRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </motion.section>
 

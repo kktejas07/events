@@ -900,94 +900,91 @@ export default function HomePageClient({
                 "Select the perfect ticket for your needs and gain access to exclusive sessions, workshops, and more."}
             </p>
           </motion.div>
-          <motion.div
-            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="whileInView"
-            viewport={{ once: true, margin: "-80px" }}
-          >
-            {ticketsFromContent.map((tier) => (
-              <motion.div
-                key={tier.name}
-                variants={staggerItem}
-                className={`group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 ${
-                  tier.highlighted
-                    ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
-                    : "border border-white/10 bg-white/[0.02] hover:border-purple-500/30 hover:bg-white/[0.04]"
-                }`}
-              >
-                {tier.highlighted && (
-                  <div className="absolute right-0 top-0 z-10 rounded-bl-xl bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
-                    POPULAR
-                  </div>
-                )}
+          <div className="relative mt-12">
+            {/* Fade edges */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#0a0a1a] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#0a0a1a] to-transparent" />
 
-                {/* Barcode at the top */}
-                <div className="flex items-center justify-between px-6 pt-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 text-sm font-bold text-white shadow-lg shadow-purple-600/30">
-                      E
+            <div
+              className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {ticketsFromContent.map((tier) => (
+                <motion.div
+                  key={tier.name}
+                  className={`group relative w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 sm:w-[300px] ${
+                    tier.highlighted
+                      ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
+                      : "border border-white/10 bg-white/[0.02] hover:border-purple-500/30 hover:bg-white/[0.04]"
+                  }`}
+                  {...fadeInUp}
+                >
+                  {tier.highlighted && (
+                    <div className="absolute right-0 top-0 z-10 rounded-bl-xl bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
+                      POPULAR
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold text-white">AI SUMMIT</p>
-                      <p className="text-[10px] uppercase tracking-wider text-gray-500">2026</p>
+                  )}
+
+                  {/* Barcode at the top */}
+                  <div className="flex items-center justify-between px-6 pt-5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 text-sm font-bold text-white shadow-lg shadow-purple-600/30">
+                        E
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-white">AI SUMMIT</p>
+                        <p className="text-[10px] uppercase tracking-wider text-gray-500">2026</p>
+                      </div>
                     </div>
+                    <BarcodeBars value={`${tier.name}-${tier.price}`} className="h-12" />
                   </div>
-                  <BarcodeBars value={`${tier.name}-${tier.price}`} className="h-12" />
-                </div>
 
-                {/* Content */}
-                <div className="relative p-6 pt-4">
-                  {/* Gradient line */}
-                  <div
-                    className={`mb-4 h-1 w-16 rounded-full bg-gradient-to-r ${tier.color || "from-purple-600 to-cyan-600"}`}
-                  />
+                  {/* Content */}
+                  <div className="relative p-6 pt-4">
+                    <div
+                      className={`mb-4 h-1 w-16 rounded-full bg-gradient-to-r ${tier.color || "from-purple-600 to-cyan-600"}`}
+                    />
 
-                  {/* Plan name & price */}
-                  <div className="flex items-end justify-between">
-                    <h3 className="text-lg font-bold text-white">{tier.name}</h3>
-                    <div className="flex items-baseline gap-0.5">
-                      <span className="text-xs text-gray-500">$</span>
-                      <span className="text-3xl font-bold text-white">{tier.price}</span>
+                    <div className="flex items-end justify-between">
+                      <h3 className="text-lg font-bold text-white">{tier.name}</h3>
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-xs text-gray-500">$</span>
+                        <span className="text-3xl font-bold text-white">{tier.price}</span>
+                      </div>
                     </div>
+
+                    <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs text-gray-500">
+                      <Calendar className="h-3.5 w-3.5 shrink-0 text-purple-400" />
+                      <span>October 1 to 5 - 10:00 AM</span>
+                    </div>
+
+                    <div className="my-5 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                    <ul className="space-y-2.5">
+                      {tier.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-xs text-gray-400">
+                          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-purple-400" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link href="/events" className="mt-6 block">
+                      <Button
+                        className={`w-full text-sm transition-all duration-300 ${
+                          tier.highlighted
+                            ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
+                            : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                        }`}
+                      >
+                        Buy Ticket <MoveRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
-
-                  {/* Date */}
-                  <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs text-gray-500">
-                    <Calendar className="h-3.5 w-3.5 shrink-0 text-purple-400" />
-                    <span>October 1 to 5 - 10:00 AM</span>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="my-5 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-                  {/* Features */}
-                  <ul className="space-y-2.5">
-                    {tier.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-gray-400">
-                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-purple-400" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Buy button */}
-                  <Link href="/events" className="mt-6 block">
-                    <Button
-                      className={`w-full text-sm transition-all duration-300 ${
-                        tier.highlighted
-                          ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
-                          : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
-                      }`}
-                    >
-                      Buy Ticket <MoveRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </motion.section>
 
