@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BarcodeBars } from "@/components/ui/barcode-bars";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -374,7 +375,7 @@ export default function HomePageClient({
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                The Future of Intelligence
+                {hero?.badge || "The Future of Intelligence"}
               </motion.span>
               <motion.h1
                 className="mt-6 text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl"
@@ -382,9 +383,9 @@ export default function HomePageClient({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
               >
-                AI Summit{" "}
+                {hero?.title || "AI Summit"}{" "}
                 <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                  2026
+                  {hero?.year || "2026"}
                 </span>
               </motion.h1>
               <motion.p
@@ -393,8 +394,8 @@ export default function HomePageClient({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
-                Join thought leaders, developers, and researchers as we explore how AI is reshaping
-                industries, creativity, and the future of work.
+                {hero?.description ||
+                  "Join thought leaders, developers, and researchers as we explore how AI is reshaping industries, creativity, and the future of work."}
               </motion.p>
               <motion.div
                 className="mt-6 flex flex-wrap items-center gap-4 text-gray-300"
@@ -404,11 +405,11 @@ export default function HomePageClient({
               >
                 <span className="flex items-center gap-1.5">
                   <Calendar className="h-4 w-4 text-purple-400" />
-                  October 1-5, 2026
+                  {hero?.date || "October 1-5, 2026"}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4 text-purple-400" />
-                  San Francisco, CA
+                  {hero?.location || "San Francisco, CA"}
                 </span>
               </motion.div>
               <motion.div
@@ -422,17 +423,17 @@ export default function HomePageClient({
                     size="lg"
                     className="group gap-2 bg-purple-600 text-white hover:bg-purple-700"
                   >
-                    Get Tickets{" "}
+                    {hero?.ctaText || "Get Tickets"}{" "}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </Link>
-                <a href="#schedule">
+                <a href={hero?.secondaryCtaLink || "#schedule"}>
                   <Button
                     size="lg"
                     variant="outline"
                     className="border-gray-600 text-white hover:bg-white/10"
                   >
-                    View Schedule
+                    {hero?.secondaryCtaText || "View Schedule"}
                   </Button>
                 </a>
               </motion.div>
@@ -508,14 +509,16 @@ export default function HomePageClient({
           <div className="mx-auto flex max-w-4xl items-center gap-8 rounded-xl border border-white/10 bg-white/[0.04] px-8 py-4 backdrop-blur-xl">
             <div className="shrink-0">
               <p className="text-xs font-semibold uppercase tracking-widest text-purple-400">
-                Hurry Up!
+                {hero?.hurryText || "Hurry Up!"}
               </p>
-              <p className="text-sm text-gray-400">Book Your Seat Now</p>
+              <p className="text-sm text-gray-400">{hero?.hurrySubtext || "Book Your Seat Now"}</p>
             </div>
             <CountdownTimer target={hero?.countdownTarget} />
             <div className="hidden items-center gap-3 sm:flex">
               <MapPin className="h-5 w-5 shrink-0 text-purple-400" />
-              <p className="text-sm text-gray-400">121 AI Blvd, San Francisco, CA 94107</p>
+              <p className="text-sm text-gray-400">
+                {hero?.venueAddress || "121 AI Blvd, San Francisco, CA 94107"}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -941,15 +944,7 @@ export default function HomePageClient({
                       <p className="text-[10px] uppercase tracking-wider text-gray-500">2026</p>
                     </div>
                   </div>
-                  <div className="flex h-12 items-end gap-[1px]">
-                    {[4, 2, 6, 1, 3, 5, 7, 2, 4, 6, 1, 3, 5, 7, 2, 4, 6, 1, 3, 2].map((h, i) => (
-                      <div
-                        key={i}
-                        className="w-[3px] rounded-sm bg-white/60"
-                        style={{ height: `${h * 4 + 4}px` }}
-                      />
-                    ))}
-                  </div>
+                  <BarcodeBars value={`${tier.name}-${tier.price}`} className="h-12" />
                 </div>
 
                 {/* Content */}
