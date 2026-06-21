@@ -36,12 +36,56 @@ export default async function HomePage() {
     const rows = await db.siteContent.findMany();
     for (const row of rows) {
       const sectionData = row.data as Record<string, unknown>;
-      const defaultSection = defaultContent[row.section] as Record<string, unknown> | undefined;
-      if (defaultSection && typeof defaultSection === "object" && !Array.isArray(defaultSection)) {
+      const defaultSection = defaultContent[row.section] as
+        | Record<string, unknown>
+        | undefined;
+      if (
+        defaultSection &&
+        typeof defaultSection === "object" &&
+        !Array.isArray(defaultSection)
+      ) {
         mergedContent[row.section] = deepMerge(defaultSection, sectionData);
       } else {
         mergedContent[row.section] = sectionData;
       }
+    }
+
+    // Fetch real sponsors from DB
+    const dbSponsors = await db.sponsor.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+    });
+    if (dbSponsors.length > 0) {
+      mergedContent["_dbSponsors"] = dbSponsors.map((s) => ({
+        name: s.name,
+        tier: s.tier,
+        logoUrl: s.logoUrl,
+        websiteUrl: s.websiteUrl,
+      }));
+    }
+
+    // Fetch featured event for hero
+    const featuredEvent = await db.event.findFirst({
+      where: { isFeatured: true, status: "PUBLISHED" },
+      include: { venue: true, ticketTypes: { orderBy: { sortOrder: "asc" }, take: 1 } },
+    });
+    if (featuredEvent) {
+      mergedContent["_featuredEvent"] = {
+        title: featuredEvent.title,
+        slug: featuredEvent.slug,
+        startDate: featuredEvent.startDate.toISOString(),
+        endDate: featuredEvent.endDate.toISOString(),
+        category: featuredEvent.category,
+        description: featuredEvent.description,
+        shortDescription: featuredEvent.shortDescription,
+        venueName: featuredEvent.venue?.name,
+        venueCity: featuredEvent.venue?.city,
+        venueCountry: featuredEvent.venue?.country,
+        venueAddress: featuredEvent.venue?.address,
+        lowestPrice: featuredEvent.ticketTypes[0]
+          ? Number(featuredEvent.ticketTypes[0].price)
+          : null,
+      };
     }
   } catch (error) {
     console.error("Home page fetch error:", error);

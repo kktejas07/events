@@ -312,6 +312,31 @@ export default function HomePageClient({
   const scheduleHeader = content.schedule as { badge?: string; title?: string };
   const newsletterContent = content.newsletter as Record<string, string>;
   const ctaContent = content.cta as Record<string, string>;
+
+  // Real DB data (injected by server component)
+  const dbSponsors = (content._dbSponsors as Array<{
+    name: string;
+    tier: string;
+    logoUrl: string;
+    websiteUrl: string;
+  }>) ?? [];
+  const featuredEvent = content._featuredEvent as Record<string, unknown> | undefined;
+
+  // Use DB sponsors for the section if available, otherwise use CMS data
+  const displaySponsors =
+    dbSponsors.length > 0
+      ? dbSponsors.map((s) => ({
+          name: s.name,
+          tier: s.tier,
+          initials: s.name.slice(0, 2).toUpperCase(),
+          color: s.logoUrl
+            ? "#6C5CE7"
+            : ["#7C3AED", "#06B6D4", "#F59E0B", "#8B5CF6", "#10B981", "#EC4899"][
+                s.name.length % 6
+              ],
+        }))
+      : sponsorsFromContent;
+
   const marqueeTexts = (content.marquee as string[]) ?? [];
   const quoteMarqueeTexts =
     ((content.quoteMarquee as { texts?: string[] })?.texts as string[]) ?? [];
@@ -868,7 +893,7 @@ export default function HomePageClient({
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#0a0a1a] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#0a0a1a] to-transparent" />
             <div className="animate-marquee flex gap-16 hover:[animation-play-state:paused]">
-              {[...sponsorsFromContent, ...sponsorsFromContent].map((sp, i) => (
+              {[...displaySponsors, ...displaySponsors].map((sp, i) => (
                 <div
                   key={i}
                   className="flex shrink-0 items-center gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-6 py-3 transition-all duration-300 hover:border-purple-500/30 hover:bg-white/[0.06]"
@@ -1029,7 +1054,7 @@ export default function HomePageClient({
             whileInView="whileInView"
             viewport={{ once: true, margin: "-80px" }}
           >
-            {sponsorsFromContent.slice(0, 8).map((sp) => (
+            {displaySponsors.slice(0, 8).map((sp) => (
               <motion.div
                 key={sp.name}
                 variants={staggerItem}
