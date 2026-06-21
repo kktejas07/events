@@ -908,7 +908,7 @@ export default function HomePageClient({
             </p>
           </motion.div>
           <motion.div
-            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -920,7 +920,7 @@ export default function HomePageClient({
                 variants={staggerItem}
                 className={`group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 ${
                   tier.highlighted
-                    ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/20 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
+                    ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
                     : "border border-white/10 bg-white/[0.02] hover:border-purple-500/30 hover:bg-white/[0.04]"
                 }`}
               >
@@ -930,51 +930,58 @@ export default function HomePageClient({
                   </div>
                 )}
 
-                {/* Barcode edge effect */}
-                <div className="absolute right-0 top-0 flex h-full w-10 flex-col justify-center gap-[2px] opacity-10">
-                  {Array.from({ length: 25 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-white"
-                      style={{
-                        height: `${2 + Math.random() * 4}px`,
-                        width: `${50 + Math.random() * 50}%`,
-                        marginLeft: "auto",
-                      }}
-                    />
-                  ))}
+                {/* Barcode at the top */}
+                <div className="flex items-center justify-between px-6 pt-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 text-sm font-bold text-white shadow-lg shadow-purple-600/30">
+                      E
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white">AI SUMMIT</p>
+                      <p className="text-[10px] uppercase tracking-wider text-gray-500">2026</p>
+                    </div>
+                  </div>
+                  <div className="flex h-12 items-end gap-[1px]">
+                    {[4, 2, 6, 1, 3, 5, 7, 2, 4, 6, 1, 3, 5, 7, 2, 4, 6, 1, 3, 2].map((h, i) => (
+                      <div
+                        key={i}
+                        className="w-[3px] rounded-sm bg-white/60"
+                        style={{ height: `${h * 4 + 4}px` }}
+                      />
+                    ))}
+                  </div>
                 </div>
 
-                {/* Ticket card content */}
-                <div className="relative p-6">
-                  {/* Gradient line on top */}
+                {/* Content */}
+                <div className="relative p-6 pt-4">
+                  {/* Gradient line */}
                   <div
                     className={`mb-4 h-1 w-16 rounded-full bg-gradient-to-r ${tier.color || "from-purple-600 to-cyan-600"}`}
                   />
 
-                  {/* Plan name */}
-                  <h3 className="text-xl font-bold text-white">{tier.name}</h3>
-
-                  {/* Price */}
-                  <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-sm text-gray-500">$</span>
-                    <span className="text-5xl font-bold text-white">{tier.price}</span>
+                  {/* Plan name & price */}
+                  <div className="flex items-end justify-between">
+                    <h3 className="text-lg font-bold text-white">{tier.name}</h3>
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="text-xs text-gray-500">$</span>
+                      <span className="text-3xl font-bold text-white">{tier.price}</span>
+                    </div>
                   </div>
 
-                  {/* Date info */}
-                  <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-gray-400">
-                    <Calendar className="h-4 w-4 shrink-0 text-purple-400" />
+                  {/* Date */}
+                  <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs text-gray-500">
+                    <Calendar className="h-3.5 w-3.5 shrink-0 text-purple-400" />
                     <span>October 1 to 5 - 10:00 AM</span>
                   </div>
 
                   {/* Divider */}
-                  <div className="my-5 h-px bg-gradient-to-r from-white/20 via-white/10 to-transparent" />
+                  <div className="my-5 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
                   {/* Features */}
-                  <ul className="space-y-3">
+                  <ul className="space-y-2.5">
                     {tier.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5 text-sm text-gray-400">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-purple-400" />
+                      <li key={f} className="flex items-start gap-2 text-xs text-gray-400">
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-purple-400" />
                         <span>{f}</span>
                       </li>
                     ))}
@@ -983,7 +990,7 @@ export default function HomePageClient({
                   {/* Buy button */}
                   <Link href="/events" className="mt-6 block">
                     <Button
-                      className={`w-full transition-all duration-300 ${
+                      className={`w-full text-sm transition-all duration-300 ${
                         tier.highlighted
                           ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
                           : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
