@@ -73,39 +73,50 @@ export default function AdminLandingPage() {
   }
 
   async function saveSection(key: SectionKey) {
+    const sectionData = content[key];
+    if (!sectionData) {
+      toast.error("No data to save");
+      return;
+    }
     setSaving(true);
     try {
+      const body = JSON.stringify({ section: key, data: sectionData });
       const res = await fetch("/api/admin/site-content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ section: key, data: content[key] }),
+        body,
       });
       const json = await res.json();
       if (json.success) {
         toast.success(`"${sections.find((s) => s.key === key)?.label}" saved`);
       } else {
-        toast.error(json.error || "Save failed");
+        toast.error(json.error || "Save failed. Are you logged in as admin?");
       }
-    } catch {
-      toast.error("Network error");
+    } catch (e) {
+      toast.error("Network error: " + (e instanceof Error ? e.message : "unknown"));
     }
     setSaving(false);
   }
 
   function saveAll() {
     setSaving(true);
-    const promises = Object.entries(content).map(([key, value]) =>
-      fetch("/api/admin/site-content", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ section: key, data: value }),
-      }).then((r) => r.json())
-    );
+    const promises = Object.entries(content).map(async ([key, value]) => {
+      try {
+        const res = await fetch("/api/admin/site-content", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ section: key, data: value }),
+        });
+        return await res.json();
+      } catch {
+        return { success: false };
+      }
+    });
     Promise.all(promises)
       .then((results) => {
         const failed = results.filter((r) => !r.success);
         if (failed.length === 0) toast.success("All sections saved");
-        else toast.error(`${failed.length} sections failed`);
+        else toast.error(`${failed.length} sections failed — are you logged in as admin?`);
       })
       .catch(() => toast.error("Save failed"))
       .finally(() => setSaving(false));

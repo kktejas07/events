@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "sonner";
 import {
   LayoutDashboard,
   Calendar,
@@ -84,6 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
         <main className="p-6">{children}</main>
+        <Toaster richColors />
       </div>
     </div>
   );
