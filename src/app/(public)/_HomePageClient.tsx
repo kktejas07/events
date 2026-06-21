@@ -880,40 +880,6 @@ export default function HomePageClient({
         </div>
       </motion.section>
 
-      <section className="border-y border-white/5 bg-[#0a0a1a] py-16">
-        <div className="container">
-          <motion.div
-            className="relative overflow-hidden"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#0a0a1a] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#0a0a1a] to-transparent" />
-            <div className="animate-marquee flex gap-16 hover:[animation-play-state:paused]">
-              {[...displaySponsors, ...displaySponsors].map((sp, i) => (
-                <div
-                  key={i}
-                  className="flex shrink-0 items-center gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-6 py-3 transition-all duration-300 hover:border-purple-500/30 hover:bg-white/[0.06]"
-                >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold text-white"
-                    style={{ background: sp.color }}
-                  >
-                    {sp.initials}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{sp.name}</p>
-                    <p className="text-[10px] uppercase tracking-wider text-gray-500">{sp.tier}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       <motion.section id="tickets" className="bg-[#0a0a1a] py-24" {...fadeInUp}>
         <div className="container">
           <motion.div
