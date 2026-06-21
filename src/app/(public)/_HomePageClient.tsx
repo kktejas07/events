@@ -601,34 +601,53 @@ export default function HomePageClient({
         </motion.a>
       </section>
 
-      <motion.section
-        id="about"
-        className="overflow-hidden border-y border-white/5 bg-[#0a0a1a] py-5"
-        {...fadeInUp}
-      >
-        <div className="w-full overflow-hidden whitespace-nowrap">
-          <div className="animate-marquee flex gap-16 text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
-            {Array.from({ length: 2 }).flatMap((_, setIdx) =>
-              (marqueeTexts.length
-                ? marqueeTexts
-                : [
-                    "Next Intelligence",
-                    "Future Now",
-                    "Empowering Innovation",
-                    "Smarter Tomorrow",
-                    "Think Forward",
-                    "Cognitive Shift",
-                  ]
-              ).map((text, i) => (
-                <span key={`${setIdx}-${i}`} className="flex items-center gap-16">
-                  <span>{text}</span>
-                  <span className="h-2 w-2 rounded-full bg-purple-500/50" />
-                </span>
-              ))
-            )}
+      {/* Marquee Bands - AIvent style stacked rotated strips */}
+      <section className="overflow-hidden bg-[#0a0a1a] py-0">
+        {/* Band 1 - dark bg, slight rotation */}
+        <div className="relative -rotate-1 scale-105 bg-gradient-to-r from-purple-900/30 via-[#0a0a1a] to-purple-900/20 py-4">
+          <div className="w-full overflow-hidden whitespace-nowrap">
+            <div className="animate-marquee flex gap-0 text-5xl font-extrabold uppercase tracking-wider text-white/10 sm:text-6xl">
+              {Array.from({ length: 4 }).flatMap((_, setIdx) =>
+                (marqueeTexts.length
+                  ? marqueeTexts
+                  : [
+                      "Next Intelligence",
+                      "Future Now",
+                      "Empowering Innovation",
+                      "Smarter Tomorrow",
+                      "Think Forward",
+                      "Cognitive Shift",
+                    ]
+                ).map((text, i, arr) => (
+                  <span key={`b1-${setIdx}-${i}`} className="mx-4 flex items-center gap-4">
+                    <span>{text}</span>
+                    <span className="mx-2 text-purple-500/20">/</span>
+                  </span>
+                ))
+              )}
+            </div>
           </div>
         </div>
-      </motion.section>
+
+        {/* Band 2 - purple bg, reverse rotation */}
+        <div className="relative -mt-6 rotate-1 scale-105 bg-gradient-to-r from-cyan-900/30 via-purple-900/20 to-cyan-900/20 py-4">
+          <div className="w-full overflow-hidden whitespace-nowrap">
+            <div className="animate-marquee-reverse flex gap-0 text-5xl font-extrabold uppercase tracking-wider text-white/10 sm:text-6xl">
+              {Array.from({ length: 4 }).flatMap((_, setIdx) =>
+                (quoteMarqueeTexts.length
+                  ? quoteMarqueeTexts
+                  : ["Next Intelligence", "Future Now", "Empowering Innovation", "Smarter Tomorrow"]
+                ).map((text, i, arr) => (
+                  <span key={`b2-${setIdx}-${i}`} className="mx-4 flex items-center gap-4">
+                    <span>{text}</span>
+                    <span className="mx-2 text-cyan-500/20">/</span>
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="bg-[#0a0a1a] py-24">
         <div className="container">
@@ -702,24 +721,6 @@ export default function HomePageClient({
         </div>
       </section>
 
-      <section className="bg-[#0a0a1a] py-4">
-        <div className="w-full overflow-hidden bg-gradient-to-r from-purple-600/20 via-cyan-600/20 to-purple-600/20 py-4">
-          <div className="animate-marquee-reverse flex whitespace-nowrap text-3xl font-bold uppercase tracking-widest text-white/10">
-            {Array.from({ length: 3 }).flatMap((_, setIdx) =>
-              (quoteMarqueeTexts.length
-                ? quoteMarqueeTexts
-                : ["Next Intelligence", "Future Now", "Empowering Innovation", "Smarter Tomorrow"]
-              ).map((text, i) => (
-                <span key={`${setIdx}-${i}`} className="mx-8 flex items-center gap-8">
-                  <span>{text}</span>
-                  <span className="h-3 w-3 rounded-full bg-purple-500/30" />
-                </span>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
-
       <motion.section id="why-attend" className="bg-[#0a0a1a] py-24" {...fadeInUp}>
         <div className="container">
           <motion.div
@@ -766,10 +767,39 @@ export default function HomePageClient({
 
       <motion.section
         id="testimonials"
-        className="border-y border-white/5 bg-[#0a0a1a] py-24"
+        className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
         {...fadeInUp}
       >
-        <div className="container">
+        {/* Background illustration */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
+          <div className="absolute -left-20 top-10 h-80 w-80 rounded-full bg-purple-500 blur-3xl" />
+          <div className="absolute -right-20 bottom-10 h-96 w-96 rounded-full bg-cyan-500 blur-3xl" />
+          <svg
+            className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2"
+            viewBox="0 0 200 200"
+          >
+            <circle
+              cx="100"
+              cy="100"
+              r="80"
+              fill="none"
+              stroke="white"
+              strokeWidth="0.3"
+              strokeDasharray="4 8"
+            />
+            <circle
+              cx="100"
+              cy="100"
+              r="60"
+              fill="none"
+              stroke="white"
+              strokeWidth="0.2"
+              strokeDasharray="2 6"
+            />
+            <circle cx="100" cy="100" r="40" fill="none" stroke="white" strokeWidth="0.4" />
+          </svg>
+        </div>
+        <div className="container relative">
           <motion.div
             className="mx-auto max-w-2xl text-center"
             initial={{ opacity: 0, y: 30 }}
@@ -1029,10 +1059,28 @@ export default function HomePageClient({
 
       <motion.section
         id="sponsors"
-        className="border-y border-white/5 bg-[#0a0a1a] py-24"
+        className="relative border-y border-white/5 bg-[#0a0a1a] py-24"
         {...fadeInUp}
       >
-        <div className="container">
+        {/* Background illustration */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.04]">
+          <div className="absolute left-1/4 top-0 h-64 w-64 rounded-full bg-purple-500 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 h-48 w-48 rounded-full bg-cyan-500 blur-3xl" />
+          <svg className="absolute left-0 top-0 h-full w-full" viewBox="0 0 400 200">
+            <pattern
+              id="sponsorGrid"
+              x="0"
+              y="0"
+              width="60"
+              height="60"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="30" cy="30" r="1" fill="white" opacity="0.5" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#sponsorGrid)" />
+          </svg>
+        </div>
+        <div className="container relative">
           <motion.div
             className="mx-auto max-w-2xl text-center"
             initial={{ opacity: 0, y: 30 }}
@@ -1126,8 +1174,32 @@ export default function HomePageClient({
         </div>
       </motion.section>
 
-      <motion.section id="newsletter" className="bg-[#0a0a1a] py-24" {...fadeInUp}>
-        <div className="container">
+      <motion.section id="newsletter" className="relative bg-[#0a0a1a] py-24" {...fadeInUp}>
+        {/* Background illustration */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.04]">
+          <div className="absolute -left-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-purple-500 blur-3xl" />
+          <div className="absolute -right-20 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-cyan-500 blur-3xl" />
+          <svg
+            className="absolute left-1/2 top-0 h-full w-[800px] -translate-x-1/2"
+            viewBox="0 0 400 300"
+          >
+            <path
+              d="M0 150 Q100 50 200 150 T400 150"
+              fill="none"
+              stroke="white"
+              strokeWidth="0.3"
+              opacity="0.5"
+            />
+            <path
+              d="M0 180 Q100 80 200 180 T400 180"
+              fill="none"
+              stroke="white"
+              strokeWidth="0.2"
+              opacity="0.3"
+            />
+          </svg>
+        </div>
+        <div className="container relative">
           <div className="mx-auto max-w-2xl">
             <motion.div
               className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 backdrop-blur-sm"
