@@ -805,6 +805,15 @@ export default function HomePageClient({
         </div>
       </motion.section>
 
+      {/* Diagonal divider */}
+      <div
+        className="-mb-px h-24 w-full"
+        style={{
+          backgroundImage: "url('/images/divider-down.svg')",
+          backgroundSize: "100% 100%",
+        }}
+      />
+
       <motion.section id="speakers" className="bg-[#0a0a1a] py-24" {...fadeInUp}>
         <div className="container">
           <motion.div
@@ -1033,6 +1042,15 @@ export default function HomePageClient({
         </div>
       </motion.section>
 
+      {/* Diagonal divider */}
+      <div
+        className="-mb-px h-24 w-full"
+        style={{
+          backgroundImage: "url('/images/divider-up.svg')",
+          backgroundSize: "100% 100%",
+        }}
+      />
+
       <motion.section
         id="sponsors"
         className="relative border-y border-white/5 py-24"
@@ -1111,14 +1129,14 @@ export default function HomePageClient({
       {featuredEvent && (
         <motion.section
           id="venue"
-        className="relative border-y border-white/5 py-24"
-        style={{
-          backgroundImage: "url('/images/bg-testimonials.svg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-        {...fadeInUp}
+          className="relative border-y border-white/5 py-24"
+          style={{
+            backgroundImage: "url('/images/bg-testimonials.svg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+          {...fadeInUp}
         >
           <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
             <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
