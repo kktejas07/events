@@ -28,6 +28,16 @@ interface TicketTypeData {
   sortOrder: number;
 }
 
+interface SessionData {
+  id?: string;
+  title: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  day: number;
+  speakerName: string;
+}
+
 interface FormData {
   title: string;
   slug: string;
@@ -74,8 +84,18 @@ export default function EventFormPage() {
 
   const [form, setForm] = useState<FormData>(emptyForm);
   const [ticketTypes, setTicketTypes] = useState<TicketTypeData[]>([]);
+  const [sessions, setSessions] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+
+  const emptySession = (): SessionData => ({
+    title: "",
+    startTime: "",
+    endTime: "",
+    room: "",
+    day: 1,
+    speakerName: "",
+  });
 
   useEffect(() => {
     if (!isNew && id) {
@@ -108,6 +128,19 @@ export default function EventFormPage() {
                   color: (tt.color as string) || "#6C5CE7",
                   isActive: tt.isActive !== false,
                   sortOrder: (tt.sortOrder as number) || 0,
+                }))
+              );
+            }
+            if (e.sessions?.length > 0) {
+              setSessions(
+                e.sessions.map((s: Record<string, unknown>) => ({
+                  id: s.id as string,
+                  title: (s.title as string) || "",
+                  startTime: s.startTime ? new Date(s.startTime as string).toISOString().slice(0, 16) : "",
+                  endTime: s.endTime ? new Date(s.endTime as string).toISOString().slice(0, 16) : "",
+                  room: (s.room as string) || "",
+                  day: (s.day as number) || 1,
+                  speakerName: s.speaker ? `${(s.speaker as Record<string,string>).firstName || ""} ${(s.speaker as Record<string,string>).lastName || ""}` : "",
                 }))
               );
             }
@@ -177,6 +210,22 @@ export default function EventFormPage() {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ticketTypes: ticketTypesToSave }),
+        });
+
+        // Save sessions
+        const sessionsToSave = sessions.map((s) => ({
+          ...(s.id ? { id: s.id } : {}),
+          title: s.title || "Untitled",
+          startTime: s.startTime ? new Date(s.startTime).toISOString() : new Date().toISOString(),
+          endTime: s.endTime ? new Date(s.endTime).toISOString() : new Date().toISOString(),
+          room: s.room || "",
+          day: s.day || 1,
+          speakerName: s.speakerName || "",
+        }));
+        await fetch(`/api/admin/events/${eventId}/sessions`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessions: sessionsToSave }),
         });
 
         toast.success(isNew ? "Event created" : "Event updated");
@@ -432,6 +481,139 @@ export default function EventFormPage() {
                   </div>
                 </div>
               ))
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Schedule Sessions */}
+        <Card className="border-white/10 bg-white/[0.03]">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-white">Schedule Sessions</CardTitle>
+              <p className="mt-1 text-sm text-gray-500">
+                Add session timings, speakers, and rooms for this event
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setSessions((prev) => [...prev, emptySession()])}
+              className="border-white/10 text-gray-300 hover:bg-white/10"
+            >
+              <Plus className="mr-1 h-4 w-4" /> Add Session
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {sessions.length === 0 ? (
+              <p className="py-4 text-center text-sm text-gray-500">
+                No sessions yet. Click &ldquo;Add Session&rdquo; to create one.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {sessions.map((s, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg border border-white/10 bg-white/[0.02] p-4"
+                  >
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Session #{i + 1}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-red-400 hover:text-red-300"
+                        onClick={() =>
+                          setSessions((prev) => prev.filter((_, j) => j !== i))
+                        }
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">Title</Label>
+                        <Input
+                          value={s.title}
+                          onChange={(e) => {
+                            const updated = [...sessions];
+                            updated[i] = { ...s, title: e.target.value };
+                            setSessions(updated);
+                          }}
+                          placeholder="Opening Keynote"
+                          className="border-white/10 bg-white/[0.03] text-sm text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">Day #</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={s.day}
+                          onChange={(e) => {
+                            const updated = [...sessions];
+                            updated[i] = { ...s, day: parseInt(e.target.value) || 1 };
+                            setSessions(updated);
+                          }}
+                          className="border-white/10 bg-white/[0.03] text-sm text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">Room</Label>
+                        <Input
+                          value={s.room}
+                          onChange={(e) => {
+                            const updated = [...sessions];
+                            updated[i] = { ...s, room: e.target.value };
+                            setSessions(updated);
+                          }}
+                          placeholder="Main Hall"
+                          className="border-white/10 bg-white/[0.03] text-sm text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">Start Time</Label>
+                        <Input
+                          type="datetime-local"
+                          value={s.startTime}
+                          onChange={(e) => {
+                            const updated = [...sessions];
+                            updated[i] = { ...s, startTime: e.target.value };
+                            setSessions(updated);
+                          }}
+                          className="border-white/10 bg-white/[0.03] text-sm text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">End Time</Label>
+                        <Input
+                          type="datetime-local"
+                          value={s.endTime}
+                          onChange={(e) => {
+                            const updated = [...sessions];
+                            updated[i] = { ...s, endTime: e.target.value };
+                            setSessions(updated);
+                          }}
+                          className="border-white/10 bg-white/[0.03] text-sm text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">Speaker Name</Label>
+                        <Input
+                          value={s.speakerName}
+                          onChange={(e) => {
+                            const updated = [...sessions];
+                            updated[i] = { ...s, speakerName: e.target.value };
+                            setSessions(updated);
+                          }}
+                          placeholder="John Doe"
+                          className="border-white/10 bg-white/[0.03] text-sm text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
