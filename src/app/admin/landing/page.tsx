@@ -380,54 +380,55 @@ export default function AdminLandingPage() {
       case "schedule":
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field
-                label="Badge"
-                value={d.badge}
-                onChange={(v) => updateNested("schedule", "badge", v)}
-              />
-              <Field
-                label="Title"
-                value={d.title}
-                onChange={(v) => updateNested("schedule", "title", v)}
-              />
-            </div>
+            <Field label="Badge" value={d.badge} onChange={(v) => updateNested("schedule", "badge", v)} />
+            <Field label="Title" value={d.title} onChange={(v) => updateNested("schedule", "title", v)} />
+            <Label className="text-xs text-gray-400 mt-4">Days & Sessions</Label>
             <ListEditor
               items={((d.days as Record<string, unknown>[]) || []).map((day) => ({
                 ...day,
-                sessionsJson: String(
-                  day.sessionsJson || JSON.stringify(day.sessions || [], null, 2)
-                ),
+                sessionsJson: String(day.sessionsJson || JSON.stringify(day.sessions || [], null, 2)),
               }))}
               fields={[
                 { key: "day", label: "Day Label" },
                 { key: "date", label: "Date" },
               ]}
               onChange={(items) => updateNested("schedule", "days", items)}
-              renderExtra={(item, index, fieldUpdate) => (
-                <div className="mt-3">
-                  <Label className="text-xs text-gray-400">Sessions (JSON format)</Label>
-                  <p className="mb-1 text-[10px] text-gray-600">
-                    Array of {`{ time, title, speaker, type }`} objects
-                  </p>
-                  <textarea
-                    value={String(
-                      item.sessionsJson ||
-                        JSON.stringify((item as Record<string, unknown>).sessions || [], null, 2)
-                    )}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value);
-                        fieldUpdate("sessions", parsed);
-                        fieldUpdate("sessionsJson", e.target.value);
-                      } catch {
-                        fieldUpdate("sessionsJson", e.target.value);
-                      }
-                    }}
-                    className="min-h-[120px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 font-mono text-xs text-green-400"
-                  />
-                </div>
-              )}
+              renderExtra={(item, index, fieldUpdate) => {
+                const sessions = (item.sessions as Record<string, string>[]) || [];
+                const updateSessions = (newSessions: Record<string, string>[]) => {
+                  fieldUpdate("sessions", newSessions);
+                  fieldUpdate("sessionsJson", JSON.stringify(newSessions, null, 2));
+                };
+                return (
+                  <div className="mt-3 border-t border-white/5 pt-3">
+                    <Label className="mb-2 text-xs text-gray-400">Sessions</Label>
+                    <div className="space-y-2">
+                      {sessions.map((s, si) => (
+                        <div key={si} className="grid grid-cols-4 gap-2">
+                          <Input placeholder="Time" value={s.time || ""} onChange={(e) => {
+                            const updated = [...sessions]; updated[si] = { ...s, time: e.target.value }; updateSessions(updated);
+                          }} className="border-white/10 bg-white/[0.05] text-xs text-white" />
+                          <Input placeholder="Title" value={s.title || ""} onChange={(e) => {
+                            const updated = [...sessions]; updated[si] = { ...s, title: e.target.value }; updateSessions(updated);
+                          }} className="border-white/10 bg-white/[0.05] text-xs text-white" />
+                          <Input placeholder="Speaker" value={s.speaker || ""} onChange={(e) => {
+                            const updated = [...sessions]; updated[si] = { ...s, speaker: e.target.value }; updateSessions(updated);
+                          }} className="border-white/10 bg-white/[0.05] text-xs text-white" />
+                          <div className="flex gap-1">
+                            <Input placeholder="Type" value={s.type || ""} onChange={(e) => {
+                              const updated = [...sessions]; updated[si] = { ...s, type: e.target.value }; updateSessions(updated);
+                            }} className="flex-1 border-white/10 bg-white/[0.05] text-xs text-white" />
+                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-red-400 hover:text-red-300"
+                              onClick={() => updateSessions(sessions.filter((_, j) => j !== si))}>×</Button>
+                          </div>
+                        </div>
+                      ))}
+                      <Button variant="outline" size="sm" className="w-full border-dashed border-white/20 text-xs text-gray-400"
+                        onClick={() => updateSessions([...sessions, { time: "", title: "", speaker: "", type: "Session" }])}>+ Add Session</Button>
+                    </div>
+                  </div>
+                );
+              }}
             />
           </div>
         );

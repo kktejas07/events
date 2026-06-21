@@ -60,7 +60,7 @@ export default async function HomePage() {
       }));
     }
 
-    // Fetch featured event for hero
+    // Fetch featured event with ticket types and schedule
     const featuredEvent = await db.event.findFirst({
       where: { isFeatured: true, status: "PUBLISHED" },
       include: {
@@ -68,6 +68,10 @@ export default async function HomePage() {
         ticketTypes: {
           where: { isActive: true },
           orderBy: { sortOrder: "asc" },
+        },
+        sessions: {
+          include: { speaker: true },
+          orderBy: [{ day: "asc" }, { startTime: "asc" }],
         },
       },
     });
@@ -89,6 +93,13 @@ export default async function HomePage() {
           price: Number(tt.price),
           perks: tt.perks,
           color: tt.color,
+        })),
+        sessions: featuredEvent.sessions.map((s) => ({
+          day: s.day,
+          time: `${new Date(s.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} - ${new Date(s.endTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`,
+          title: s.title,
+          speaker: s.speaker ? `${s.speaker.firstName} ${s.speaker.lastName}` : "TBA",
+          type: "Session",
         })),
       };
     }
