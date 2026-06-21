@@ -221,15 +221,6 @@ export default function HomePageClient({
   const [activeDay, setActiveDay] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    router.refresh();
-  }, []);
-
-  useEffect(() => {
-    setContent(initialContent);
-  }, [initialContent]);
 
   const hero = content.hero as Record<string, string>;
   const benefitsFromContent =
@@ -906,16 +897,18 @@ export default function HomePageClient({
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
-              Tickets
+              Ticket Options
             </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Choose Your Pass</h2>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              {ticketHeader?.title || "Choose Your Pass"}
+            </h2>
             <p className="mt-4 text-muted-foreground">
-              Select the perfect ticket for your needs and gain access to exclusive sessions,
-              workshops, and more.
+              {ticketHeader?.description ||
+                "Select the perfect ticket for your needs and gain access to exclusive sessions, workshops, and more."}
             </p>
           </motion.div>
           <motion.div
-            className="mt-12 grid gap-6 lg:grid-cols-4"
+            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -925,32 +918,76 @@ export default function HomePageClient({
               <motion.div
                 key={tier.name}
                 variants={staggerItem}
-                className={`relative rounded-xl border p-6 transition-all duration-300 hover:-translate-y-2 ${tier.highlighted ? "border-purple-500/50 bg-purple-500/10 shadow-lg shadow-purple-500/10" : "border-white/10 bg-white/[0.03] hover:border-purple-500/30 hover:bg-white/[0.06]"}`}
+                className={`group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2 ${
+                  tier.highlighted
+                    ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/20 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
+                    : "border border-white/10 bg-white/[0.02] hover:border-purple-500/30 hover:bg-white/[0.04]"
+                }`}
               >
                 {tier.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-3 py-1 text-xs font-semibold text-white">
-                      Most Popular
-                    </span>
+                  <div className="absolute right-0 top-0 z-10 rounded-bl-xl bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
+                    POPULAR
                   </div>
                 )}
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-white">{tier.name}</h3>
-                  <div className="mt-3">
-                    <span className="text-4xl font-bold text-white">${tier.price}</span>
+
+                {/* Barcode edge effect */}
+                <div className="absolute right-0 top-0 flex h-full w-10 flex-col justify-center gap-[2px] opacity-10">
+                  {Array.from({ length: 25 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-white"
+                      style={{
+                        height: `${2 + Math.random() * 4}px`,
+                        width: `${50 + Math.random() * 50}%`,
+                        marginLeft: "auto",
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Ticket card content */}
+                <div className="relative p-6">
+                  {/* Gradient line on top */}
+                  <div
+                    className={`mb-4 h-1 w-16 rounded-full bg-gradient-to-r ${tier.color || "from-purple-600 to-cyan-600"}`}
+                  />
+
+                  {/* Plan name */}
+                  <h3 className="text-xl font-bold text-white">{tier.name}</h3>
+
+                  {/* Price */}
+                  <div className="mt-3 flex items-baseline gap-1">
+                    <span className="text-sm text-gray-500">$</span>
+                    <span className="text-5xl font-bold text-white">{tier.price}</span>
                   </div>
-                  <Separator className="my-5 bg-white/10" />
-                  <ul className="space-y-3 text-left">
+
+                  {/* Date info */}
+                  <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-gray-400">
+                    <Calendar className="h-4 w-4 shrink-0 text-purple-400" />
+                    <span>October 1 to 5 - 10:00 AM</span>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="my-5 h-px bg-gradient-to-r from-white/20 via-white/10 to-transparent" />
+
+                  {/* Features */}
+                  <ul className="space-y-3">
                     {tier.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-gray-400">
+                      <li key={f} className="flex items-start gap-2.5 text-sm text-gray-400">
                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-purple-400" />
-                        {f}
+                        <span>{f}</span>
                       </li>
                     ))}
                   </ul>
+
+                  {/* Buy button */}
                   <Link href="/events" className="mt-6 block">
                     <Button
-                      className={`w-full transition-all duration-300 ${tier.highlighted ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40" : "border-white/10 bg-white/5 text-white hover:bg-white/10"}`}
+                      className={`w-full transition-all duration-300 ${
+                        tier.highlighted
+                          ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
+                          : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                      }`}
                     >
                       Buy Ticket <MoveRight className="ml-2 h-4 w-4" />
                     </Button>

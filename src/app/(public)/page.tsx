@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+import { unstable_noStore as noStore } from "next/cache";
 import { db } from "@/lib/db";
 import { defaultContent } from "@/lib/landing-defaults";
 import HomePageClient from "./_HomePageClient";
@@ -28,6 +29,7 @@ function deepMerge(target: Record<string, unknown>, source: Record<string, unkno
 }
 
 export default async function HomePage() {
+  noStore();
   let mergedContent: Record<string, unknown> = { ...defaultContent };
 
   try {
