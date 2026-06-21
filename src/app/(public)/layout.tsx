@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 

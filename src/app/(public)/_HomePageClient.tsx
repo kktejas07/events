@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const fadeInUp = {
@@ -220,6 +221,11 @@ export default function HomePageClient({
   const [activeDay, setActiveDay] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   useEffect(() => {
     setContent(initialContent);

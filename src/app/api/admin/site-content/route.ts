@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { defaultContent } from "@/lib/landing-defaults";
@@ -46,6 +47,8 @@ export async function PUT(req: NextRequest) {
       update: { data },
       create: { section, data },
     });
+
+    revalidatePath("/");
 
     return NextResponse.json({ success: true });
   } catch (error) {
