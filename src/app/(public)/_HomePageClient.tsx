@@ -349,9 +349,10 @@ export default function HomePageClient({
           muted
           loop
           playsInline
+          preload="metadata"
           className="absolute inset-0 h-full w-full object-cover"
         >
-          <source src="/videos/hero-background.mp4" type="video/mp4" />
+          <source src="/videos/hero-bg.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 bg-black/55" />
