@@ -36,14 +36,8 @@ export default async function HomePage() {
     const rows = await db.siteContent.findMany();
     for (const row of rows) {
       const sectionData = row.data as Record<string, unknown>;
-      const defaultSection = defaultContent[row.section] as
-        | Record<string, unknown>
-        | undefined;
-      if (
-        defaultSection &&
-        typeof defaultSection === "object" &&
-        !Array.isArray(defaultSection)
-      ) {
+      const defaultSection = defaultContent[row.section] as Record<string, unknown> | undefined;
+      if (defaultSection && typeof defaultSection === "object" && !Array.isArray(defaultSection)) {
         mergedContent[row.section] = deepMerge(defaultSection, sectionData);
       } else {
         mergedContent[row.section] = sectionData;

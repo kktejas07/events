@@ -314,12 +314,13 @@ export default function HomePageClient({
   const ctaContent = content.cta as Record<string, string>;
 
   // Real DB data (injected by server component)
-  const dbSponsors = (content._dbSponsors as Array<{
-    name: string;
-    tier: string;
-    logoUrl: string;
-    websiteUrl: string;
-  }>) ?? [];
+  const dbSponsors =
+    (content._dbSponsors as Array<{
+      name: string;
+      tier: string;
+      logoUrl: string;
+      websiteUrl: string;
+    }>) ?? [];
   const featuredEvent = content._featuredEvent as Record<string, unknown> | undefined;
 
   // Use DB sponsors for the section if available, otherwise use CMS data
@@ -331,9 +332,7 @@ export default function HomePageClient({
           initials: s.name.slice(0, 2).toUpperCase(),
           color: s.logoUrl
             ? "#6C5CE7"
-            : ["#7C3AED", "#06B6D4", "#F59E0B", "#8B5CF6", "#10B981", "#EC4899"][
-                s.name.length % 6
-              ],
+            : ["#7C3AED", "#06B6D4", "#F59E0B", "#8B5CF6", "#10B981", "#EC4899"][s.name.length % 6],
         }))
       : sponsorsFromContent;
 
