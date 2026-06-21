@@ -397,29 +397,6 @@ export default function AdminSettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Email Provider Card */}
-          <Card className="border-primary/20 bg-primary/5">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <Mail className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle>Email Provider</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      Configure your email delivery service
-                    </p>
-                  </div>
-                </div>
-                <Link href="/admin/settings/email">
-                  <Button variant="outline" className="gap-2">
-                    Configure <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-          </Card>
         </div>
       )}
     </div>
