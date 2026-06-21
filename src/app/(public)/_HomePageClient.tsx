@@ -379,6 +379,7 @@ export default function HomePageClient({
     color: string;
   }[];
   const speakerH = content.speakers as { badge?: string; title?: string; description?: string };
+  const featured = content._featuredEvent as Record<string, unknown> | undefined;
 
   // Schedule: prefer featured event DB sessions, fallback to CMS
   const dbSessions = (featured?.sessions as { day: number; time: string; title: string; speaker: string; type: string }[]) ?? [];
@@ -457,7 +458,6 @@ export default function HomePageClient({
   const faqH = content.faq as { badge?: string; title?: string };
   const news = content.newsletter as Record<string, string>;
   const cta = content.cta as Record<string, string>;
-  const featured = content._featuredEvent as Record<string, unknown> | undefined;
 
   // Icon map for benefits
   const iconMap: Record<string, React.ElementType> = {
