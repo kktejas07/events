@@ -19,7 +19,7 @@ async function firebaseSignIn(provider: "google" | "github") {
     toast.error("Firebase not configured. Please check your Firebase settings.");
     return false;
   }
-  const result = await signIn("credentials", {
+  const result = await signIn("firebase", {
     idToken,
     provider: "firebase",
     redirect: false,
@@ -42,7 +42,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn("email-password", {
         email: form.email,
         password: form.password,
         redirect: false,
