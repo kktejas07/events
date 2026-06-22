@@ -532,7 +532,17 @@ export default function HomePageClient({
         ref={heroRef}
         className="relative flex min-h-screen items-center overflow-hidden bg-[#0a0a1a]"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-[#0a0a1a] to-cyan-900/20" />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+          preload="metadata"
+          onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
+        >
+          <source src="/videos/hero-bg.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a1a] via-transparent to-[#0a0a1a]/30" />
 
