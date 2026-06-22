@@ -1,15 +1,20 @@
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
-const firebaseAdminConfig = {
-  credential: process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-    ? cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY))
-    : undefined,
-};
+function getFirebaseAdminConfig() {
+  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (!key) return {};
+  try {
+    return { credential: cert(JSON.parse(key)) };
+  } catch {
+    console.warn("Invalid FIREBASE_SERVICE_ACCOUNT_KEY JSON, using default credentials");
+    return {};
+  }
+}
 
 export function getFirebaseAdmin() {
   if (!getApps().length) {
-    initializeApp(firebaseAdminConfig);
+    initializeApp(getFirebaseAdminConfig());
   }
   return getAuth();
 }

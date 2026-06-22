@@ -539,6 +539,7 @@ export default function HomePageClient({
           playsInline
           className="absolute inset-0 h-full w-full object-cover"
           preload="metadata"
+          onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
         >
           <source src="/videos/hero-bg.mp4" type="video/mp4" />
         </video>
