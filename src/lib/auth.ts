@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials";
 import LinkedIn from "next-auth/providers/linkedin";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
-import { verifyFirebaseToken } from "@/lib/firebase";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -21,46 +20,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }),
         ]
       : []),
-    Credentials({
-      id: "firebase",
-      credentials: {
-        idToken: { label: "ID Token", type: "text" },
-        provider: { label: "Provider", type: "text" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.idToken || credentials?.provider !== "firebase") return null;
-
-        try {
-          const decoded = await verifyFirebaseToken(credentials.idToken as string);
-          const email = decoded.email || "";
-          const name = decoded.name || email.split("@")[0] || "User";
-          const photo = decoded.picture || "";
-
-          let user = await db.user.findUnique({ where: { email } });
-
-          if (!user) {
-            const [firstName, ...lastParts] = name.split(" ");
-            user = await db.user.create({
-              data: {
-                email,
-                firstName,
-                lastName: lastParts.join(" ") || "",
-                avatarUrl: photo,
-              },
-            });
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-            image: user.avatarUrl,
-          };
-        } catch {
-          return null;
-        }
-      },
-    }),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
