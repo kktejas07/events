@@ -85,15 +85,4 @@
     "tsx": "^4.15.6",
     "typescript": "^5.4.5"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "esbuild",
-      "prisma",
-      "protobufjs",
-      "sharp",
-      "unrs-resolver"
-    ]
-  }
 }
