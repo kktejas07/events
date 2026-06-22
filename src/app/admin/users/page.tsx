@@ -3,9 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
-import { Eye, Ban, Loader2 } from "lucide-react";
+import { Eye, Ban, Loader2, Plus, X } from "lucide-react";
 
 interface User {
   id: string;
@@ -31,6 +33,9 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
+  const [creating, setCreating] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -51,6 +56,36 @@ export default function AdminUsersPage() {
     setLoading(true);
     fetchUsers();
   }, [fetchUsers]);
+
+  async function handleCreateScanner(e: React.FormEvent) {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: newUser.email,
+          firstName: newUser.name,
+          lastName: "",
+          role: "SCANNER",
+          password: newUser.password,
+        }),
+      });
+      const json = await res.json();
+      if (json.success || res.ok) {
+        toast.success(`Scanner account created: ${newUser.email}`);
+        setNewUser({ name: "", email: "", password: "" });
+        setShowCreate(false);
+        fetchUsers();
+      } else {
+        toast.error(json.error || "Failed to create scanner");
+      }
+    } catch {
+      toast.error("Network error");
+    }
+    setCreating(false);
+  }
 
   async function handleBan(id: string, banned: boolean) {
     const action = banned ? "unban" : "ban";
@@ -83,10 +118,76 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-white">Users</h2>
-        <p className="text-gray-400">Registered users ({users.length} total)</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white">Users</h2>
+          <p className="text-gray-400">Registered users ({total} total)</p>
+        </div>
+        <Button
+          onClick={() => setShowCreate(!showCreate)}
+          className="gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+        >
+          {showCreate ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {showCreate ? "Cancel" : "Create Scanner"}
+        </Button>
       </div>
+
+      {showCreate && (
+        <Card className="border-purple-500/30 bg-purple-500/5">
+          <CardHeader>
+            <CardTitle className="text-white">Create Scanner Account</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateScanner} className="space-y-4">
+              <p className="text-sm text-gray-400">
+                Scanner accounts can only use the ticket scanning page. They won&apos;t have admin access.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-1">
+                  <Label className="text-sm text-gray-300">Full Name</Label>
+                  <Input
+                    placeholder="John Doe"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    required
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-sm text-gray-300">Email</Label>
+                  <Input
+                    type="email"
+                    placeholder="scanner@example.com"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    required
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-sm text-gray-300">Password</Label>
+                  <Input
+                    type="text"
+                    placeholder="Min 8 characters"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    required
+                    minLength={8}
+                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+              <Button
+                type="submit"
+                disabled={creating}
+                className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+              >
+                {creating ? "Creating..." : "Create Scanner Account"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="border-white/10 bg-white/[0.03]">
         <CardHeader>

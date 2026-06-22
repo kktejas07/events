@@ -18,6 +18,7 @@ interface EmailSettings {
   SMTP_PASS: string;
   POSTAL_BASE_URL: string;
   POSTAL_API_KEY: string;
+  BREVO_API_KEY: string;
   MAIL_FROM_NAME: string;
   MAIL_FROM_EMAIL: string;
   EMAIL_FROM: string;
@@ -32,6 +33,7 @@ const defaults: EmailSettings = {
   SMTP_PASS: "",
   POSTAL_BASE_URL: "https://mail.studentalumni.ai",
   POSTAL_API_KEY: "",
+  BREVO_API_KEY: "",
   MAIL_FROM_NAME: "Events Platform",
   MAIL_FROM_EMAIL: "noreply@yourdomain.com",
   EMAIL_FROM: "",
@@ -82,8 +84,14 @@ export default function EmailSettingsPage() {
     setTesting(true);
     setTestResult(null);
     try {
+      const isBrevo = settings.EMAIL_PROVIDER === "brevo";
       const isPostal = settings.EMAIL_PROVIDER === "postal";
-      const body = isPostal
+      const body = isBrevo
+        ? {
+            provider: "brevo",
+            config: { apiKey: settings.BREVO_API_KEY },
+          }
+        : isPostal
         ? {
             provider: "postal",
             config: { baseUrl: settings.POSTAL_BASE_URL, apiKey: settings.POSTAL_API_KEY },
@@ -156,7 +164,7 @@ export default function EmailSettingsPage() {
           <CardTitle>Choose Provider</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <button
               type="button"
               onClick={() => update("EMAIL_PROVIDER", "smtp")}
@@ -168,7 +176,21 @@ export default function EmailSettingsPage() {
             >
               <p className="text-lg font-semibold">SMTP</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Use any SMTP server — Postal SMTP, Gmail, SendGrid, etc.
+                Use any SMTP server — Gmail, SendGrid, etc.
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => update("EMAIL_PROVIDER", "brevo")}
+              className={`rounded-xl border-2 p-5 text-left transition-all hover:shadow-md ${
+                provider === "brevo"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary"
+                  : "border-border hover:border-muted-foreground"
+              }`}
+            >
+              <p className="text-lg font-semibold">Brevo</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Brevo (Sendinblue) — REST API with free tier
               </p>
             </button>
             <button
@@ -213,7 +235,23 @@ export default function EmailSettingsPage() {
       </Card>
 
       {/* Provider Config */}
-      {provider === "postal" ? (
+      {provider === "brevo" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Brevo API</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <PasswordInput
+              label="API Key"
+              value={settings.BREVO_API_KEY}
+              onChange={(v) => update("BREVO_API_KEY", v)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Get your API key from Brevo Dashboard → SMTP &amp; API → API Keys
+            </p>
+          </CardContent>
+        </Card>
+      ) : provider === "postal" ? (
         <Card>
           <CardHeader>
             <CardTitle>Postal API</CardTitle>

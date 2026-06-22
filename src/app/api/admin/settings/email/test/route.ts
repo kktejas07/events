@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { PostalApiProvider } from "@/services/email/providers/postal-provider";
 import { SmtpProvider } from "@/services/email/providers/smtp-provider";
+import { BrevoProvider } from "@/services/email/providers/brevo-provider";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -13,7 +14,12 @@ export async function POST(req: Request) {
   const { provider, config } = await req.json();
 
   let testProvider;
-  if (provider === "postal") {
+  if (provider === "brevo") {
+    testProvider = new BrevoProvider({
+      apiKey: config.apiKey,
+      defaultSender: { name: "Test", email: "test@example.com" },
+    });
+  } else if (provider === "postal") {
     testProvider = new PostalApiProvider(config.baseUrl, config.apiKey);
   } else if (provider === "smtp") {
     testProvider = new SmtpProvider(config.smtp);
