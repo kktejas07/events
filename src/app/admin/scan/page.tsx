@@ -80,6 +80,10 @@ export default function ScanPage() {
               at the ticket&apos;s barcode or QR code. The ticket will be verified and checked in automatically.
               Works on both iOS and Android devices — no app install required.
             </p>
+            <p className="mt-2 text-purple-400">
+              For event staff: share <strong>/scan</strong> with scanner-only accounts (SCANNER role).
+              They won&apos;t have access to the admin panel.
+            </p>
           </div>
         </CardContent>
       </Card>
