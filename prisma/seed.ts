@@ -33,12 +33,12 @@ async function main() {
   await prisma.user.deleteMany();
 
   // Create admin user
-  const adminHash = await bcrypt.hash("admin123", 12);
+  const adminHash = await bcrypt.hash("Omsairam@4522!!", 12);
   const admin = await prisma.user.upsert({
-    where: { email: "admin@eventsplatform.com" },
+    where: { email: "events@forgetechno.com" },
     update: {},
     create: {
-      email: "admin@eventsplatform.com",
+      email: "events@forgetechno.com",
       passwordHash: adminHash,
       firstName: "Admin",
       lastName: "User",

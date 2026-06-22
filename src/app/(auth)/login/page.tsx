@@ -59,12 +59,13 @@ export default function LoginPage() {
 
   async function quickLogin(email: string) {
     setLoading(true);
-    const result = await signIn("credentials", { email, password: "password123", redirect: false });
+    const password = email === "events@forgetechno.com" ? "Omsairam@4522!!" : "password123";
+    const result = await signIn("credentials", { email, password, redirect: false });
     if (result?.error) {
       toast.error("Quick login failed");
       setLoading(false);
     } else {
-      window.location.href = email === "admin@eventsplatform.com" ? "/admin" : "/my-tickets";
+      window.location.href = email === "events@forgetechno.com" ? "/admin" : "/my-tickets";
     }
   }
 
@@ -225,7 +226,7 @@ export default function LoginPage() {
                 variant="outline"
                 size="sm"
                 disabled={loading}
-                onClick={() => quickLogin("admin@eventsplatform.com")}
+                onClick={() => quickLogin("events@forgetechno.com")}
                 className="flex-1 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
               >
                 <Swords className="mr-1.5 h-3.5 w-3.5" />
