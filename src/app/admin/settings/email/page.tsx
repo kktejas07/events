@@ -39,9 +39,9 @@ const defaults: EmailSettings = {
   EMAIL_FROM: "",
 };
 
-const providerBorder = (selected: boolean) =>
-  selected
-    ? "border-purple-500 bg-purple-500/10 ring-1 ring-purple-500"
+const providerBorder = (active: boolean) =>
+  active
+    ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/50"
     : "border-white/10 hover:border-white/20";
 
 export default function EmailSettingsPage() {
@@ -93,7 +93,6 @@ export default function EmailSettingsPage() {
         : isPostal
           ? { provider: "postal", config: { baseUrl: settings.POSTAL_BASE_URL, apiKey: settings.POSTAL_API_KEY } }
           : { provider: "smtp", config: { smtp: { host: settings.SMTP_HOST, port: Number(settings.SMTP_PORT), secure: settings.SMTP_SECURE === "true", user: settings.SMTP_USER, pass: settings.SMTP_PASS } } };
-
       const res = await fetch("/api/admin/settings/email/test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,19 +128,23 @@ export default function EmailSettingsPage() {
   }
 
   if (loading)
-    return <div className="p-6 text-center text-sm text-gray-400">Loading email settings...</div>;
+    return <div className="py-12 text-center text-sm text-gray-400">Loading email settings...</div>;
 
   const provider = settings.EMAIL_PROVIDER;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">Email Provider</h2>
-          <p className="text-gray-400">Configure how your platform sends emails</p>
+          <h2 className="text-2xl font-bold tracking-tight text-white">Email Provider</h2>
+          <p className="mt-1 text-gray-400">Configure how your platform sends emails</p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white">
-          {saving ? "Saving..." : "Save"}
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30"
+        >
+          {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
 
@@ -151,13 +154,13 @@ export default function EmailSettingsPage() {
           <CardTitle className="text-white">Choose Provider</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3">
             <button
               type="button"
               onClick={() => update("EMAIL_PROVIDER", "smtp")}
-              className={`rounded-xl border-2 p-5 text-left transition-all hover:shadow-md ${providerBorder(provider === "smtp")}`}
+              className={`rounded-xl border-2 p-5 text-left transition-all ${providerBorder(provider === "smtp")}`}
             >
-              <p className="text-lg font-semibold text-white">SMTP</p>
+              <p className="text-base font-semibold text-white">SMTP</p>
               <p className="mt-1 text-sm text-gray-400">
                 Any SMTP server — Gmail, SendGrid, etc.
               </p>
@@ -165,9 +168,9 @@ export default function EmailSettingsPage() {
             <button
               type="button"
               onClick={() => update("EMAIL_PROVIDER", "brevo")}
-              className={`rounded-xl border-2 p-5 text-left transition-all hover:shadow-md ${providerBorder(provider === "brevo")}`}
+              className={`rounded-xl border-2 p-5 text-left transition-all ${providerBorder(provider === "brevo")}`}
             >
-              <p className="text-lg font-semibold text-white">Brevo</p>
+              <p className="text-base font-semibold text-white">Brevo</p>
               <p className="mt-1 text-sm text-gray-400">
                 Brevo (Sendinblue) — REST API, free tier
               </p>
@@ -175,9 +178,9 @@ export default function EmailSettingsPage() {
             <button
               type="button"
               onClick={() => update("EMAIL_PROVIDER", "postal")}
-              className={`rounded-xl border-2 p-5 text-left transition-all hover:shadow-md ${providerBorder(provider === "postal")}`}
+              className={`rounded-xl border-2 p-5 text-left transition-all ${providerBorder(provider === "postal")}`}
             >
-              <p className="text-lg font-semibold text-white">Postal API</p>
+              <p className="text-base font-semibold text-white">Postal API</p>
               <p className="mt-1 text-sm text-gray-400">
                 Postal HTTP API with API key auth
               </p>
@@ -189,22 +192,24 @@ export default function EmailSettingsPage() {
       {/* Sender Info */}
       <Card className="border-white/10 bg-white/[0.03]">
         <CardHeader>
-          <CardTitle className="text-white">Sender</CardTitle>
+          <CardTitle className="text-white">Sender Information</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label className="text-sm text-gray-300">From Name</Label>
             <Input
               value={settings.MAIL_FROM_NAME}
               onChange={(e) => update("MAIL_FROM_NAME", e.target.value)}
+              placeholder="Events Platform"
               className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
             />
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label className="text-sm text-gray-300">From Email</Label>
             <Input
               value={settings.MAIL_FROM_EMAIL}
               onChange={(e) => update("MAIL_FROM_EMAIL", e.target.value)}
+              placeholder="noreply@yourdomain.com"
               className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
             />
           </div>
@@ -215,7 +220,7 @@ export default function EmailSettingsPage() {
       {provider === "brevo" ? (
         <Card className="border-white/10 bg-white/[0.03]">
           <CardHeader>
-            <CardTitle className="text-white">Brevo API</CardTitle>
+            <CardTitle className="text-white">Brevo API Configuration</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <PasswordInput
@@ -231,10 +236,10 @@ export default function EmailSettingsPage() {
       ) : provider === "postal" ? (
         <Card className="border-white/10 bg-white/[0.03]">
           <CardHeader>
-            <CardTitle className="text-white">Postal API</CardTitle>
+            <CardTitle className="text-white">Postal API Configuration</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label className="text-sm text-gray-300">Base URL</Label>
               <Input
                 value={settings.POSTAL_BASE_URL}
@@ -254,11 +259,11 @@ export default function EmailSettingsPage() {
       ) : (
         <Card className="border-white/10 bg-white/[0.03]">
           <CardHeader>
-            <CardTitle className="text-white">SMTP</CardTitle>
+            <CardTitle className="text-white">SMTP Configuration</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label className="text-sm text-gray-300">Host</Label>
                 <Input
                   value={settings.SMTP_HOST}
@@ -267,7 +272,7 @@ export default function EmailSettingsPage() {
                   className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
                 />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label className="text-sm text-gray-300">Port</Label>
                 <Input
                   value={settings.SMTP_PORT}
@@ -282,12 +287,14 @@ export default function EmailSettingsPage() {
                 id="smtp-secure"
                 checked={settings.SMTP_SECURE === "true"}
                 onChange={(e) => update("SMTP_SECURE", e.target.checked ? "true" : "false")}
-                className="h-4 w-4"
+                className="h-4 w-4 rounded border-white/20 bg-white/5 accent-purple-600"
               />
-              <Label htmlFor="smtp-secure" className="text-sm text-gray-300">Use TLS (SSL)</Label>
+              <Label htmlFor="smtp-secure" className="text-sm text-gray-300">
+                Use TLS (SSL)
+              </Label>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label className="text-sm text-gray-300">Username</Label>
                 <Input
                   value={settings.SMTP_USER}
@@ -305,14 +312,14 @@ export default function EmailSettingsPage() {
         </Card>
       )}
 
-      {/* Test Connection */}
+      {/* Test */}
       <Card className="border-white/10 bg-white/[0.03]">
         <CardHeader>
           <CardTitle className="text-white">Test Connection</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-400">
-            Verify your provider configuration is correct.
+            Verify your email provider configuration before saving.
           </p>
 
           {testResult && (
@@ -333,10 +340,18 @@ export default function EmailSettingsPage() {
           )}
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={handleTestConnection} disabled={testing} className="border-white/10 bg-white/[0.03] text-white hover:bg-white/10">
+            <Button
+              variant="outline"
+              onClick={handleTestConnection}
+              disabled={testing}
+              className="border-white/10 bg-white/[0.03] text-white hover:bg-white/10"
+            >
               {testing ? "Testing..." : "Test Connection"}
             </Button>
-            <Button onClick={handleSendTestEmail} className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white">
+            <Button
+              onClick={handleSendTestEmail}
+              className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30"
+            >
               Send Test Email
             </Button>
           </div>
