@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Github, Linkedin, Sparkles, ArrowRight, Swords, UserRound } from "lucide-react";
+import { Github, Linkedin, Sparkles, ArrowRight } from "lucide-react";
 import { signInWithGoogle, signInWithGithub } from "@/lib/firebase-auth";
 
 async function firebaseSignIn(provider: "google" | "github") {
@@ -55,18 +55,6 @@ export default function LoginPage() {
       toast.error("Something went wrong");
     }
     setLoading(false);
-  }
-
-  async function quickLogin(email: string) {
-    setLoading(true);
-    const password = email === "events@forgetechno.com" ? "Omsairam@4522!!" : "password123";
-    const result = await signIn("credentials", { email, password, redirect: false });
-    if (result?.error) {
-      toast.error("Quick login failed");
-      setLoading(false);
-    } else {
-      window.location.href = email === "events@forgetechno.com" ? "/admin" : "/my-tickets";
-    }
   }
 
   async function handleSocialLogin(provider: "google" | "github") {
@@ -222,26 +210,7 @@ export default function LoginPage() {
             </form>
 
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={loading}
-                onClick={() => quickLogin("events@forgetechno.com")}
-                className="flex-1 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-              >
-                <Swords className="mr-1.5 h-3.5 w-3.5" />
-                Admin Login
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={loading}
-                onClick={() => quickLogin("john@example.com")}
-                className="flex-1 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-              >
-                <UserRound className="mr-1.5 h-3.5 w-3.5" />
-                Test User
-              </Button>
+              
             </div>
           </motion.div>
 
