@@ -12,7 +12,8 @@ ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
 ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID
 
 COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts && \
+    pnpm rebuild @prisma/client @prisma/engines esbuild prisma protobufjs sharp unrs-resolver
 COPY . .
 RUN pnpm db:generate
 RUN pnpm build
