@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Github, Linkedin, Sparkles, ArrowRight, Swords, UserRound } from "lucide-react";
+import { Github, Linkedin, Sparkles, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { signInWithGoogle, signInWithGithub } from "@/lib/firebase-auth";
 
 async function firebaseSignIn(provider: "google" | "github") {
@@ -60,6 +60,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<"google" | "github" | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -330,30 +332,48 @@ export default function RegisterPage() {
                   <Label htmlFor="password" className="text-sm text-gray-300">
                     Password *
                   </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Min 8 characters"
-                    value={form.password}
-                    onChange={(e) => update("password", e.target.value)}
-                    required
-                    minLength={8}
-                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Min 8 characters"
+                      value={form.password}
+                      onChange={(e) => update("password", e.target.value)}
+                      required
+                      minLength={8}
+                      className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="confirmPassword" className="text-sm text-gray-300">
                     Confirm *
                   </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Re-enter password"
-                    value={form.confirmPassword}
-                    onChange={(e) => update("confirmPassword", e.target.value)}
-                    required
-                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirm ? "text" : "password"}
+                      placeholder="Re-enter password"
+                      value={form.confirmPassword}
+                      onChange={(e) => update("confirmPassword", e.target.value)}
+                      required
+                      className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    >
+                      {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
