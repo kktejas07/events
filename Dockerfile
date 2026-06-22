@@ -25,9 +25,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Prisma client at runtime
-COPY --from=builder /app/node_modules/.prisma/client ./node_modules/.prisma/client 2>/dev/null || true
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+    # Prisma client at runtime
+    COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
