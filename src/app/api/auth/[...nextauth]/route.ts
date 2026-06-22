@@ -12,13 +12,15 @@ const { handlers } = NextAuth({
     error: "/login",
   },
   providers: [
-    LinkedIn({
-      clientId: process.env.AUTH_LINKEDIN_ID!,
-      clientSecret: process.env.AUTH_LINKEDIN_SECRET!,
-      authorization: {
-        params: { scope: "openid profile email" },
-      },
-    }),
+    ...(process.env.AUTH_LINKEDIN_ID && process.env.AUTH_LINKEDIN_SECRET
+      ? [
+          LinkedIn({
+            clientId: process.env.AUTH_LINKEDIN_ID,
+            clientSecret: process.env.AUTH_LINKEDIN_SECRET,
+            authorization: { params: { scope: "openid profile email" } },
+          }),
+        ]
+      : []),
     Credentials({
       id: "firebase",
       credentials: {

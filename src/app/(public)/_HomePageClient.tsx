@@ -532,17 +532,7 @@ export default function HomePageClient({
         ref={heroRef}
         className="relative flex min-h-screen items-center overflow-hidden bg-[#0a0a1a]"
       >
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover"
-          preload="metadata"
-          onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
-        >
-          <source src="/videos/hero-bg.mp4" type="video/mp4" />
-        </video>
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-[#0a0a1a] to-cyan-900/20" />
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a1a] via-transparent to-[#0a0a1a]/30" />
 
@@ -654,7 +644,7 @@ export default function HomePageClient({
           MARQUEE BANDS
           ═══════════════════════════════════════════ */}
       <section className="overflow-hidden bg-[#0a0a1a]">
-        <div className="bg-gradient-to-r from-purple-900/30 via-purple-800/20 to-purple-900/30 py-5">
+        <div className="bg-gradient-to-r from-purple-700/60 via-purple-600/50 to-purple-700/60 py-5 shadow-lg shadow-purple-900/30">
           <div className="animate-marquee flex whitespace-nowrap text-4xl font-extrabold uppercase tracking-wider text-white sm:text-5xl">
             {[...Array(4)].flatMap((_, setIdx) =>
               (marquee.length
@@ -670,19 +660,19 @@ export default function HomePageClient({
               ).map((t, i) => (
                 <span key={`a-${setIdx}-${i}`} className="mx-4 flex items-center gap-4">
                   {t}
-                  <span className="text-purple-500/30">/</span>
+                  <span className="text-purple-300/40">/</span>
                 </span>
               ))
             )}
           </div>
         </div>
-        <div className="-mt-4 bg-gradient-to-r from-cyan-900/30 via-purple-800/20 to-cyan-900/30 py-5">
+        <div className="-mt-4 bg-gradient-to-r from-cyan-700/60 via-teal-600/50 to-cyan-700/60 py-5 shadow-lg shadow-cyan-900/30 -rotate-1">
           <div className="animate-marquee-reverse flex whitespace-nowrap text-4xl font-extrabold uppercase tracking-wider text-white sm:text-5xl">
             {[...Array(4)].flatMap((_, setIdx) =>
               qMarquee.map((t, i) => (
                 <span key={`b-${setIdx}-${i}`} className="mx-4 flex items-center gap-4">
                   {t}
-                  <span className="text-cyan-500/30">/</span>
+                  <span className="text-cyan-300/40">/</span>
                 </span>
               ))
             )}
