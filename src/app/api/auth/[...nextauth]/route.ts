@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { verifyFirebaseToken } from "@/lib/firebase";
 
 const { handlers } = NextAuth({
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
