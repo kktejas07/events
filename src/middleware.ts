@@ -12,6 +12,15 @@ export default auth((req) => {
     }
   }
 
+  if (pathname.startsWith("/scan")) {
+    if (!req.auth) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    if (!["ADMIN", "SUPER_ADMIN", "SCANNER"].includes(role || "")) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+  }
+
   if (
     pathname.startsWith("/my-tickets") ||
     pathname.startsWith("/profile") ||
@@ -24,6 +33,9 @@ export default auth((req) => {
 
   if (pathname.startsWith("/my-tickets") || pathname.startsWith("/profile")) {
     if (["ADMIN", "SUPER_ADMIN", "SCANNER"].includes(role || "")) {
+      if (role === "SCANNER") {
+        return NextResponse.redirect(new URL("/scan", req.url));
+      }
       return NextResponse.redirect(new URL("/admin", req.url));
     }
   }
@@ -32,5 +44,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/my-tickets/:path*", "/profile/:path*", "/checkout"],
+  matcher: ["/admin/:path*", "/my-tickets/:path*", "/profile/:path*", "/checkout", "/scan"],
 };
