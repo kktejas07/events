@@ -1,9 +1,20 @@
 import { EmailService, PostalApiProvider, SmtpProvider } from "@/services/email";
+import { BrevoProvider } from "@/services/email/providers/brevo-provider";
 
 let emailServiceInstance: EmailService | null = null;
 
 function buildProvider() {
   const provider = process.env.EMAIL_PROVIDER || "smtp";
+
+  if (provider === "brevo") {
+    return new BrevoProvider({
+      apiKey: process.env.BREVO_API_KEY || "",
+      defaultSender: {
+        name: process.env.MAIL_FROM_NAME || "Events Platform",
+        email: process.env.MAIL_FROM_EMAIL || "noreply@events.forgetechno.com",
+      },
+    });
+  }
 
   if (provider === "postal") {
     return new PostalApiProvider(

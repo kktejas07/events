@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { EmailService } from "@/services/email";
 import { PostalApiProvider } from "@/services/email/providers/postal-provider";
 import { SmtpProvider } from "@/services/email/providers/smtp-provider";
+import { BrevoProvider } from "@/services/email/providers/brevo-provider";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -27,7 +28,12 @@ export async function POST(req: Request) {
   const fromEmail = s.MAIL_FROM_EMAIL || process.env.MAIL_FROM_EMAIL || "noreply@yourdomain.com";
 
   let emailProvider;
-  if (provider === "postal") {
+  if (provider === "brevo") {
+    emailProvider = new BrevoProvider({
+      apiKey: s.BREVO_API_KEY || process.env.BREVO_API_KEY || "",
+      defaultSender: { name: fromName, email: fromEmail },
+    });
+  } else if (provider === "postal") {
     emailProvider = new PostalApiProvider(
       s.POSTAL_BASE_URL || process.env.POSTAL_BASE_URL || "",
       s.POSTAL_API_KEY || process.env.POSTAL_API_KEY || ""

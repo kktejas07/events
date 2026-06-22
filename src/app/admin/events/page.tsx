@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import { Plus, Edit, Trash2, Eye } from "lucide-react";
 
@@ -24,13 +25,18 @@ export default function AdminEventsPage() {
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  async function fetchEvents() {
+  const fetchEvents = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/events");
+      const res = await fetch(`/api/admin/events?page=${page}&limit=10`);
       const json = await res.json();
       if (json.success) {
         setEvents(json.data);
+        setTotalPages(json.meta.totalPages);
+        setTotal(json.meta.total);
       } else {
         toast.error(json.error || "Failed to load events");
       }
@@ -38,11 +44,12 @@ export default function AdminEventsPage() {
       toast.error("Network error loading events");
     }
     setLoading(false);
-  }
+  }, [page]);
 
   useEffect(() => {
+    setLoading(true);
     fetchEvents();
-  }, []);
+  }, [fetchEvents]);
 
   async function handleDelete(id: string, title: string) {
     if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
@@ -182,6 +189,12 @@ export default function AdminEventsPage() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              onPageChange={setPage}
+            />
           </CardContent>
         </Card>
       )}

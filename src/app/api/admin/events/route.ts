@@ -4,23 +4,37 @@ import { eventSchema } from "@/lib/validations";
 import { auth } from "@/lib/auth";
 import { generateSlug } from "@/lib/utils";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const events = await db.event.findMany({
-      include: {
-        ticketTypes: { where: { isActive: true } },
-        venue: true,
-        _count: { select: { orders: true } },
-      },
-      orderBy: { startDate: "desc" },
-    });
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
 
-    return NextResponse.json({ success: true, data: events });
+    const [events, total] = await Promise.all([
+      db.event.findMany({
+        include: {
+          ticketTypes: { where: { isActive: true } },
+          venue: true,
+          _count: { select: { orders: true } },
+        },
+        orderBy: { startDate: "desc" },
+        skip,
+        take: limit,
+      }),
+      db.event.count(),
+    ]);
+
+    return NextResponse.json({
+      success: true,
+      data: events,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
   } catch (error) {
     console.error("Admin events fetch error:", error);
     return NextResponse.json({ success: false, error: "Failed to fetch events" }, { status: 500 });

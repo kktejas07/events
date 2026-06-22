@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import { Eye, Ban, Loader2 } from "lucide-react";
 
@@ -27,22 +28,29 @@ const roleColor: Record<string, string> = {
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/users");
+      const res = await fetch(`/api/admin/users?page=${page}&limit=20`);
       const json = await res.json();
-      if (json.success) setUsers(json.data);
-      else toast.error(json.error || "Failed to load users");
+      if (json.success) {
+        setUsers(json.data);
+        setTotalPages(json.meta.totalPages);
+        setTotal(json.meta.total);
+      } else toast.error(json.error || "Failed to load users");
     } catch {
       toast.error("Network error");
     }
     setLoading(false);
-  }
+  }, [page]);
 
   useEffect(() => {
+    setLoading(true);
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   async function handleBan(id: string, banned: boolean) {
     const action = banned ? "unban" : "ban";
@@ -88,7 +96,8 @@ export default function AdminUsersPage() {
           {users.length === 0 ? (
             <p className="text-gray-400">No users registered yet.</p>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/10 text-left">
@@ -147,6 +156,13 @@ export default function AdminUsersPage() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              onPageChange={setPage}
+            />
+          </>
           )}
         </CardContent>
       </Card>

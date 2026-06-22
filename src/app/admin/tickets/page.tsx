@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import { Eye, Ban, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -29,22 +30,29 @@ const statusColor: Record<string, string> = {
 export default function AdminTicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  async function fetchTickets() {
+  const fetchTickets = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/tickets");
+      const res = await fetch(`/api/admin/tickets?page=${page}&limit=20`);
       const json = await res.json();
-      if (json.success) setTickets(json.data);
-      else toast.error(json.error || "Failed to load tickets");
+      if (json.success) {
+        setTickets(json.data);
+        setTotalPages(json.meta.totalPages);
+        setTotal(json.meta.total);
+      } else toast.error(json.error || "Failed to load tickets");
     } catch {
       toast.error("Network error");
     }
     setLoading(false);
-  }
+  }, [page]);
 
   useEffect(() => {
+    setLoading(true);
     fetchTickets();
-  }, []);
+  }, [fetchTickets]);
 
   async function handleRevoke(id: string) {
     if (!window.confirm("Revoke this ticket?")) return;
@@ -87,7 +95,8 @@ export default function AdminTicketsPage() {
           {tickets.length === 0 ? (
             <p className="text-gray-400">No tickets issued yet.</p>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/10 text-left">
@@ -157,6 +166,13 @@ export default function AdminTicketsPage() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              onPageChange={setPage}
+            />
+          </>
           )}
         </CardContent>
       </Card>

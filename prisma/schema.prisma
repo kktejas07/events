@@ -271,14 +271,16 @@ model Ticket {
 }
 
 model ScanLog {
-  id         String   @id @default(cuid())
-  ticketId   String
-  scannedBy  String
-  eventId    String
-  success    Boolean
-  result     String?
-  deviceInfo String?
-  ipAddress  String?
+  id          String   @id @default(cuid())
+  ticketId    String
+  scannedBy   String
+  eventId     String
+  success     Boolean
+  result      String?
+  deviceInfo  String?
+  ipAddress   String?
+  userAgent   String?
+  geoLocation String?
 
   ticket Ticket @relation(fields: [ticketId], references: [id])
 
