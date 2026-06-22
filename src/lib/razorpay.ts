@@ -5,10 +5,12 @@ let razorpayInstance: Razorpay | null = null;
 
 export function getRazorpay(): Razorpay {
   if (!razorpayInstance) {
-    razorpayInstance = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID!,
-      key_secret: process.env.RAZORPAY_KEY_SECRET!,
-    });
+    const key_id = process.env.RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!key_id || !key_secret) {
+      throw new Error("Razorpay keys not configured (missing RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET)");
+    }
+    razorpayInstance = new Razorpay({ key_id, key_secret });
   }
   return razorpayInstance;
 }
