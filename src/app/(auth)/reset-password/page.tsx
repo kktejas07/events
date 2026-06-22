@@ -58,7 +58,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a1a] px-4">
+    <div className="relative flex h-full items-center justify-center overflow-hidden bg-[#0a0a1a] px-4">
       <div className="animate-gradient absolute inset-0 bg-gradient-to-br from-purple-900/30 via-[#0a0a1a] to-cyan-900/20" />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -182,7 +182,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#0a0a1a]">
+        <div className="flex h-full items-center justify-center bg-[#0a0a1a]">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
         </div>
       }
