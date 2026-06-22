@@ -1,0 +1,15 @@
+.next
+node_modules
+.git
+.gitignore
+.env
+.env.example
+.env.local
+.env.production
+.next
+*.md
+.DS_Store
+.gitkeep
+.vscode
+.idea
+*.mp4

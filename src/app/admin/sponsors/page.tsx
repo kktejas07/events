@@ -82,7 +82,13 @@ export default async function AdminSponsorsPage() {
                             rel="noopener noreferrer"
                             className="text-primary hover:underline"
                           >
-                            {new URL(sponsor.websiteUrl).hostname}
+                            {(() => {
+                              try {
+                                return new URL(sponsor.websiteUrl.startsWith("http") ? sponsor.websiteUrl : `https://${sponsor.websiteUrl}`).hostname;
+                              } catch {
+                                return sponsor.websiteUrl;
+                              }
+                            })()}
                           </a>
                         ) : (
                           <span className="text-muted-foreground">—</span>

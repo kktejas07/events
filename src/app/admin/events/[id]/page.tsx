@@ -136,11 +136,17 @@ export default function EventFormPage() {
                 e.sessions.map((s: Record<string, unknown>) => ({
                   id: s.id as string,
                   title: (s.title as string) || "",
-                  startTime: s.startTime ? new Date(s.startTime as string).toISOString().slice(0, 16) : "",
-                  endTime: s.endTime ? new Date(s.endTime as string).toISOString().slice(0, 16) : "",
+                  startTime: s.startTime
+                    ? new Date(s.startTime as string).toISOString().slice(0, 16)
+                    : "",
+                  endTime: s.endTime
+                    ? new Date(s.endTime as string).toISOString().slice(0, 16)
+                    : "",
                   room: (s.room as string) || "",
                   day: (s.day as number) || 1,
-                  speakerName: s.speaker ? `${(s.speaker as Record<string,string>).firstName || ""} ${(s.speaker as Record<string,string>).lastName || ""}` : "",
+                  speakerName: s.speaker
+                    ? `${(s.speaker as Record<string, string>).firstName || ""} ${(s.speaker as Record<string, string>).lastName || ""}`
+                    : "",
                 }))
               );
             }
@@ -372,7 +378,7 @@ export default function EventFormPage() {
                   onChange={(e) => setForm((prev) => ({ ...prev, isFeatured: e.target.checked }))}
                   className="h-4 w-4 rounded accent-purple-500"
                 />
-                <Label htmlFor="isFeatured" className="text-gray-300 cursor-pointer">
+                <Label htmlFor="isFeatured" className="cursor-pointer text-gray-300">
                   Featured Event (display on landing page)
                 </Label>
               </div>
@@ -524,10 +530,7 @@ export default function EventFormPage() {
             ) : (
               <div className="space-y-3">
                 {sessions.map((s, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg border border-white/10 bg-white/[0.02] p-4"
-                  >
+                  <div key={i} className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
                     <div className="mb-2 flex items-center justify-between">
                       <span className="text-sm text-gray-400">Session #{i + 1}</span>
                       <Button
@@ -535,9 +538,7 @@ export default function EventFormPage() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-red-400 hover:text-red-300"
-                        onClick={() =>
-                          setSessions((prev) => prev.filter((_, j) => j !== i))
-                        }
+                        onClick={() => setSessions((prev) => prev.filter((_, j) => j !== i))}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>

@@ -67,16 +67,16 @@ function CountdownTimer({ target }: { target?: string }) {
   }, [target]);
 
   return (
-    <div className="flex gap-2 text-center">
+    <div className="flex gap-2 text-center sm:gap-4">
       {[
         { l: "Days", v: time.days },
         { l: "Hours", v: String(time.hours).padStart(2, "0") },
         { l: "Mins", v: String(time.mins).padStart(2, "0") },
         { l: "Secs", v: String(time.secs).padStart(2, "0") },
       ].map(({ l, v }) => (
-        <div key={l} className="min-w-[52px]">
-          <div className="text-lg font-bold tabular-nums text-white sm:text-xl">{v}</div>
-          <div className="text-[9px] font-medium uppercase tracking-widest text-gray-500">{l}</div>
+        <div key={l} className="min-w-[60px] sm:min-w-[90px]">
+          <div className="text-2xl font-extrabold tabular-nums text-white sm:text-4xl lg:text-5xl xl:text-6xl">{v}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 sm:text-xs lg:text-sm">{l}</div>
         </div>
       ))}
     </div>
@@ -382,15 +382,48 @@ export default function HomePageClient({
   const featured = content._featuredEvent as Record<string, unknown> | undefined;
 
   // Schedule: prefer featured event DB sessions, fallback to CMS
-  const dbSessions = (featured?.sessions as { day: number; time: string; title: string; speaker: string; type: string }[]) ?? [];
-  const schedH = { badge: "Schedule", title: dbSessions.length > 0 ? "Event Schedule" : (content.schedule as { badge?: string; title?: string })?.title || "Schedule" };
-  const schedDays: { day: string; date: string; sessions: { time: string; title: string; speaker: string; type: string }[] }[] = dbSessions.length > 0
-    ? (() => {
-        const m = new Map<number, typeof dbSessions>();
-        dbSessions.forEach((s) => { if (!m.has(s.day)) m.set(s.day, []); m.get(s.day)!.push(s); });
-        return [...m.entries()].map(([d, sessions]) => ({ day: `Day ${d}`, date: `Oct ${d}, 2026`, sessions }));
-      })()
-    : ((content.schedule as { days?: { day: string; date: string; sessions: { time: string; title: string; speaker: string; type: string }[] }[] })?.days ?? []);
+  const dbSessions =
+    (featured?.sessions as {
+      day: number;
+      time: string;
+      title: string;
+      speaker: string;
+      type: string;
+    }[]) ?? [];
+  const schedH = {
+    badge: "Schedule",
+    title:
+      dbSessions.length > 0
+        ? "Event Schedule"
+        : (content.schedule as { badge?: string; title?: string })?.title || "Schedule",
+  };
+  const schedDays: {
+    day: string;
+    date: string;
+    sessions: { time: string; title: string; speaker: string; type: string }[];
+  }[] =
+    dbSessions.length > 0
+      ? (() => {
+          const m = new Map<number, typeof dbSessions>();
+          dbSessions.forEach((s) => {
+            if (!m.has(s.day)) m.set(s.day, []);
+            m.get(s.day)!.push(s);
+          });
+          return [...m.entries()].map(([d, sessions]) => ({
+            day: `Day ${d}`,
+            date: `Oct ${d}, 2026`,
+            sessions,
+          }));
+        })()
+      : ((
+          content.schedule as {
+            days?: {
+              day: string;
+              date: string;
+              sessions: { time: string; title: string; speaker: string; type: string }[];
+            }[];
+          }
+        )?.days ?? []);
   const ticketH = content.tickets as { badge?: string; title?: string; description?: string };
   const tixCMS = ((
     content.tickets as {
@@ -497,7 +530,7 @@ export default function HomePageClient({
           ═══════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative flex h-screen items-center overflow-hidden bg-[#0a0a1a]"
+        className="relative flex min-h-screen items-center overflow-hidden bg-[#0a0a1a]"
       >
         <video
           autoPlay
@@ -593,22 +626,22 @@ export default function HomePageClient({
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0a1a] to-transparent" />
         <motion.div
-          className="absolute bottom-5 left-0 right-0 z-20 hidden px-4 lg:block"
+          className="absolute bottom-8 left-0 right-0 z-20 px-4"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2 }}
         >
-          <div className="mx-auto flex max-w-3xl items-center gap-6 rounded-xl border border-white/[0.08] bg-white/[0.03] px-6 py-3 backdrop-blur-xl">
-            <div className="shrink-0">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-purple-400">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-4 backdrop-blur-xl sm:flex-row sm:gap-6 sm:px-6 sm:py-5 lg:gap-10 lg:px-10 lg:py-6">
+            <div className="shrink-0 text-center sm:text-left">
+              <p className="text-xs font-bold uppercase tracking-widest text-purple-400 sm:text-sm">
                 {hero?.hurryText || "Hurry Up!"}
               </p>
-              <p className="text-xs text-gray-500">{hero?.hurrySubtext || "Book Your Seat Now"}</p>
+              <p className="text-xs text-gray-500 sm:text-sm">{hero?.hurrySubtext || "Book Your Seat Now"}</p>
             </div>
             <CountdownTimer target={hero?.countdownTarget} />
-            <div className="hidden items-center gap-2 sm:flex">
-              <MapPin className="h-4 w-4 shrink-0 text-purple-400" />
-              <p className="text-xs text-gray-500">
+            <div className="hidden items-center gap-2 sm:flex sm:gap-3">
+              <MapPin className="h-4 w-4 shrink-0 text-purple-400 sm:h-5 sm:w-5" />
+              <p className="text-xs text-gray-500 sm:text-sm">
                 {hero?.venueAddress || "121 AI Blvd, San Francisco, CA 94107"}
               </p>
             </div>
@@ -620,8 +653,8 @@ export default function HomePageClient({
           MARQUEE BANDS
           ═══════════════════════════════════════════ */}
       <section className="overflow-hidden bg-[#0a0a1a]">
-        <div className="relative -rotate-1 scale-105 bg-gradient-to-r from-purple-900/20 via-[#0a0a1a] to-purple-900/10 py-4">
-          <div className="animate-marquee flex whitespace-nowrap text-5xl font-extrabold uppercase tracking-wider text-white/[0.07] sm:text-6xl">
+        <div className="bg-gradient-to-r from-purple-900/30 via-purple-800/20 to-purple-900/30 py-5">
+          <div className="animate-marquee flex whitespace-nowrap text-4xl font-extrabold uppercase tracking-wider text-white sm:text-5xl">
             {[...Array(4)].flatMap((_, setIdx) =>
               (marquee.length
                 ? marquee
@@ -634,21 +667,21 @@ export default function HomePageClient({
                     "Cognitive Shift",
                   ]
               ).map((t, i) => (
-                <span key={`a-${setIdx}-${i}`} className="mx-3 flex items-center gap-3">
+                <span key={`a-${setIdx}-${i}`} className="mx-4 flex items-center gap-4">
                   {t}
-                  <span className="mx-2 text-purple-500/20">/</span>
+                  <span className="text-purple-500/30">/</span>
                 </span>
               ))
             )}
           </div>
         </div>
-        <div className="relative -mt-5 rotate-1 scale-105 bg-gradient-to-r from-cyan-900/20 via-purple-900/10 to-cyan-900/10 py-4">
-          <div className="animate-marquee-reverse flex whitespace-nowrap text-5xl font-extrabold uppercase tracking-wider text-white/[0.07] sm:text-6xl">
+        <div className="-mt-4 bg-gradient-to-r from-cyan-900/30 via-purple-800/20 to-cyan-900/30 py-5">
+          <div className="animate-marquee-reverse flex whitespace-nowrap text-4xl font-extrabold uppercase tracking-wider text-white sm:text-5xl">
             {[...Array(4)].flatMap((_, setIdx) =>
               qMarquee.map((t, i) => (
-                <span key={`b-${setIdx}-${i}`} className="mx-3 flex items-center gap-3">
+                <span key={`b-${setIdx}-${i}`} className="mx-4 flex items-center gap-4">
                   {t}
-                  <span className="mx-2 text-cyan-500/20">/</span>
+                  <span className="text-cyan-500/30">/</span>
                 </span>
               ))
             )}
@@ -748,7 +781,7 @@ export default function HomePageClient({
       {/* ═══════════════════════════════════════════
           SPEAKERS
           ═══════════════════════════════════════════ */}
-      <section className="bg-[#0a0a1a] py-24">
+      <section id="speakers" className="bg-[#0a0a1a] py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center" {...fadeIn}>
             <span className="inline-block rounded-full border border-purple-500/25 bg-purple-500/10 px-4 py-1 text-xs font-medium text-purple-400">
@@ -852,7 +885,7 @@ export default function HomePageClient({
       {/* ═══════════════════════════════════════════
           TICKETS
           ═══════════════════════════════════════════ */}
-      <section className="bg-[#0a0a1a] py-24">
+      <section id="tickets" className="bg-[#0a0a1a] py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center" {...fadeIn}>
             <span className="inline-block rounded-full border border-purple-500/25 bg-purple-500/10 px-4 py-1 text-xs font-medium text-purple-400">
@@ -936,6 +969,7 @@ export default function HomePageClient({
           SPONSORS
           ═══════════════════════════════════════════ */}
       <section
+        id="sponsors"
         className="border-y border-white/[0.05] py-24"
         style={{
           backgroundImage: "url('/images/bg-sponsors.svg')",
@@ -1047,7 +1081,7 @@ export default function HomePageClient({
       {/* ═══════════════════════════════════════════
           FAQ
           ═══════════════════════════════════════════ */}
-      <section className="border-y border-white/[0.05] bg-[#0a0a1a] py-24">
+      <section id="faq" className="border-y border-white/[0.05] bg-[#0a0a1a] py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center" {...fadeIn}>
             <span className="inline-block rounded-full border border-purple-500/25 bg-purple-500/10 px-4 py-1 text-xs font-medium text-purple-400">

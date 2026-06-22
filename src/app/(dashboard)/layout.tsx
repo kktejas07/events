@@ -1,8 +1,13 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Ticket, User, LayoutDashboard, LogOut } from "lucide-react";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  const role = (session?.user as { role?: string })?.role;
+  const isAdmin = role === "ADMIN" || role === "SUPER_ADMIN";
+
   return (
     <div className="flex min-h-screen bg-[#0a0a1a]">
       <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-white/10 bg-[#0a0a1a] lg:block">
@@ -34,14 +39,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <User className="h-4 w-4" /> Profile
             </Button>
           </Link>
-          <Link href="/admin">
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-gray-400 hover:bg-white/10 hover:text-white"
-            >
-              <LayoutDashboard className="h-4 w-4" /> Admin
-            </Button>
-          </Link>
+          {isAdmin && (
+            <Link href="/admin">
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 text-gray-400 hover:bg-white/10 hover:text-white"
+              >
+                <LayoutDashboard className="h-4 w-4" /> Admin
+              </Button>
+            </Link>
+          )}
         </nav>
         <div className="absolute bottom-0 w-64 border-t border-white/10 bg-[#0a0a1a] p-3">
           <Link href="/api/auth/signout">

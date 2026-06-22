@@ -9,30 +9,8 @@ services:
       - "3000:3000"
     env_file:
       - .env.production
-    networks:
-      - app-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  nginx:
-    image: nginx:alpine
-    container_name: events-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./certbot/www:/var/www/certbot
-    depends_on:
-      - app
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge

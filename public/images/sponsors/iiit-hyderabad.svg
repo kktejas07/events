@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="140" height="40" viewBox="0 0 140 40">
-  <defs><linearGradient id="ii" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#7c3aed"/><stop offset="100%" style="stop-color:#a78bfa"/></linearGradient></defs>
-  <rect x="6" y="6" width="28" height="28" rx="8" fill="url(#ii)"/>
-  <text x="20" y="27" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" font-weight="bold">I</text>
-  <text x="42" y="19" fill="white" font-size="9" font-family="sans-serif" font-weight="bold">IIIT</text>
-  <text x="42" y="31" fill="#c4b5fd" font-size="8" font-family="sans-serif">Hyderabad</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="44" viewBox="0 0 150 44">
+  <defs><linearGradient id="ih" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6d28d9"/><stop offset="100%" style="stop-color:#a78bfa"/></linearGradient></defs>
+  <rect x="6" y="8" width="28" height="28" rx="4" fill="url(#ih)"/>
+  <text x="20" y="27" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" font-weight="bold">II</text>
+  <text x="44" y="18" fill="white" font-size="10" font-family="sans-serif" font-weight="bold">IIIT</text>
+  <text x="44" y="30" fill="#c4b5fd" font-size="8" font-family="sans-serif">Hyderabad</text>
+  <text x="44" y="39" fill="#64748b" font-size="7" font-family="sans-serif">Gachibowli, Hyderabad</text>
 </svg>

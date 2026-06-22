@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -10,7 +9,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Github, Linkedin, Sparkles, ArrowRight } from "lucide-react";
+import { Github, Linkedin, Sparkles, ArrowRight, Swords, UserRound } from "lucide-react";
+import { signInWithGoogle, signInWithGithub } from "@/lib/firebase-auth";
+
+async function firebaseSignIn(provider: "google" | "github") {
+  const fn = provider === "google" ? signInWithGoogle : signInWithGithub;
+  const idToken = await fn();
+  if (!idToken) {
+    toast.error("Firebase not configured. Please check your Firebase settings.");
+    return false;
+  }
+  const result = await signIn("credentials", {
+    idToken,
+    provider: "firebase",
+    redirect: false,
+  });
+  if (result?.error) {
+    toast.error("Sign in failed");
+    return false;
+  }
+  toast.success("Account created successfully!");
+  return true;
+}
 
 interface FormData {
   firstName: string;
@@ -37,12 +57,25 @@ const emptyForm: FormData = {
 };
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<"google" | "github" | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleSocialLogin(provider: "google" | "github") {
+    setSocialLoading(provider);
+    try {
+      const ok = await firebaseSignIn(provider);
+      if (ok) {
+        window.location.href = "/my-tickets";
+      }
+    } catch {
+      toast.error("Something went wrong");
+    }
+    setSocialLoading(null);
   }
 
   async function handleRegister(e: React.FormEvent) {
@@ -79,8 +112,7 @@ export default function RegisterPage() {
           password: form.password,
           redirect: false,
         });
-        router.push("/my-tickets");
-        router.refresh();
+        window.location.href = "/my-tickets";
       } else {
         toast.error(data.error || "Registration failed");
       }
@@ -131,7 +163,8 @@ export default function RegisterPage() {
               <Button
                 variant="outline"
                 className="flex-1 border-white/10 bg-white/[0.03] text-white hover:bg-white/10"
-                onClick={() => signIn("google", { callbackUrl: "/my-tickets" })}
+                disabled={socialLoading !== null}
+                onClick={() => handleSocialLogin("google")}
               >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path
@@ -156,7 +189,8 @@ export default function RegisterPage() {
               <Button
                 variant="outline"
                 className="flex-1 border-white/10 bg-white/[0.03] text-white hover:bg-white/10"
-                onClick={() => signIn("github", { callbackUrl: "/my-tickets" })}
+                disabled={socialLoading !== null}
+                onClick={() => handleSocialLogin("github")}
               >
                 <Github className="mr-2 h-4 w-4" /> GitHub
               </Button>
@@ -332,6 +366,37 @@ export default function RegisterPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  signIn("credentials", { email: "admin@eventsplatform.com", password: "password123", redirect: false }).then(r => {
+                    if (!r?.error) { window.location.href = "/admin"; }
+                    else toast.error("Quick login failed");
+                  });
+                }}
+                className="flex-1 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+              >
+                <Swords className="mr-1.5 h-3.5 w-3.5" />
+                Admin Login
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  signIn("credentials", { email: "john@example.com", password: "password123", redirect: false }).then(r => {
+                    if (!r?.error) { window.location.href = "/my-tickets"; }
+                    else toast.error("Quick login failed");
+                  });
+                }}
+                className="flex-1 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+              >
+                <UserRound className="mr-1.5 h-3.5 w-3.5" />
+                Test User
+              </Button>
+            </div>
           </motion.div>
 
           <motion.p

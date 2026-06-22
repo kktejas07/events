@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth();
     if (!session) {
@@ -26,7 +23,10 @@ export async function PUT(
     };
 
     if (!Array.isArray(sessions)) {
-      return NextResponse.json({ success: false, error: "sessions array required" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "sessions array required" },
+        { status: 400 }
+      );
     }
 
     const existing = await db.scheduleSession.findMany({
@@ -77,6 +77,9 @@ export async function PUT(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Sessions update error:", error);
-    return NextResponse.json({ success: false, error: "Failed to update sessions" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Failed to update sessions" },
+      { status: 500 }
+    );
   }
 }
