@@ -109,7 +109,7 @@ export default function RegisterPage() {
       const data = await res.json();
       if (data.success) {
         toast.success("Account created! Signing you in...");
-        await signIn("email-password", {
+        await signIn("credentials", {
           email: form.email,
           password: form.password,
           redirect: false,

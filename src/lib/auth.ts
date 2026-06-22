@@ -22,7 +22,7 @@ export const { handlers, auth } = NextAuth({
         ]
       : []),
     Credentials({
-      id: "email-password",
+      id: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },

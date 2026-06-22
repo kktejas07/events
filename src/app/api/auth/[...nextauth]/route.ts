@@ -63,42 +63,30 @@ const { handlers } = NextAuth({
       },
     }),
     Credentials({
-      id: "email-password",
+      id: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          console.error("[Auth] Missing email or password");
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
         const user = await db.user.findUnique({
           where: { email: credentials.email as string },
         });
 
-        if (!user || !user.passwordHash) {
-          console.error("[Auth] User not found or no passwordHash", credentials.email);
-          return null;
-        }
+        if (!user || !user.passwordHash) return null;
 
-        try {
-          const isValid = await bcrypt.compare(credentials.password as string, user.passwordHash);
-          console.log("[Auth] Password check for", credentials.email, "valid:", isValid);
+        const isValid = await bcrypt.compare(credentials.password as string, user.passwordHash);
 
-          if (!isValid || user.banned) return null;
+        if (!isValid || user.banned) return null;
 
-          return {
-            id: user.id,
-            email: user.email,
-            name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-            image: user.avatarUrl,
-          };
-        } catch (err) {
-          console.error("[Auth] bcrypt compare error:", err);
-          return null;
-        }
+        return {
+          id: user.id,
+          email: user.email,
+          name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+          image: user.avatarUrl,
+        };
       },
     }),
   ],

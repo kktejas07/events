@@ -42,7 +42,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await signIn("email-password", {
+      const result = await signIn("credentials", {
         email: form.email,
         password: form.password,
         redirect: false,
