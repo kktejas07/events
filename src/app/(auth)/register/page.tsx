@@ -388,34 +388,7 @@ export default function RegisterPage() {
             </form>
 
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  signIn("credentials", { email: "admin@eventsplatform.com", password: "password123", redirect: false }).then(r => {
-                    if (!r?.error) { window.location.href = "/admin"; }
-                    else toast.error("Quick login failed");
-                  });
-                }}
-                className="flex-1 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-              >
-                <Swords className="mr-1.5 h-3.5 w-3.5" />
-                Admin Login
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  signIn("credentials", { email: "john@example.com", password: "password123", redirect: false }).then(r => {
-                    if (!r?.error) { window.location.href = "/my-tickets"; }
-                    else toast.error("Quick login failed");
-                  });
-                }}
-                className="flex-1 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-              >
-                <UserRound className="mr-1.5 h-3.5 w-3.5" />
-                Test User
-              </Button>
+
             </div>
           </motion.div>
 
