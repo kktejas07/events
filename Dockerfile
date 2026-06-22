@@ -1,6 +1,6 @@
 FROM node:22-alpine AS base
 RUN apk add --no-cache openssl
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 FROM base AS builder
 WORKDIR /app
@@ -11,9 +11,8 @@ ARG NEXT_PUBLIC_FIREBASE_API_KEY
 ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
 ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID
 
-COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile --ignore-scripts && \
-    pnpm rebuild @prisma/client @prisma/engines esbuild prisma protobufjs sharp unrs-resolver
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm db:generate
 RUN pnpm build
