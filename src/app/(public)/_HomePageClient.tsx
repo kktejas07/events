@@ -28,23 +28,23 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-// ── Text reveal animation (Travelik-inspired) ──
+// ── Character-by-character text reveal (Travelik text-anime-3) ──
 function AnimatedText({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) {
-  const words = text.split(" ");
+  const chars = text.split("");
   return (
     <span className="inline-flex flex-wrap">
-      {words.map((word, i) => (
-        <span key={i} className="inline-flex overflow-hidden">
-          <motion.span
-            className={className}
-            initial={{ y: "100%" }}
-            whileInView={{ y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94], delay: delay + i * 0.08 }}
-          >
-            {word}&nbsp;
-          </motion.span>
-        </span>
+      {chars.map((char, i) => (
+        <motion.span
+          key={i}
+          className={className}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94], delay: delay + i * 0.035 }}
+          style={{ display: char === " " ? "inline" : "inline-block" }}
+        >
+          {char === " " ? "\u00A0" : char}
+        </motion.span>
       ))}
     </span>
   );
@@ -55,15 +55,37 @@ function SectionBadge({ text }: { text: string }) {
   return (
     <motion.span
       className="inline-block rounded-full border border-purple-500/20 bg-purple-500/[0.08] px-4 py-1.5 text-xs font-medium tracking-wide text-purple-300"
-      initial={{ opacity: 0, scale: 0.8 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.4 }}
+      variants={sectionBadgeVar}
     >
       {text}
     </motion.span>
   );
 }
+
+// ── Variants for staggered section headers ──
+const sectionBadgeVar = {
+  hidden: { opacity: 0, scale: 0.8 },
+  show: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
+};
+
+const sectionTitleVar = {
+  hidden: { opacity: 0, y: 30 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.15 + i * 0.07 },
+  }),
+};
+
+const sectionDescVar = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.35 } },
+};
+
+const headerContainerVar = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: 0.3 } },
+};
 
 // ── Section header with stagger: badge -> animated title -> description ──
 function SectionHeader({
@@ -77,54 +99,23 @@ function SectionHeader({
   description: string;
   className?: string;
 }) {
-  const Title = () => {
-    const words = title.split(" ");
-    return (
-      <span className="inline-flex flex-wrap justify-center">
-        {words.map((word, i) => (
-          <span key={i} className="inline-flex overflow-hidden">
-            <motion.span
-              className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl"
-              initial={{ y: "100%" }}
-              whileInView={{ y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{
-                duration: 0.5,
-                ease: [0.25, 0.46, 0.45, 0.94],
-                delay: 0.15 + i * 0.07,
-              }}
-            >
-              {word}&nbsp;
-            </motion.span>
-          </span>
-        ))}
-      </span>
-    );
-  };
-
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
+      variants={headerContainerVar}
+      initial="hidden"
+      whileInView="show"
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.3 }}
     >
-      <SectionBadge text={badge} />
+        <SectionBadge text={badge} />
       <h2 className="mt-4 flex flex-wrap justify-center">
-        <Title />
+        <AnimatedText text={title} className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl" />
       </h2>
-          {description && (
-            <motion.p
-              className="mt-4 leading-relaxed text-gray-400"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: 0.35 }}
-            >
-              {description}
-            </motion.p>
-          )}
+      {description && (
+        <motion.p className="mt-4 leading-relaxed text-gray-400" variants={sectionDescVar}>
+          {description}
+        </motion.p>
+      )}
     </motion.div>
   );
 }
@@ -210,18 +201,14 @@ const fadeInUp = {
   transition: { duration: 0.5, ease: "easeOut" },
 };
 
-const staggerContainer = {
-  initial: { opacity: 0 },
-  whileInView: { opacity: 1 },
-  viewport: { once: true, margin: "-40px" },
-  transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+const staggerContainerVar = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
-const fadeInUpItem = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-40px" },
-  transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+const fadeInUpItemVar = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
 };
 
 function CountdownTimer({ target }: { target?: string }) {
@@ -915,12 +902,12 @@ export default function HomePageClient({
             description={why?.description || "Hear from global AI pioneers and bold thinkers shaping the future."}
             className="mx-auto max-w-2xl text-center"
           />
-          <motion.div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" {...staggerContainer}>
+          <motion.div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" variants={staggerContainerVar} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
             {benefits.map((b, idx) => {
               const Icon = iconMap[b.icon] || Lightbulb;
               const accent = gradients[idx % gradients.length];
               return (
-                <motion.div key={b.title} {...fadeInUpItem}>
+                <motion.div key={b.title} variants={fadeInUpItemVar}>
                   <BenefitCard
                     title={b.title}
                     description={b.description}
@@ -959,9 +946,9 @@ export default function HomePageClient({
             description={speakerH?.description || "World-class speakers sharing insights on AI and machine learning."}
             className="mx-auto max-w-2xl text-center"
           />
-          <motion.div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" {...staggerContainer}>
+          <motion.div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" variants={staggerContainerVar} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
             {speakers.map((s, idx) => (
-              <motion.div key={s.name} {...fadeInUpItem}>
+              <motion.div key={s.name} variants={fadeInUpItemVar}>
                 <SpeakerCard
                   name={s.name}
                   role={s.role}
@@ -1139,11 +1126,11 @@ export default function HomePageClient({
             description={sponsorH?.description || "Leading organizations powering the future of innovation."}
             className="mx-auto max-w-2xl text-center"
           />
-          <motion.div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" {...staggerContainer}>
+          <motion.div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainerVar} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
             {displaySponsors.slice(0, 8).map((s) => (
               <motion.div
                 key={s.name}
-                {...fadeInUpItem}
+                variants={fadeInUpItemVar}
                 className="group flex flex-col items-center rounded-xl border border-white/[0.07] bg-white/[0.02] p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.15] hover:shadow-lg hover:shadow-purple-500/5"
               >
                 {s.logoUrl ? (
@@ -1187,7 +1174,7 @@ export default function HomePageClient({
               description="Join us in the heart of innovation."
               className="mx-auto max-w-3xl text-center"
             />
-            <motion.div className="mx-auto mt-10 grid max-w-3xl gap-5 sm:grid-cols-3" {...staggerContainer}>
+            <motion.div className="mx-auto mt-10 grid max-w-3xl gap-5 sm:grid-cols-3" variants={staggerContainerVar} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
               {[
                 {
                   icon: MapPin,
@@ -1216,7 +1203,7 @@ export default function HomePageClient({
               ].map(({ icon: Icon, label, value }) => (
                 <motion.div
                   key={label}
-                  {...fadeInUpItem}
+                  variants={fadeInUpItemVar}
                   className="group rounded-xl border border-white/[0.07] bg-white/[0.02] p-6 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.12] hover:shadow-lg"
                 >
                   <Icon className="mx-auto h-6 w-6 text-amber-400 transition-all duration-300 group-hover:scale-110" />
@@ -1240,9 +1227,9 @@ export default function HomePageClient({
             description=""
             className="mx-auto max-w-2xl text-center"
           />
-          <motion.div className="mx-auto mt-10 max-w-2xl space-y-3" {...staggerContainer}>
+          <motion.div className="mx-auto mt-10 max-w-2xl space-y-3" variants={staggerContainerVar} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
             {faqs.map((f, i) => (
-              <motion.div key={i} {...fadeInUpItem}>
+              <motion.div key={i} variants={fadeInUpItemVar}>
                 <FAQItem
                   q={f.q}
                   a={f.a}
