@@ -28,6 +28,111 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+// ── Text reveal animation (Travelik-inspired) ──
+function AnimatedText({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) {
+  const words = text.split(" ");
+  return (
+    <span className="inline-flex flex-wrap">
+      {words.map((word, i) => (
+        <span key={i} className="inline-flex overflow-hidden">
+          <motion.span
+            className={className}
+            initial={{ y: "100%" }}
+            whileInView={{ y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94], delay: delay + i * 0.08 }}
+          >
+            {word}&nbsp;
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// ── Decorative badge (Travelik-style section span) ──
+function SectionBadge({ text }: { text: string }) {
+  return (
+    <motion.span
+      className="inline-block rounded-full border border-purple-500/20 bg-purple-500/[0.08] px-4 py-1.5 text-xs font-medium tracking-wide text-purple-300"
+      initial={{ opacity: 0, scale: 0.8 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+    >
+      {text}
+    </motion.span>
+  );
+}
+
+// ── Image reveal on scroll (inspired by .image-anime) ──
+function RevealImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  return (
+    <div className="relative overflow-hidden">
+      <motion.div
+        className="absolute inset-0 z-10 origin-left bg-purple-600/20"
+        initial={{ scaleX: 1 }}
+        whileInView={{ scaleX: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+      />
+      <motion.img
+        src={src}
+        alt={alt}
+        className={className}
+        initial={{ opacity: 0, scale: 1.1 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.1 }}
+      />
+    </div>
+  );
+}
+
+// ── Rotating text circle (Travelik hero video button style) ──
+function RotatingCircle({ text }: { text: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className="h-24 w-24 sm:h-28 sm:w-28">
+      <defs>
+        <path id="circlePath" d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none" />
+      </defs>
+      <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="1" />
+      <text className="fill-purple-400/60 text-[9px] font-semibold uppercase tracking-widest">
+        <textPath href="#circlePath" startOffset="0%">
+          {text}
+        </textPath>
+      </text>
+      <circle
+        cx="50"
+        cy="50"
+        r="16"
+        fill="none"
+        stroke="rgba(139,92,246,0.25)"
+        strokeWidth="1"
+        className="animate-spin-slow"
+        style={{ animationDuration: "8s" }}
+      />
+      <circle
+        cx="50"
+        cy="50"
+        r="16"
+        fill="rgba(139,92,246,0.1)"
+        className="animate-pulse-glow"
+      >
+        <animate attributeName="r" values="16;18;16" dur="3s" repeatCount="indefinite" />
+      </circle>
+      <motion.circle
+        cx="50"
+        cy="50"
+        r="3"
+        fill="rgba(139,92,246,0.8)"
+        animate={{ scale: [1, 1.3, 1] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </svg>
+  );
+}
+
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
@@ -528,19 +633,47 @@ export default function HomePageClient({
           <div className="animate-float-delayed absolute right-[15%] top-[30%] h-6 w-6 rounded-full border border-cyan-500/20" />
           <div className="animate-float absolute bottom-[25%] left-[5%] h-3 w-3 rounded-full bg-amber-500/10" />
           <div className="animate-float-delayed absolute right-[25%] top-[60%] h-5 w-5 rounded border border-purple-500/15" />
+          <motion.div
+            className="absolute bottom-[15%] right-[8%] hidden lg:block"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          >
+            <RotatingCircle text="✦ EVENTS 2026 ✦ FUTURE OF AI ✦" />
+          </motion.div>
         </div>
 
         <div className="container relative z-10">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <motion.div {...fadeInUp}>
-              <div className="bg-purple-500/8 mb-4 inline-flex items-center gap-2 rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium tracking-wide text-purple-300">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/[0.08] px-4 py-1.5 text-xs font-medium tracking-wide text-purple-300"
+              >
                 <Sparkles className="h-3 w-3" />
-                {hero?.badge || "The Future of Intelligence"}
-              </div>
-              <h1 className="text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
-                {hero?.title || "AI Summit"}{" "}
-                <span className="bg-gradient-to-r from-purple-300 via-amber-300 to-purple-300 bg-clip-text text-transparent">
-                  {hero?.year || "2026"}
+                <span className="inline-flex overflow-hidden">
+                  <motion.span
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                    className="inline-block"
+                  >
+                    {hero?.badge || "The Future of Intelligence"}
+                  </motion.span>
+                </span>
+              </motion.div>
+              <h1 className="overflow-hidden text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+                <AnimatedText text={hero?.title || "AI Summit"} delay={0.4} />
+                <span className="inline-block overflow-hidden">
+                  <motion.span
+                    className="inline-block bg-gradient-to-r from-purple-300 via-amber-300 to-purple-300 bg-clip-text text-transparent"
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.7 }}
+                  >
+                    {hero?.year || "2026"}
+                  </motion.span>
                 </span>
               </h1>
               <p className="mt-4 max-w-lg text-base leading-relaxed text-gray-400">
@@ -674,9 +807,7 @@ export default function HomePageClient({
       <section className="bg-[#080816] py-24 sm:py-32">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center" {...fadeIn}>
-            <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-              {about?.badge || "About the Event"}
-            </span>
+            <SectionBadge text={about?.badge || "About the Event"} />
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
               {about?.title || "A Global Gathering of AI Innovators"}
             </h2>
@@ -692,9 +823,7 @@ export default function HomePageClient({
       <section className="bg-[#080816] pb-24 sm:pb-32">
         <div className="container">
           <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-              {why?.badge || "Why Attend"}
-            </span>
+            <SectionBadge text={why?.badge || "Why Attend"} />
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
               {why?.title || "What You&apos;ll Gain"}
             </h2>
@@ -726,9 +855,7 @@ export default function HomePageClient({
         <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center opacity-[0.02]" />
         <div className="container relative">
           <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-              Testimonials
-            </span>
+            <SectionBadge text="Testimonials" />
             <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
               What People Are Saying
             </h2>
@@ -743,9 +870,7 @@ export default function HomePageClient({
       <section id="speakers" className="bg-[#080816] py-24 sm:py-32">
         <div className="container">
           <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-              {speakerH?.badge || "Speakers"}
-            </span>
+            <SectionBadge text={speakerH?.badge || "Speakers"} />
             <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
               {speakerH?.title || "Meet the Visionaries"}
             </h2>
@@ -774,9 +899,7 @@ export default function HomePageClient({
         <section id="schedule" className="border-y border-white/[0.05] bg-[#080816] py-24 sm:py-32">
           <div className="container">
             <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-              <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-                {schedH?.badge || "Schedule"}
-              </span>
+              <SectionBadge text={schedH?.badge || "Schedule"} />
               <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
                 {schedH?.title || "Event Schedule"}
               </h2>
@@ -837,9 +960,7 @@ export default function HomePageClient({
       <section id="tickets" className="bg-[#080816] py-24 sm:py-32">
         <div className="container">
           <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-              {ticketH?.badge || "Ticket Options"}
-            </span>
+            <SectionBadge text={ticketH?.badge || "Ticket Options"} />
             <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
               {ticketH?.title || "Choose Your Pass"}
             </h2>
@@ -936,9 +1057,7 @@ export default function HomePageClient({
       <section id="sponsors" className="border-y border-white/[0.05] bg-[#080816] py-24 sm:py-32">
         <div className="container">
           <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-              {sponsorH?.badge || "Sponsors"}
-            </span>
+            <SectionBadge text={sponsorH?.badge || "Sponsors"} />
             <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
               {sponsorH?.title || "Our Partners"}
             </h2>
@@ -988,9 +1107,7 @@ export default function HomePageClient({
         <section className="bg-[#080816] py-24 sm:py-32">
           <div className="container">
             <motion.div className="mx-auto max-w-3xl text-center" {...fadeIn}>
-              <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-                Event Location
-              </span>
+              <SectionBadge text="Event Location" />
               <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">Location & Venue</h2>
               <p className="mt-3 text-gray-400">Join us in the heart of innovation.</p>
             </motion.div>
@@ -1041,9 +1158,7 @@ export default function HomePageClient({
       <section id="faq" className="border-y border-white/[0.05] bg-[#080816] py-24 sm:py-32">
         <div className="container">
           <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <span className="bg-purple-500/8 inline-block rounded-full border border-purple-500/20 px-4 py-1.5 text-xs font-medium text-purple-300">
-              {faqH?.badge || "FAQ"}
-            </span>
+            <SectionBadge text={faqH?.badge || "FAQ"} />
             <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
               {faqH?.title || "Everything You Need to Know"}
             </h2>
