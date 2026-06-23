@@ -57,11 +57,75 @@ function SectionBadge({ text }: { text: string }) {
       className="inline-block rounded-full border border-purple-500/20 bg-purple-500/[0.08] px-4 py-1.5 text-xs font-medium tracking-wide text-purple-300"
       initial={{ opacity: 0, scale: 0.8 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4 }}
     >
       {text}
     </motion.span>
+  );
+}
+
+// ── Section header with stagger: badge -> animated title -> description ──
+function SectionHeader({
+  badge,
+  title,
+  description,
+  className,
+}: {
+  badge: string;
+  title: string;
+  description: string;
+  className?: string;
+}) {
+  const Title = () => {
+    const words = title.split(" ");
+    return (
+      <span className="inline-flex flex-wrap justify-center">
+        {words.map((word, i) => (
+          <span key={i} className="inline-flex overflow-hidden">
+            <motion.span
+              className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl"
+              initial={{ y: "100%" }}
+              whileInView={{ y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+                delay: 0.15 + i * 0.07,
+              }}
+            >
+              {word}&nbsp;
+            </motion.span>
+          </span>
+        ))}
+      </span>
+    );
+  };
+
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.3 }}
+    >
+      <SectionBadge text={badge} />
+      <h2 className="mt-4 flex flex-wrap justify-center">
+        <Title />
+      </h2>
+          {description && (
+            <motion.p
+              className="mt-4 leading-relaxed text-gray-400"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: 0.35 }}
+            >
+              {description}
+            </motion.p>
+          )}
+    </motion.div>
   );
 }
 
@@ -144,6 +208,20 @@ const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.5, ease: "easeOut" },
+};
+
+const staggerContainer = {
+  initial: { opacity: 0 },
+  whileInView: { opacity: 1 },
+  viewport: { once: true, margin: "-40px" },
+  transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+};
+
+const fadeInUpItem = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-40px" },
+  transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
 };
 
 function CountdownTimer({ target }: { target?: string }) {
@@ -819,47 +897,40 @@ export default function HomePageClient({
       {/* ABOUT */}
       <section className="bg-[#080816] py-24 sm:py-32">
         <div className="container">
-          <div className="mx-auto max-w-3xl text-center" {...fadeIn}>
-            <SectionBadge text={about?.badge || "About the Event"} />
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-              {about?.title || "A Global Gathering of AI Innovators"}
-            </h2>
-            <p className="mt-4 leading-relaxed text-gray-400">
-              {about?.description ||
-                "Join thought leaders, developers, researchers, and founders exploring how AI is reshaping industries, creativity, and the future of work."}
-            </p>
-          </div>
+          <SectionHeader
+            badge={about?.badge || "About the Event"}
+            title={about?.title || "A Global Gathering of AI Innovators"}
+            description={about?.description || "Join thought leaders, developers, researchers, and founders exploring how AI is reshaping industries, creativity, and the future of work."}
+            className="mx-auto max-w-3xl text-center"
+          />
         </div>
       </section>
 
       {/* WHY ATTEND */}
       <section className="bg-[#080816] pb-24 sm:pb-32">
         <div className="container">
-          <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <SectionBadge text={why?.badge || "Why Attend"} />
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              {why?.title || "What You&apos;ll Gain"}
-            </h2>
-            <p className="mt-3 text-gray-400">
-              {why?.description ||
-                "Hear from global AI pioneers and bold thinkers shaping the future."}
-            </p>
-          </motion.div>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <SectionHeader
+            badge={why?.badge || "Why Attend"}
+            title={why?.title || "What You&apos;ll Gain"}
+            description={why?.description || "Hear from global AI pioneers and bold thinkers shaping the future."}
+            className="mx-auto max-w-2xl text-center"
+          />
+          <motion.div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" {...staggerContainer}>
             {benefits.map((b, idx) => {
               const Icon = iconMap[b.icon] || Lightbulb;
               const accent = gradients[idx % gradients.length];
               return (
-                <BenefitCard
-                  key={b.title}
-                  title={b.title}
-                  description={b.description}
-                  icon={Icon}
-                  accent={accent}
-                />
+                <motion.div key={b.title} {...fadeInUpItem}>
+                  <BenefitCard
+                    title={b.title}
+                    description={b.description}
+                    icon={Icon}
+                    accent={accent}
+                  />
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -867,12 +938,12 @@ export default function HomePageClient({
       <section className="relative border-y border-white/[0.05] bg-[#080816] py-24 sm:py-32">
         <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center opacity-[0.02]" />
         <div className="container relative">
-          <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <SectionBadge text="Testimonials" />
-            <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-              What People Are Saying
-            </h2>
-          </motion.div>
+          <SectionHeader
+            badge="Testimonials"
+            title="What People Are Saying"
+            description=""
+            className="mx-auto max-w-2xl text-center"
+          />
           <div className="mt-10" {...fadeIn}>
             <TestimonialCarousel items={testimonials} />
           </div>
@@ -882,28 +953,25 @@ export default function HomePageClient({
       {/* SPEAKERS */}
       <section id="speakers" className="bg-[#080816] py-24 sm:py-32">
         <div className="container">
-          <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <SectionBadge text={speakerH?.badge || "Speakers"} />
-            <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-              {speakerH?.title || "Meet the Visionaries"}
-            </h2>
-            <p className="mt-3 text-gray-400">
-              {speakerH?.description ||
-                "World-class speakers sharing insights on AI and machine learning."}
-            </p>
-          </motion.div>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <SectionHeader
+            badge={speakerH?.badge || "Speakers"}
+            title={speakerH?.title || "Meet the Visionaries"}
+            description={speakerH?.description || "World-class speakers sharing insights on AI and machine learning."}
+            className="mx-auto max-w-2xl text-center"
+          />
+          <motion.div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" {...staggerContainer}>
             {speakers.map((s, idx) => (
-              <SpeakerCard
-                key={s.name}
-                name={s.name}
-                role={s.role}
-                company={s.company}
-                initials={s.initials}
-                accent={s.color || gradients[idx % gradients.length]}
-              />
+              <motion.div key={s.name} {...fadeInUpItem}>
+                <SpeakerCard
+                  name={s.name}
+                  role={s.role}
+                  company={s.company}
+                  initials={s.initials}
+                  accent={s.color || gradients[idx % gradients.length]}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -911,12 +979,12 @@ export default function HomePageClient({
       {schedDays.length > 0 && (
         <section id="schedule" className="border-y border-white/[0.05] bg-[#080816] py-24 sm:py-32">
           <div className="container">
-            <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-              <SectionBadge text={schedH?.badge || "Schedule"} />
-              <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-                {schedH?.title || "Event Schedule"}
-              </h2>
-            </motion.div>
+            <SectionHeader
+              badge={schedH?.badge || "Schedule"}
+              title={schedH?.title || "Event Schedule"}
+              description=""
+              className="mx-auto max-w-2xl text-center"
+            />
             <div className="mt-8 flex flex-wrap justify-center gap-2">
               {schedDays.map((d, i) => (
                 <button
@@ -972,16 +1040,12 @@ export default function HomePageClient({
       {/* TICKETS */}
       <section id="tickets" className="bg-[#080816] py-24 sm:py-32">
         <div className="container">
-          <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <SectionBadge text={ticketH?.badge || "Ticket Options"} />
-            <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-              {ticketH?.title || "Choose Your Pass"}
-            </h2>
-            <p className="mt-3 text-gray-400">
-              {ticketH?.description ||
-                "Select the perfect ticket and gain access to exclusive sessions."}
-            </p>
-          </motion.div>
+          <SectionHeader
+            badge={ticketH?.badge || "Ticket Options"}
+            title={ticketH?.title || "Choose Your Pass"}
+            description={ticketH?.description || "Select the perfect ticket and gain access to exclusive sessions."}
+            className="mx-auto max-w-2xl text-center"
+          />
           <div className="relative mt-12">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-[#080816] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-[#080816] to-transparent" />
@@ -1069,19 +1133,17 @@ export default function HomePageClient({
       {/* SPONSORS */}
       <section id="sponsors" className="border-y border-white/[0.05] bg-[#080816] py-24 sm:py-32">
         <div className="container">
-          <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <SectionBadge text={sponsorH?.badge || "Sponsors"} />
-            <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-              {sponsorH?.title || "Our Partners"}
-            </h2>
-            <p className="mt-3 text-gray-400">
-              {sponsorH?.description || "Leading organizations powering the future of innovation."}
-            </p>
-          </motion.div>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <SectionHeader
+            badge={sponsorH?.badge || "Sponsors"}
+            title={sponsorH?.title || "Our Partners"}
+            description={sponsorH?.description || "Leading organizations powering the future of innovation."}
+            className="mx-auto max-w-2xl text-center"
+          />
+          <motion.div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" {...staggerContainer}>
             {displaySponsors.slice(0, 8).map((s) => (
-              <div
+              <motion.div
                 key={s.name}
+                {...fadeInUpItem}
                 className="group flex flex-col items-center rounded-xl border border-white/[0.07] bg-white/[0.02] p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.15] hover:shadow-lg hover:shadow-purple-500/5"
               >
                 {s.logoUrl ? (
@@ -1109,9 +1171,9 @@ export default function HomePageClient({
                 >
                   {s.tier}
                 </span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -1119,12 +1181,13 @@ export default function HomePageClient({
       {featured && (
         <section className="bg-[#080816] py-24 sm:py-32">
           <div className="container">
-            <motion.div className="mx-auto max-w-3xl text-center" {...fadeIn}>
-              <SectionBadge text="Event Location" />
-              <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">Location & Venue</h2>
-              <p className="mt-3 text-gray-400">Join us in the heart of innovation.</p>
-            </motion.div>
-            <div className="mx-auto mt-10 grid max-w-3xl gap-5 sm:grid-cols-3">
+            <SectionHeader
+              badge="Event Location"
+              title="Location & Venue"
+              description="Join us in the heart of innovation."
+              className="mx-auto max-w-3xl text-center"
+            />
+            <motion.div className="mx-auto mt-10 grid max-w-3xl gap-5 sm:grid-cols-3" {...staggerContainer}>
               {[
                 {
                   icon: MapPin,
@@ -1151,8 +1214,9 @@ export default function HomePageClient({
                   value: String(featured.category || "Technology"),
                 },
               ].map(({ icon: Icon, label, value }) => (
-                <div
+                <motion.div
                   key={label}
+                  {...fadeInUpItem}
                   className="group rounded-xl border border-white/[0.07] bg-white/[0.02] p-6 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.12] hover:shadow-lg"
                 >
                   <Icon className="mx-auto h-6 w-6 text-amber-400 transition-all duration-300 group-hover:scale-110" />
@@ -1160,9 +1224,9 @@ export default function HomePageClient({
                     {label}
                   </h4>
                   <p className="mt-1.5 text-sm text-white">{value}</p>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
       )}
@@ -1170,23 +1234,24 @@ export default function HomePageClient({
       {/* FAQ */}
       <section id="faq" className="border-y border-white/[0.05] bg-[#080816] py-24 sm:py-32">
         <div className="container">
-          <motion.div className="mx-auto max-w-2xl text-center" {...fadeIn}>
-            <SectionBadge text={faqH?.badge || "FAQ"} />
-            <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-              {faqH?.title || "Everything You Need to Know"}
-            </h2>
-          </motion.div>
-          <div className="mx-auto mt-10 max-w-2xl space-y-3">
+          <SectionHeader
+            badge={faqH?.badge || "FAQ"}
+            title={faqH?.title || "Everything You Need to Know"}
+            description=""
+            className="mx-auto max-w-2xl text-center"
+          />
+          <motion.div className="mx-auto mt-10 max-w-2xl space-y-3" {...staggerContainer}>
             {faqs.map((f, i) => (
-              <FAQItem
-                key={i}
-                q={f.q}
-                a={f.a}
-                open={openFaq === i}
-                onToggle={() => setOpenFaq(openFaq === i ? null : i)}
-              />
+              <motion.div key={i} {...fadeInUpItem}>
+                <FAQItem
+                  q={f.q}
+                  a={f.a}
+                  open={openFaq === i}
+                  onToggle={() => setOpenFaq(openFaq === i ? null : i)}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -1194,16 +1259,38 @@ export default function HomePageClient({
       <section className="relative bg-[#080816] py-24 sm:py-32">
         <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center opacity-[0.02]" />
         <div className="container relative">
-          <motion.div className="mx-auto max-w-lg text-center" {...fadeIn}>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-amber-600 shadow-lg shadow-purple-600/20">
+          <motion.div
+            className="mx-auto max-w-lg text-center"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-amber-600 shadow-lg shadow-purple-600/20"
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+            >
               <Mail className="h-6 w-6 text-white" />
+            </motion.div>
+            <div className="mt-4">
+              <AnimatedText
+                text={news?.title || "Stay in the Loop"}
+                className="text-2xl font-bold text-white sm:text-3xl"
+                delay={0.2}
+              />
             </div>
-            <h2 className="mt-4 text-2xl font-bold text-white sm:text-3xl">
-              {news?.title || "Stay in the Loop"}
-            </h2>
-            <p className="mt-2 text-sm text-gray-400">
+            <motion.p
+              className="mt-2 text-sm text-gray-400"
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
               {news?.description || "Get the latest event updates delivered to your inbox."}
-            </p>
+            </motion.p>
           </motion.div>
           <form
             className="mx-auto mt-8 max-w-md space-y-3"
