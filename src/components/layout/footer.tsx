@@ -33,12 +33,6 @@ export function Footer() {
                 <li>
                   <Link href="/contact">contact us</Link>
                 </li>
-                <li>
-                  <Link href="/blog">blog</Link>
-                </li>
-                <li>
-                  <Link href="/pricing">pricing</Link>
-                </li>
               </ul>
               <div className="wow fadeInUp" data-wow-delay=".3s">
                 <NewsletterForm />

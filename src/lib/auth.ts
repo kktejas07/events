@@ -40,6 +40,10 @@ export const { handlers, auth } = NextAuth({
 
         if (!isValid || user.banned) return null;
 
+        if (!user.emailVerified) {
+          throw new Error("EMAIL_NOT_VERIFIED");
+        }
+
         return {
           id: user.id,
           email: user.email,

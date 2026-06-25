@@ -111,13 +111,14 @@ function initSwipers() {
       spaceBetween: 30,
       speed: 1300,
       loop: true,
+      centeredSlides: true,
       autoplay: { delay: 2000, disableOnInteraction: false },
       breakpoints: {
-        0: { slidesPerView: 2 },
-        576: { slidesPerView: 3 },
-        768: { slidesPerView: 4 },
-        992: { slidesPerView: 5 },
-        1200: { slidesPerView: 6 },
+        1199: { slidesPerView: 6 },
+        991: { slidesPerView: 4 },
+        767: { slidesPerView: 3 },
+        575: { slidesPerView: 3 },
+        0: { slidesPerView: 1 },
       },
     });
   });

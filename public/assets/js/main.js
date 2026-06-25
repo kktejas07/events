@@ -24,8 +24,7 @@
         $(".offcanvas__info").removeClass("info-open");
         $(".offcanvas__overlay").removeClass("overlay-open");
       });
-      $documentOn.on("click", ".sidebar__toggle", function (e) {
-        e.preventDefault();
+      $(".sidebar__toggle").on("click", function () {
         $(".offcanvas__info").addClass("info-open");
         $(".offcanvas__overlay").addClass("overlay-open");
       });
@@ -168,8 +167,8 @@
         });
     }
 
-    //>> Gt Testimonial box Slider — managed by React (TestimonialSliders component) <<//
-    // Skipped here to avoid double-init with Next.js hydration
+    //>> Gt Testimonial box Slider — handled by React TestimonialSliders on Next.js <<//
+    // (original theme inits these in static HTML; see TestimonialSliders.tsx)
 
         // Left Side: Testimonial Content Slider
     if ($('.th-testimonial-slider').length > 0 && $('.swiper-image').length > 0) {
@@ -697,15 +696,11 @@
     }
     
     function loader() {
-        function hidePreloader() {
+        $windowOn.on('load', function() {
+            // Animate loader off screen
             $(".preloader").addClass('loaded');
             $(".preloader").delay(200).fadeOut();
-        }
-        if (document.readyState === 'complete') {
-            hidePreloader();
-        } else {
-            $windowOn.on('load', hidePreloader);
-        }
+        });
     }
     
     loader();

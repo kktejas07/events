@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { themeAssets, scheduleImage, speakerImage, newsImage } from "@/lib/theme-images";
-import { hyderabadColleges } from "@/lib/hyderabad-colleges";
+import { resolveThemeImage } from "@/lib/resolve-theme-image";
+import { defaultContent } from "@/lib/landing-defaults";
+import { AboutConferenceSection } from "@/components/theme/about-conference-section";
 import { TestimonialSliders } from "@/components/ui/testimonial-sliders";
 
 const FALLBACK_IMG = "/assets/img/logo/blue-logo.svg";
@@ -34,7 +36,7 @@ function CountdownTimer({ target }: { target?: string }) {
     return () => clearInterval(id);
   }, [target]);
   return (
-    <div className="gt-coming-soon-time">
+    <div className="gt-coming-soon-time" data-event-time={target || "2026-10-01T09:00:00"}>
       <div className="gt-timer-content">
         <h3 className="gt-day">{time.days}</h3>
         <p>Days</p>
@@ -110,7 +112,7 @@ export default function HomePageClient({
   const heroBg = hero.backgroundImage || themeAssets.hero.background;
   const heroShapeImage = hero.heroImage || themeAssets.hero.shape;
   const about = (initialContent.about as Record<string, string>) || {};
-  const aboutImage = about.image || themeAssets.about.image;
+  const aboutDefaults = defaultContent.about as Record<string, string>;
   const statsArr = (initialContent.stats as Record<string, string>[]) || [];
   const speakersSection = (initialContent.speakers as Record<string, unknown>) || {};
   const speakersItems = (speakersSection.items as Record<string, string>[]) || [];
@@ -161,12 +163,16 @@ export default function HomePageClient({
             <div className="col-xl-10">
               <div className="gt-hero-content">
                 <span
-                  className="img-custom-anim-left"
+                  className="wow img-custom-anim-left"
+                  data-wow-duration="1.3s"
+                  data-wow-delay="0.3s"
                 >
                   {hero.badge || "digital Design"}
                 </span>
                 <h1
-                  className="img-custom-anim-right"
+                  className="wow img-custom-anim-right"
+                  data-wow-duration="1.3s"
+                  data-wow-delay="0.3s"
                 >
                   {hero.title || "conference"}
                 </h1>
@@ -187,93 +193,13 @@ export default function HomePageClient({
         </div>
       </section>
 
-      {/* ════════ ABOUT ════════ */}
-      <section className="gt-about-section section-padding fix">
-        <div className="gt-left-shape">
-          <img src={themeAssets.about.shape1} alt="" />
-        </div>
-        <div className="gt-right-shape">
-          <img src={themeAssets.about.shape2} alt="" />
-        </div>
-        <div className="gt-blur-shape">
-          <img src={themeAssets.about.blur} alt="" />
-        </div>
-        <div className="container">
-          <div className="gt-about-wrapper-3">
-            <div className="row g-4">
-              <div className="col-lg-6">
-                <div className="gt-about-image wow fadeInUp" data-wow-delay=".3s">
-                  <img src={aboutImage} alt="img" />
-                  <div className="gt-circle-shape">
-                    <img src={themeAssets.about.circle} alt="" />
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-6">
-                <div className="gt-about-content">
-                  <div className="gt-section-title mb-0">
-                    <span className="gt-sub-title gt-style-4 wow fadeInUp">
-                      {about.badge || "About design conference"}
-                    </span>
-                    <h2 className="wow fadeInUp" data-wow-delay=".3s">
-                      {about.title || "Building The Future of digital design & Conferences"}
-                    </h2>
-                  </div>
-                  <p className="gt-text wow fadeInUp" data-wow-delay=".5s">
-                    {about.description ||
-                      "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion."}
-                  </p>
-                  <div className="gt-counter-box wow fadeInUp" data-wow-delay=".3s">
-                    {statsArr.length > 0 ? (
-                      statsArr.map((s, i) => (
-                        <div key={i} className="gt-count-item">
-                          <h2>
-                            <span className="gt-count">{s.value}</span>
-                            {s.suffix || ""}
-                          </h2>
-                          <p>{s.label}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <>
-                        <div className="gt-count-item">
-                          <h2>
-                            <span className="gt-count">25</span>+
-                          </h2>
-                          <p>Our Visionary Speakers</p>
-                        </div>
-                        <div className="gt-count-item">
-                          <h2>
-                            <span className="gt-count">897</span>+
-                          </h2>
-                          <p>Event Participants</p>
-                        </div>
-                        <div className="gt-count-item">
-                          <h2>
-                            <span className="gt-count">69</span>+
-                          </h2>
-                          <p>International Sponsors</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <div className="gt-about-button wow fadeInUp" data-wow-delay=".5s">
-                    <Link href="/events" className="gt-theme-btn gt-theme-btn-3">
-                      <i className="fa-solid fa-arrow-up"></i> get tickets
-                    </Link>
-                    <ul className="gt-button">
-                      <li>
-                        <i className="fa-solid fa-phone-volume"></i>
-                        <a href="tel:+9132140203420">+91 3214 0203 420</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AboutConferenceSection
+        badge={about.badge || aboutDefaults.badge}
+        title={about.title || aboutDefaults.title}
+        description={about.description || aboutDefaults.description}
+        image={about.image}
+        stats={statsArr as { value: string; label: string; suffix?: string }[]}
+      />
 
       {/* ════════ EVENT INTRO ════════ */}
       <section className="gt-event-intro-section section-padding pb-0">
@@ -286,7 +212,9 @@ export default function HomePageClient({
               <div className="gt-event-intro-items">
                 <div className="gt-intro-video">
                   <div
-                    className="gt-intro-image img-custom-anim-left"
+                    className="gt-intro-image wow img-custom-anim-left"
+                    data-wow-duration="1.3s"
+                    data-wow-delay="0.3s"
                   >
                     <img src={themeAssets.intro.text} alt="Conference" />
                   </div>
@@ -339,10 +267,12 @@ export default function HomePageClient({
             </ul>
           </div>
           <div className="tab-content">
-            {schedData.map((d) => (
+            {schedData
+              .filter((d) => d.day === activeTab)
+              .map((d) => (
               <div
                 key={d.day}
-                className={`tab-pane fade ${activeTab === d.day ? "active show" : ""}`}
+                className="tab-pane fade active show"
                 role="tabpanel"
               >
                 <div className="row g-4">
@@ -407,13 +337,11 @@ export default function HomePageClient({
                     >
                       <div className="gt-event-video-image">
                         <video
-                          src="/assets/img/events/business.mp4"
+                          src={themeAssets.video}
                           autoPlay
                           muted
                           loop
                           playsInline
-                          className="w-100"
-                          style={{ objectFit: "cover", borderRadius: "40px", maxHeight: "700px" }}
                         />
                       </div>
                     </div>
@@ -465,7 +393,9 @@ export default function HomePageClient({
               {speakersItems.slice(0, 2).map((sp, i) => (
                 <div
                   key={i}
-                  className={`col-xl-4 col-lg-6 col-md-6 ${i === 0 ? "img-custom-anim-left" : "img-custom-anim-right"}`}
+                  className={`col-xl-4 col-lg-6 col-md-6 wow ${i === 0 ? "img-custom-anim-left" : "img-custom-anim-right"}`}
+                  data-wow-duration="1.3s"
+                  data-wow-delay="0.3s"
                 >
                   <div className="gt-speaker-items-3">
                     <div className="gt-speaker-image">
@@ -496,7 +426,7 @@ export default function HomePageClient({
                           <i className="fa-solid fa-play"></i>
                         </a>
                         <h4>
-                          <a href="#">{sp.name}</a>
+                          <Link href="/speakers">{sp.name}</Link>
                         </h4>
                         <p>{sp.role}</p>
                       </div>
@@ -514,7 +444,7 @@ export default function HomePageClient({
                   </h2>
                   <p className="mt-mb-0 wow fadeInUp mt-3 text-white" data-wow-delay=".5s">
                     {speakerDesc ||
-                      "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking"}
+                      "Welcome to our design conference hub, where creativity meets innovation! We are a community of forward-thinking designers and creative leaders."}
                   </p>
                 </div>
                 <Link
@@ -522,13 +452,15 @@ export default function HomePageClient({
                   className="gt-theme-btn gt-theme-btn-3 wow fadeInUp mt-5"
                   data-wow-delay=".3s"
                 >
-                  <i className="fa-solid fa-arrow-up"></i> view all speakers
+                  <i className="fa-solid fa-arrow-up"></i> view all speaker&apos;s
                 </Link>
               </div>
               {speakersItems.slice(2, 5).map((sp, i) => (
                 <div
                   key={i + 2}
-                  className={`col-xl-4 col-lg-6 col-md-6 ${["img-custom-anim-left", "img-custom-anim-top", "img-custom-anim-right"][i]}`}
+                  className={`col-xl-4 col-lg-6 col-md-6 wow ${["img-custom-anim-left", "img-custom-anim-top", "img-custom-anim-right"][i]}`}
+                  data-wow-duration="1.3s"
+                  data-wow-delay="0.3s"
                 >
                   <div className="gt-speaker-items-3">
                     <div className="gt-speaker-image">
@@ -559,7 +491,7 @@ export default function HomePageClient({
                           <i className="fa-solid fa-play"></i>
                         </a>
                         <h4>
-                          <a href="#">{sp.name}</a>
+                          <Link href="/speakers">{sp.name}</Link>
                         </h4>
                         <p>{sp.role}</p>
                       </div>
@@ -596,7 +528,7 @@ export default function HomePageClient({
                   <div className="gt-shape">
                     <img src={themeAssets.services.shape2} alt="" />
                   </div>
-                    <div className="gt-service-image img-custom-anim-left">
+                    <div className="gt-service-image wow img-custom-anim-left" data-wow-duration="1.3s" data-wow-delay="0.3s">
                       <img src={faqImage} alt="Event attendee" />
                     </div>
                 </div>
@@ -613,64 +545,68 @@ export default function HomePageClient({
                         : [
                             {
                               q: "Networking",
-                              a: "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion.",
+                              a: "Connect with designers, developers, and creative leaders from around the world at our design conference.",
                             },
                             {
                               q: "Connecting minds",
-                              a: "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion.",
+                              a: "Share ideas, collaborate on projects, and build lasting professional relationships throughout the event.",
                             },
                             {
                               q: "Creating future",
-                              a: "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion.",
+                              a: "Explore emerging trends in digital design, UX, and creative technology shaping the industry.",
                             },
                             {
                               q: "Great Speakers",
-                              a: "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion.",
+                              a: "Learn from visionary speakers who are pushing the boundaries of design and digital innovation.",
                             },
                             {
                               q: "New People",
-                              a: "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion.",
+                              a: "Meet fellow creatives, expand your network, and discover new opportunities in the design community.",
                             },
                             {
                               q: "Have Fun",
-                              a: "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion.",
+                              a: "Enjoy workshops, networking sessions, and social events designed to inspire and energize.",
                             },
                           ]
-                      ).map((item: Record<string, string>, idx: number) => (
-                        <div key={idx} className="accordion-item mb-3">
+                      ).map((item: Record<string, string>, idx: number) => {
+                        const faqId = idx + 1;
+                        const isOpen = idx === 3;
+                        const isLast = idx === 5;
+                        return (
+                        <div key={idx} className={`accordion-item ${isLast ? "mb-0" : "mb-3"}`}>
                           <h5 className="accordion-header">
                             <button
-                              className={`accordion-button d-flex flex-wrap gap-2 ${idx === 3 ? "" : "collapsed"}`}
+                              className={`accordion-button d-flex gap-2 flex-wrap ${isOpen ? "" : "collapsed"} ${isLast ? "gt-style-2" : ""}`}
                               type="button"
                               data-bs-toggle="collapse"
-                              data-bs-target={`#faq${idx}`}
-                              aria-expanded={idx === 3 ? "true" : "false"}
+                              data-bs-target={`#faq${faqId}`}
+                              aria-expanded={isOpen ? "true" : "false"}
+                              aria-controls={`faq${faqId}`}
                             >
-                              <span>{String(idx + 1).padStart(2, "0")}</span>
+                              <span>{String(faqId).padStart(2, "0")}</span>
                               {item.q || item.title}
                             </button>
                           </h5>
                           <div
-                            id={`faq${idx}`}
-                            className={`accordion-collapse collapse ${idx === 3 ? "show" : ""}`}
+                            id={`faq${faqId}`}
+                            className={`accordion-collapse collapse ${isOpen ? "show" : ""}`}
                             data-bs-parent="#accordion"
                           >
                             <div className="accordion-body">
                               {item.a ||
                                 item.description ||
-                                "Welcome to our AI Business & Startup hub, where innovation meets ingenuity!"}
+                                "Welcome to our design conference community, where creativity meets innovation!"}
                               <div className="thumb">
                                 <img
-                                  src={
-                                    [themeAssets.services.faq2, themeAssets.services.faq2, themeAssets.services.faq3][idx % 3]
-                                  }
+                                  src={themeAssets.services.faq2}
                                   alt={item.q || item.title || "Event benefit"}
                                 />
                               </div>
                             </div>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -683,7 +619,7 @@ export default function HomePageClient({
       {/* ════════ TICKETS ════════ */}
       <section className="gt-event-ticket-section-3">
         <div className="gt-dark-shape">
-          <img src={themeAssets.sponsors.dark} alt="" />
+          <img src={themeAssets.ticket.darkShape} alt="" />
         </div>
         <div className="gt-right-shape">
           <img src={themeAssets.services.rightShape} alt="" />
@@ -853,7 +789,7 @@ export default function HomePageClient({
                       </Link>
                     </div>
                     <div className="gt-news-image">
-                      <img src={post.image || newsImage(i)} alt={post.title} onError={handleImgError} />
+                      <img src={newsImage(i)} alt={post.title} onError={handleImgError} />
                       <div className="post-date">
                         <h5>{post.day || "20"}</h5>
                         <p>{post.month || "april"}</p>
@@ -876,10 +812,9 @@ export default function HomePageClient({
               <div className="swiper-wrapper">
                 {(dbSponsors.length > 0
                   ? dbSponsors
-                  : hyderabadColleges.map((c) => ({
-                      name: c.name,
-                      logoUrl: c.logo,
-                      websiteUrl: c.website,
+                  : Array.from({ length: 6 }, (_, i) => ({
+                      name: "Sponsor",
+                      logoUrl: themeAssets.brand.default,
                     }))
                 ).map((sp: unknown, i: number) => {
                     const sponsor = (sp || {}) as Record<string, string>;
@@ -887,10 +822,7 @@ export default function HomePageClient({
                       <div key={i} className="swiper-slide">
                         <div className="brand-image text-center">
                           <img
-                            src={
-                              sponsor.logoUrl ||
-                              hyderabadColleges[i % hyderabadColleges.length]?.logo
-                            }
+                            src={resolveThemeImage(sponsor.logoUrl, themeAssets.brand.default)}
                             alt={sponsor.name || "brand"}
                             onError={handleImgError}
                           />

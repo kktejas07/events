@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { themeAssets } from "@/lib/theme-images";
+import { resolveThemeImage } from "@/lib/resolve-theme-image";
 import { ArrowLeft, Calendar, MapPin, Users, Globe, Ticket } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -39,15 +41,11 @@ export default async function CollegeDetailPage({ params }: { params: Promise<{ 
         <div className="mt-6">
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 overflow-hidden rounded-xl">
-              {org.logo ? (
-                <img src={org.logo} alt={org.name} className="h-full w-full object-cover" />
-              ) : (
-                <img
-                  src="https://images.unsplash.com/photo-1607237130085-3e1b0c93ac44?w=100&q=80"
-                  alt={org.name}
-                  className="h-full w-full object-cover"
-                />
-              )}
+              <img
+                src={resolveThemeImage(org.logo, themeAssets.collegeLogo)}
+                alt={org.name}
+                className="h-full w-full object-cover"
+              />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">{org.name}</h1>

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/forms/password-input";
 import { toast } from "sonner";
-import { CreditCard, Shield, Link2, Settings2, Mail, ChevronRight, Upload } from "lucide-react";
+import { CreditCard, Shield, Link2, Settings2, Mail, Bell, ChevronRight, Upload } from "lucide-react";
 
 interface Settings {
   NEXT_PUBLIC_APP_NAME: string;
@@ -32,6 +32,26 @@ interface Settings {
   STUDENTALUMNI_WEBHOOK_SECRET: string;
   UPSTASH_REDIS_REST_URL: string;
   UPSTASH_REDIS_REST_TOKEN: string;
+  WHATSAPP_API_URL: string;
+  WHATSAPP_API_KEY: string;
+}
+
+const NOTIFICATION_TYPES = [
+  { id: "otp", label: "OTP Verification" },
+  { id: "welcome", label: "Welcome Message" },
+  { id: "ticket", label: "Ticket Confirmation" },
+  { id: "receipt", label: "Order Receipt" },
+  { id: "reminder", label: "Event Reminder" },
+  { id: "password_reset", label: "Password Reset" },
+];
+
+const CHANNELS = [
+  { id: "email", label: "Email" },
+  { id: "whatsapp", label: "WhatsApp" },
+];
+
+function notifyKey(type: string, channel: string) {
+  return `notify_${type}_${channel}`;
 }
 
 const defaults: Settings = {
@@ -54,20 +74,60 @@ const defaults: Settings = {
   STUDENTALUMNI_WEBHOOK_SECRET: "",
   UPSTASH_REDIS_REST_URL: "",
   UPSTASH_REDIS_REST_TOKEN: "",
+  WHATSAPP_API_URL: "",
+  WHATSAPP_API_KEY: "",
 };
 
-type TabId = "general" | "payments" | "auth" | "integrations";
+type TabId = "general" | "payments" | "auth" | "integrations" | "notifications";
 
 const tabs: { id: TabId; label: string; icon: typeof Settings2 }[] = [
   { id: "general", label: "General", icon: Settings2 },
   { id: "payments", label: "Payments", icon: CreditCard },
   { id: "auth", label: "Authentication", icon: Shield },
   { id: "integrations", label: "Integrations", icon: Link2 },
+  { id: "notifications", label: "Notifications", icon: Bell },
 ];
+
+function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      style={{
+        width: "40px",
+        height: "22px",
+        borderRadius: "11px",
+        border: "none",
+        cursor: "pointer",
+        background: checked ? "#7c3aed" : "#374151",
+        position: "relative",
+        transition: "background 0.2s",
+        padding: 0,
+      }}
+    >
+      <span
+        style={{
+          display: "block",
+          width: "18px",
+          height: "18px",
+          borderRadius: "50%",
+          background: "#fff",
+          position: "absolute",
+          top: "2px",
+          left: checked ? "20px" : "2px",
+          transition: "left 0.2s",
+        }}
+      />
+    </button>
+  );
+}
 
 export default function AdminSettingsPage() {
   const router = useRouter();
   const [settings, setSettings] = useState<Settings>(defaults);
+  const [notifyConfig, setNotifyConfig] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("general");
@@ -76,7 +136,18 @@ export default function AdminSettingsPage() {
     fetch("/api/admin/settings")
       .then((r) => r.json())
       .then((data) => {
-        if (data.settings) setSettings({ ...defaults, ...data.settings });
+        if (data.settings) {
+          const s = data.settings;
+          const notify: Record<string, boolean> = {};
+          for (const type of NOTIFICATION_TYPES) {
+            for (const ch of CHANNELS) {
+              const key = notifyKey(type.id, ch.id);
+              notify[key] = s[key] === "true";
+            }
+          }
+          setNotifyConfig(notify);
+          setSettings({ ...defaults, ...s });
+        }
       })
       .catch(() => toast.error("Failed to load settings"))
       .finally(() => setLoading(false));
@@ -86,15 +157,27 @@ export default function AdminSettingsPage() {
     setSettings((prev) => ({ ...prev, [key]: value }));
   }
 
+  function toggleNotify(type: string, channel: string) {
+    const key = notifyKey(type, channel);
+    setNotifyConfig((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
   const hasValue = (key: keyof Settings) => settings[key]?.length > 0;
 
   async function handleSave() {
     setSaving(true);
     try {
+      const payload = { ...settings };
+      for (const type of NOTIFICATION_TYPES) {
+        for (const ch of CHANNELS) {
+          const key = notifyKey(type.id, ch.id);
+          payload[key as keyof Settings] = notifyConfig[key] ? "true" : "false" as any;
+        }
+      }
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ settings }),
+        body: JSON.stringify({ settings: payload }),
       });
       if (res.ok) {
         toast.success("Settings saved");
@@ -394,6 +477,104 @@ export default function AdminSettingsPage() {
                 value={settings.UPSTASH_REDIS_REST_TOKEN}
                 onChange={(v) => update("UPSTASH_REDIS_REST_TOKEN", v)}
               />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Notifications */}
+      {activeTab === "notifications" && (
+        <div className="space-y-6">
+          {/* WhatsApp Config */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  WhatsApp Configuration
+                </div>
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Enter your WhatsApp service provider details. Supports any HTTP-based WhatsApp API.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1">
+                <Label>WhatsApp API URL</Label>
+                <Input
+                  placeholder="https://your-whatsapp-service.com/api/send"
+                  value={settings.WHATSAPP_API_URL}
+                  onChange={(e) => update("WHATSAPP_API_URL", e.target.value)}
+                />
+              </div>
+              <PasswordInput
+                label="WhatsApp API Key"
+                value={settings.WHATSAPP_API_KEY}
+                onChange={(v) => update("WHATSAPP_API_KEY", v)}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Channel Toggles */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  Notification Channels
+                </div>
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Toggle which channels each notification type is delivered through. At least one channel
+                must be enabled per type for delivery to work.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid #2d3748" }}>
+                      <th style={{ textAlign: "left", padding: "12px 16px", color: "#9ca3af", fontWeight: 600, fontSize: "13px" }}>Notification Type</th>
+                      {CHANNELS.map((ch) => (
+                        <th key={ch.id} style={{ textAlign: "center", padding: "12px 16px", color: "#9ca3af", fontWeight: 600, fontSize: "13px" }}>{ch.label}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {NOTIFICATION_TYPES.map((type) => (
+                      <tr key={type.id} style={{ borderBottom: "1px solid #1f2937" }}>
+                        <td style={{ padding: "14px 16px", color: "#d1d5db", fontSize: "14px" }}>{type.label}</td>
+                        {CHANNELS.map((ch) => {
+                          const key = notifyKey(type.id, ch.id);
+                          return (
+                            <td key={ch.id} style={{ textAlign: "center", padding: "14px 16px" }}>
+                              <ToggleSwitch
+                                checked={notifyConfig[key] ?? false}
+                                onChange={() => toggleNotify(type.id, ch.id)}
+                              />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Info Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>How It Works</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm text-muted-foreground">
+              <p>When a notification is triggered, the system checks which channels are enabled for that type and delivers through all enabled channels simultaneously.</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li><strong>Email</strong> — uses your configured email provider (SMTP/Postal/Brevo). Works with any valid email address.</li>
+                <li><strong>WhatsApp</strong> — uses the configured WhatsApp API. Requires a valid phone number with country code (e.g., +919876543210).</li>
+              </ul>
+              <p className="mt-2">Email templates are automatically converted to plain text for WhatsApp delivery. Both channels receive the same content.</p>
             </CardContent>
           </Card>
         </div>

@@ -84,13 +84,13 @@ export default function ServicePage() {
               <div key={n} className="comm">
                 <div></div>
                 <div className="cmn-textslide">
-                  <img src="/assets/img/marquee/01.png" alt="" /> marketing
+                  <img src={themeAssets.marquee.icon} alt="" /> marketing
                 </div>
                 <div className="cmn-textslide">
-                  <img src="/assets/img/marquee/01.png" alt="" /> BUSINESS
+                  <img src={themeAssets.marquee.icon} alt="" /> BUSINESS
                 </div>
                 <div className="cmn-textslide">
-                  <img src="/assets/img/marquee/01.png" alt="" /> branding
+                  <img src={themeAssets.marquee.icon} alt="" /> branding
                 </div>
               </div>
             ))}
@@ -107,7 +107,7 @@ export default function ServicePage() {
             </h2>
           </div>
           <div className="row">
-            {themeAssets.news.items.map((img, i) => (
+            {themeAssets.news.innerPage.slice(0, 3).map((img, i) => (
               <div key={i} className="col-xl-4 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay={`.${3 + i * 2}s`}>
                 <div className="gt-news-card-item">
                   <div className="gt-news-image">

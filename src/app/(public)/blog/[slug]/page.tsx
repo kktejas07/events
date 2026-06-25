@@ -4,7 +4,9 @@ export const revalidate = 0;
 import { unstable_noStore as noStore } from "next/cache";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { db } from "@/lib/db";
+import { innerPageNewsImage } from "@/lib/theme-images";
 
 export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
   noStore();
@@ -43,59 +45,23 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
 
   return (
     <>
-      <div className="gt-breadcrumb-wrapper fix">
-        <div className="gt-top-shape">
-          <img src="/assets/img/inner-page/breadcrumb/bg-shape.png" alt="img" />
-        </div>
-        <div className="gt-line-shape">
-          <img src="/assets/img/inner-page/breadcrumb/line-shape.png" alt="img" />
-        </div>
-        <div className="gt-arrow-shape float-bob-y">
-          <img src="/assets/img/inner-page/breadcrumb/arrow.png" alt="img" />
-        </div>
-        <div
-          className="gt-page-heading bg-cover"
-          style={{ backgroundImage: "url(/assets/img/inner-page/breadcrumb/bg.png)" }}
-        >
-          <div className="gt-breadcrumb-sub-title">
-            <h1 className="wow fadeInUp" data-wow-delay=".3s">
-              BLOG DETAILS
-            </h1>
-          </div>
-          <ul className="gt-breadcrumb-items wow fadeInUp" data-wow-delay=".5s">
-            <li>
-              <Link href="/">Home</Link>
-            </li>
-            <li>
-              <i className="fa-solid fa-chevron-right"></i>
-            </li>
-            <li>
-              <Link href="/blog">Blog</Link>
-            </li>
-            <li>
-              <i className="fa-solid fa-chevron-right"></i>
-            </li>
-            <li>
-              <span>{post.title}</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <Breadcrumb
+        title="BLOG DETAILS"
+        crumbs={[
+          { label: "Blog", href: "/blog" },
+          { label: post.title },
+        ]}
+      />
 
       <section className="gt-news-section section-padding fix">
         <div className="container">
           <div className="row">
             <div className="col-lg-8">
               <div className="gt-news-details-post">
-                {post.coverImage && (
-                  <div className="gt-news-details-image">
-                    <img
-                      src={post.coverImage}
-                      alt={post.title}
-                    />
-                    <span>{post.category || "General"}</span>
-                  </div>
-                )}
+                <div className="gt-news-details-image">
+                  <img src={innerPageNewsImage(0, post.coverImage)} alt={post.title} />
+                  <span>{post.category || "General"}</span>
+                </div>
                 <div className="gt-news-details-content">
                   <h2>{post.title}</h2>
                   {post.author && (
@@ -137,13 +103,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
                     {recentPosts.map((rp) => (
                       <div key={rp.id} className="gt-sidebar-recent-post">
                         <div className="gt-sidebar-recent-image">
-                          <img
-                            src={
-                              rp.coverImage ||
-                              "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=100&q=80"
-                            }
-                            alt={rp.title}
-                          />
+                          <img src={innerPageNewsImage(recentPosts.indexOf(rp), rp.coverImage)} alt={rp.title} />
                         </div>
                         <div className="gt-sidebar-recent-content">
                           <h6>

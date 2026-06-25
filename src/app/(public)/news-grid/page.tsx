@@ -5,7 +5,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { newsImage } from "@/lib/theme-images";
+import { innerPageNewsImage } from "@/lib/theme-images";
 
 export default async function NewsGridPage() {
   noStore();
@@ -38,7 +38,7 @@ export default async function NewsGridPage() {
           slug: "blog",
           excerpt: "Stay updated with the latest from our design conference community.",
           category: "Corporate",
-          coverImage: newsImage(i),
+          coverImage: innerPageNewsImage(i),
           publishedAt: new Date(2025, 2, 11 + i),
         }));
 
@@ -57,7 +57,7 @@ export default async function NewsGridPage() {
               >
                 <div className="gt-news-card-item">
                   <div className="gt-news-image">
-                    <img src={newsImage(i, post.coverImage)} alt={post.title} />
+                    <img src={innerPageNewsImage(i, post.coverImage)} alt={post.title} />
                     <span>{post.category || "Corporate"}</span>
                   </div>
                   <div className="gt-news-content">

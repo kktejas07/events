@@ -6,6 +6,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { themeAssets } from "@/lib/theme-images";
+import { resolveThemeImage } from "@/lib/resolve-theme-image";
 import { hyderabadColleges } from "@/lib/hyderabad-colleges";
 
 export default async function SponsorPage() {
@@ -55,7 +56,10 @@ export default async function SponsorPage() {
                 <div className="gt-sponsor-item mt-0">
                   <div className="gt-sponsor-logo">
                     <img
-                      src={sp.logoUrl || hyderabadColleges[i % hyderabadColleges.length].logo}
+                      src={resolveThemeImage(
+                        sp.logoUrl,
+                        hyderabadColleges[i % hyderabadColleges.length].logo
+                      )}
                       alt={sp.name}
                     />
                   </div>

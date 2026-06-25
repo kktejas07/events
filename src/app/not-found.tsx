@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { themeAssets } from "@/lib/theme-images";
 
 export default function NotFound() {
   return (
@@ -13,7 +14,7 @@ export default function NotFound() {
               <div className="gt-error-items">
                 <div className="gt-error-image wow fadeInUp" data-wow-delay=".3s">
                   <img
-                    src="https://images.unsplash.com/photo-1584820927498-cfe5211fd1bf?w=500&q=80"
+                    src={themeAssets.error404}
                     alt="404 illustration"
                     style={{ maxWidth: 300, borderRadius: 20 }}
                   />

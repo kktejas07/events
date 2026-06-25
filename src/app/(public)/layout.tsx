@@ -80,7 +80,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       </div>
 
       <Header />
-      <main className="fix">{children}</main>
+      <main>{children}</main>
       <Footer />
       <ThemeInit />
     </>

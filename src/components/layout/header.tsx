@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { defaultContent } from "@/lib/landing-defaults";
+import { NavLinks } from "@/components/layout/nav-links";
 
 type SiteSettings = {
   headerAddress: string;
@@ -18,76 +19,6 @@ const defaultSite: SiteSettings = {
   ticketButtonText: (defaultContent.site as SiteSettings)?.ticketButtonText || "get ticket",
   ticketButtonLink: (defaultContent.site as SiteSettings)?.ticketButtonLink || "/events",
 };
-
-function NavLinks({ isHome }: { isHome: boolean }) {
-  const pathname = usePathname();
-  const isActive = (path: string) => (pathname === path ? "active" : "");
-
-  return (
-    <ul>
-      <li className={`has-dropdown ${isActive("/") ? "active" : ""}`}>
-        <a href="/" className={isHome ? "border-none" : undefined}>
-          Home
-        </a>
-        <ul className="submenu">
-          <li><a href="/">Design Conference</a></li>
-        </ul>
-      </li>
-      <li
-        className={`has-dropdown ${
-          isActive("/about") ||
-          isActive("/sponsor") ||
-          isActive("/pricing") ||
-          isActive("/service") ||
-          isActive("/service-details")
-            ? "active"
-            : ""
-        }`}
-      >
-        <a href="/about">Pages</a>
-        <ul className="submenu">
-          <li><a href="/about">About Us</a></li>
-          <li className="has-dropdown">
-            <a href="/service-details">
-              Our Service <i className="fas fa-angle-right"></i>
-            </a>
-            <ul className="submenu">
-              <li><a href="/service">Our Services</a></li>
-              <li><a href="/service-details">Service Details</a></li>
-            </ul>
-          </li>
-          <li><a href="/sponsor">Sponsor</a></li>
-          <li><a href="/pricing">Our Pricing</a></li>
-        </ul>
-      </li>
-      <li className={`has-dropdown ${isActive("/events") || isActive("/event-details") ? "active" : ""}`}>
-        <a href="/events">event</a>
-        <ul className="submenu">
-          <li><a href="/events">Event</a></li>
-          <li><a href="/event-details">Event Details</a></li>
-        </ul>
-      </li>
-      <li className={`has-dropdown ${isActive("/speakers") || isActive("/speaker-details") ? "active" : ""}`}>
-        <a href="/speakers">Speaker</a>
-        <ul className="submenu">
-          <li><a href="/speakers">Speaker</a></li>
-          <li><a href="/speaker-details">Speaker Details</a></li>
-        </ul>
-      </li>
-      <li className={`has-dropdown ${isActive("/blog") || isActive("/news-grid") || isActive("/news-details") ? "active" : ""}`}>
-        <a href="/blog">Blog</a>
-        <ul className="submenu">
-          <li><a href="/news-grid">Blog Grid</a></li>
-          <li><a href="/blog">Blog Standard</a></li>
-          <li><a href="/news-details">Blog Details</a></li>
-        </ul>
-      </li>
-      <li className={isActive("/contact")}>
-        <a href="/contact">Contact Us</a>
-      </li>
-    </ul>
-  );
-}
 
 export function Header() {
   const { data: session } = useSession();

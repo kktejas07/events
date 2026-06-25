@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyRazorpayWebhook } from "@/lib/razorpay";
 import { db } from "@/lib/db";
 import { generateBarcodeValue } from "@/lib/barcode";
-import { sendEmail } from "@/lib/email";
+import { notify, NotificationType } from "@/services/notification";
+import { renderTicketPurchaseEmail } from "@/lib/email-templates/ticket-purchase";
+import { renderOrderReceiptEmail } from "@/lib/email-templates/order-receipt";
 
 export async function POST(req: NextRequest) {
   try {
@@ -68,20 +70,52 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Send confirmation email
-      if (order.user.email) {
-        await sendEmail({
-          to: order.user.email,
-          subject: `Your tickets for ${order.event.title}`,
-          html: `
-            <h1>Order Confirmed!</h1>
-            <p>Thank you for your purchase. Your tickets for <strong>${order.event.title}</strong> are confirmed.</p>
-            <p>Order ID: ${order.id}</p>
-            <p>Total: ₹${Number(order.total).toLocaleString()}</p>
-            <p>View your tickets: <a href="${process.env.NEXT_PUBLIC_APP_URL}/my-tickets">My Tickets</a></p>
-          `,
-        });
-      }
+      // Send ticket confirmation notification
+      const ticketHtml = renderTicketPurchaseEmail({
+        firstName: order.user.firstName || "Valued Customer",
+        orderId: order.id,
+        eventName: order.event.title,
+        eventDate: order.event.startDate
+          ? new Date(order.event.startDate).toLocaleDateString()
+          : "TBA",
+        eventVenue: (order.event as any).venue?.name || "TBA",
+        tickets: order.items.map((i) => ({
+          name: i.ticketType?.name || "Ticket",
+          quantity: i.quantity,
+          price: Number(i.unitPrice),
+        })),
+        total: Number(order.total),
+      });
+
+      await notify(
+        NotificationType.TICKET_CONFIRMATION,
+        { email: order.user.email, phone: order.user.phone || undefined },
+        `Your tickets for ${order.event.title}`,
+        ticketHtml
+      );
+
+      // Send order receipt notification
+      const receiptHtml = renderOrderReceiptEmail({
+        firstName: order.user.firstName || "Valued Customer",
+        orderId: order.id,
+        eventName: order.event.title,
+        paymentMethod: "Razorpay",
+        paidAt: new Date().toLocaleString(),
+        items: order.items.map((i) => ({
+          description: `${i.ticketType?.name || "Ticket"} x ${i.quantity}`,
+          amount: Number(i.totalPrice),
+        })),
+        subtotal: Number(order.subtotal),
+        tax: Number(order.tax),
+        total: Number(order.total),
+      });
+
+      await notify(
+        NotificationType.ORDER_RECEIPT,
+        { email: order.user.email, phone: order.user.phone || undefined },
+        `Receipt for ${order.event.title}`,
+        receiptHtml
+      );
     }
 
     return NextResponse.json({ success: true });

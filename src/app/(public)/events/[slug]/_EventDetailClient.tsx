@@ -2,6 +2,14 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { EventScheduleTabs, type ScheduleDay } from "@/components/theme/event-schedule-tabs";
+import { eventCoverImage } from "@/lib/theme-images";
+
+const detailImages = [
+  "/assets/img/inner-page/event-details/details-2.jpg",
+  "/assets/img/inner-page/event-details/details-3.jpg",
+];
 
 interface EventData {
   id: string;
@@ -41,16 +49,8 @@ interface EventData {
   faqs: { id: string; question: string; answer: string }[];
 }
 
-const topicImages = [
-  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
-  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
-];
-
-const unsplashEventDetail =
-  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80";
 
 export default function EventDetailClient({ event }: { event: EventData }) {
-  const [activeDay, setActiveDay] = useState(0);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -88,40 +88,23 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
   const speaker = event.sessions.find((s) => s.speaker);
 
+  const sessionScheduleDays: ScheduleDay[] = sessionDays.map((d) => ({
+    id: `day${String(d.day).padStart(2, "0")}`,
+    label: `day ${String(d.day).padStart(2, "0")}`,
+    sessions: d.sessions.map((session) => ({
+      title: session.title,
+      date: `${new Date(session.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} - ${new Date(session.endTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`,
+      room: session.room || (session.speaker ? `${session.speaker.firstName} ${session.speaker.lastName}` : "Main Hall"),
+      location: event.venue
+        ? `${event.venue.address}, ${event.venue.city}`
+        : undefined,
+      href: `/events/${event.slug}`,
+    })),
+  }));
+
   return (
     <>
-      <div className="gt-breadcrumb-wrapper fix">
-        <div className="gt-top-shape">
-          <img src="/assets/img/inner-page/breadcrumb/bg-shape.png" alt="img" />
-        </div>
-        <div className="gt-line-shape">
-          <img src="/assets/img/inner-page/breadcrumb/line-shape.png" alt="img" />
-        </div>
-        <div className="gt-arrow-shape float-bob-y">
-          <img src="/assets/img/inner-page/breadcrumb/arrow.png" alt="img" />
-        </div>
-        <div
-          className="gt-page-heading bg-cover"
-          style={{ backgroundImage: "url(/assets/img/inner-page/breadcrumb/bg.png)" }}
-        >
-          <div className="gt-breadcrumb-sub-title">
-            <h1 className="wow fadeInUp" data-wow-delay=".3s">
-              EVENT DETAILS
-            </h1>
-          </div>
-          <ul className="gt-breadcrumb-items wow fadeInUp" data-wow-delay=".5s">
-            <li>
-              <a href="/">Home</a>
-            </li>
-            <li>
-              <i className="fa-solid fa-chevron-right"></i>
-            </li>
-            <li>
-              <span>EVENT DETAILS</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <Breadcrumb title="EVENT DETAILS" />
 
       <section className="gt-events-details-section section-padding fix">
         <div className="container">
@@ -147,7 +130,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                     )}
                   </ul>
                   <div className="gt-details-image">
-                    <img src={event.coverImage || unsplashEventDetail} alt={event.title} />
+                    <img src={eventCoverImage(0, event.coverImage)} alt={event.title} />
                     <div className="gt-client-image">
                       <img src="/assets/img/inner-page/event-details/client.png" alt="img" />
                     </div>
@@ -195,12 +178,12 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                     </div>
                     <div className="col-xl-6 col-lg-12">
                       <div className="gt-thumb">
-                        <img src={topicImages[0]} alt="img" />
+                        <img src={detailImages[0]} alt="img" />
                       </div>
                     </div>
                     <div className="col-xl-6 col-lg-12">
                       <div className="gt-thumb">
-                        <img src={topicImages[1]} alt="img" />
+                        <img src={detailImages[1]} alt="img" />
                       </div>
                     </div>
                     <div className="col-xl-6 col-lg-12">
@@ -268,55 +251,14 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                   </div>
 
                   {event.sessions.length > 0 && (
-                    <div className="mb-4 mt-4">
+                    <div className="mt-4">
                       <h3>Event Schedule</h3>
-                      <div className="d-flex mb-4 mt-3 flex-wrap gap-2">
-                        {sessionDays.map((d, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setActiveDay(i)}
-                            className={`btn btn-sm ${activeDay === i ? "gt-theme-btn" : "btn-outline-light"}`}
-                          >
-                            Day {d.day}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="space-y-3">
-                        {sessionDays[activeDay]?.sessions.map((session) => (
-                          <div
-                            key={session.id}
-                            className="gt-card d-flex flex-column flex-sm-row align-items-center gap-4 p-4"
-                          >
-                            <div className="rounded-3 shrink-0 bg-purple-500/10 px-4 py-2 text-center">
-                              <div className="fw-semibold text-purple text-sm">
-                                {new Date(session.startTime).toLocaleTimeString("en-US", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </div>
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="fw-semibold text-white">{session.title}</h4>
-                              <div className="d-flex flex-wrap gap-3 text-sm text-gray-400">
-                                {session.speaker && (
-                                  <span>
-                                    <i className="fa-solid fa-microphone text-purple me-1"></i>{" "}
-                                    {session.speaker.firstName} {session.speaker.lastName}
-                                  </span>
-                                )}
-                                {session.room && (
-                                  <span>
-                                    <i className="fa-solid fa-location-dot text-purple me-1"></i>{" "}
-                                    {session.room}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <span className="badge text-purple shrink-0 border border-purple-500/30">
-                              Session
-                            </span>
-                          </div>
-                        ))}
+                      <div className="mt-4">
+                        <EventScheduleTabs
+                          embedded
+                          days={sessionScheduleDays}
+                          defaultTicketHref={`/events/${event.slug}`}
+                        />
                       </div>
                     </div>
                   )}
@@ -334,13 +276,31 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                   {event.faqs.length > 0 && (
                     <div className="mt-4">
                       <h3>Frequently Asked Questions</h3>
-                      <div className="mt-3 space-y-3">
-                        {event.faqs.map((faq) => (
-                          <div key={faq.id} className="gt-card p-4">
-                            <h4 className="fw-semibold text-white">{faq.question}</h4>
-                            <p className="mt-2 text-sm text-gray-400">{faq.answer}</p>
-                          </div>
-                        ))}
+                      <div className="faq-accordion mt-3">
+                        <div className="accordion" id="eventFaq">
+                          {event.faqs.map((faq, idx) => (
+                            <div key={faq.id} className={`accordion-item ${idx === event.faqs.length - 1 ? "mb-0" : "mb-3"}`}>
+                              <h5 className="accordion-header">
+                                <button
+                                  className={`accordion-button ${idx === 0 ? "" : "collapsed"}`}
+                                  type="button"
+                                  data-bs-toggle="collapse"
+                                  data-bs-target={`#faq-${faq.id}`}
+                                  aria-expanded={idx === 0 ? "true" : "false"}
+                                >
+                                  {faq.question}
+                                </button>
+                              </h5>
+                              <div
+                                id={`faq-${faq.id}`}
+                                className={`accordion-collapse collapse ${idx === 0 ? "show" : ""}`}
+                                data-bs-parent="#eventFaq"
+                              >
+                                <div className="accordion-body">{faq.answer}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { registerSchema } from "@/lib/validations";
+import { createOTP } from "@/lib/otp";
+import { renderOTPEmail } from "@/lib/email-templates/otp";
+import { notify, NotificationType } from "@/services/notification";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,6 +50,7 @@ export async function POST(req: NextRequest) {
         graduationYear: graduationYear || null,
         gender: gender || null,
         organizationId: organizationId || null,
+        emailVerified: null, // unverified until OTP is confirmed
       },
     });
 
@@ -61,8 +65,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Send OTP
+    const otp = await createOTP(email);
+    const html = renderOTPEmail({ firstName: firstName || "User", otp });
+    await notify(
+      NotificationType.OTP,
+      { email: user.email, phone: user.phone || undefined },
+      "Your Verification Code",
+      html
+    );
+
     return NextResponse.json({
       success: true,
+      requiresOTP: true,
       data: { id: user.id, email: user.email },
     });
   } catch (error) {

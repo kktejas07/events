@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { NewsletterForm } from "@/components/ui/newsletter-form";
+import { themeAssets } from "@/lib/theme-images";
 
 function CountdownTimer({ target }: { target: string }) {
   const [time, setTime] = useState({ days: "00", hours: "00", mins: "00", secs: "00" });
@@ -57,7 +58,7 @@ export default function ComingSoonPage() {
               </Link>
               <div className="gt-coming-soon-image">
                 <img
-                  src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80"
+                  src={themeAssets.comingSoon}
                   alt="Coming soon"
                   style={{ maxWidth: 200, borderRadius: "50%" }}
                 />

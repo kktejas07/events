@@ -4,7 +4,10 @@ export const revalidate = 0;
 import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { defaultContent } from "@/lib/landing-defaults";
 import { themeAssets } from "@/lib/theme-images";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { AboutConferenceSection } from "@/components/theme/about-conference-section";
 
 export default async function AboutPage() {
   noStore();
@@ -22,15 +25,14 @@ export default async function AboutPage() {
     console.error("About page fetch error:", error);
   }
 
-  const badge = (aboutContent.badge as string) || "About design conference";
-  const title =
-    (aboutContent.title as string) || "Building The Future of digital design & Conferences";
-  const aboutImage = (aboutContent.image as string) || themeAssets.about.image;
+  const aboutDefaults = defaultContent["about-page"] as Record<string, unknown>;
+  const badge = (aboutContent.badge as string) || (aboutDefaults.badge as string);
+  const title = (aboutContent.title as string) || (aboutDefaults.title as string);
   const description =
-    (aboutContent.description as string) ||
-    "Welcome to our AI Business & Startup hub, where innovation meets ingenuity! We are a community of forward-thinking entrepreneurs, industry leaders, and AI experts, united by our shared passion.";
-  const stats = (aboutContent.stats as { value: string; label: string; suffix?: string }[]) || [];
-  const phoneNumber = (aboutContent.phoneNumber as string) || "+91 3214 0203 420";
+    (aboutContent.description as string) || (aboutDefaults.description as string);
+  const stats = (aboutContent.stats as { value: string; label: string; suffix?: string }[]) ||
+    (aboutDefaults.stats as { value: string; label: string; suffix?: string }[]);
+  const phoneNumber = (aboutContent.phoneNumber as string) || (aboutDefaults.phoneNumber as string);
   const ticketPackages =
     (aboutContent.ticketPackages as {
       name: string;
@@ -41,126 +43,29 @@ export default async function AboutPage() {
 
   return (
     <>
-      <div className="gt-breadcrumb-wrapper fix">
-        <div className="gt-top-shape">
-          <img src="/assets/img/inner-page/breadcrumb/bg-shape.png" alt="img" />
-        </div>
-        <div className="gt-line-shape">
-          <img src="/assets/img/inner-page/breadcrumb/line-shape.png" alt="img" />
-        </div>
-        <div className="gt-arrow-shape float-bob-y">
-          <img src="/assets/img/inner-page/breadcrumb/arrow.png" alt="img" />
-        </div>
-        <div
-          className="gt-page-heading bg-cover"
-          style={{ backgroundImage: "url(/assets/img/inner-page/breadcrumb/bg.png)" }}
-        >
-          <div className="gt-breadcrumb-sub-title">
-            <h1 className="wow fadeInUp" data-wow-delay=".3s">
-              ABOUT US
-            </h1>
-          </div>
-          <ul className="gt-breadcrumb-items wow fadeInUp" data-wow-delay=".5s">
-            <li>
-              <Link href="/">Home</Link>
-            </li>
-            <li>
-              <i className="fa-solid fa-chevron-right"></i>
-            </li>
-            <li>
-              <span>ABOUT US</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <Breadcrumb title="ABOUT US" />
 
-      <section className="gt-about-section section-padding fix">
-        <div className="gt-left-shape">
-          <img src={themeAssets.about.shape1} alt="" />
-        </div>
-        <div className="gt-right-shape">
-          <img src={themeAssets.about.shape2} alt="" />
-        </div>
-        <div className="container">
-          <div className="gt-about-wrapper-3">
-            <div className="row g-4">
-              <div className="col-lg-6">
-                <div className="gt-about-image wow fadeInUp" data-wow-delay=".3s">
-                  <img src={aboutImage} alt="img" />
-                  <div className="gt-blur-shape">
-                    <img src={themeAssets.about.blur} alt="" />
-                  </div>
-                  <div className="gt-circle-shape">
-                    <img src={themeAssets.about.circle} alt="" />
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-6">
-                <div className="gt-about-content">
-                  <div className="gt-section-title mb-0">
-                    <span className="gt-sub-title gt-style-4 wow fadeInUp">{badge}</span>
-                    <h2 className="wow fadeInUp" data-wow-delay=".3s">
-                      {title}
-                    </h2>
-                  </div>
-                  <p className="gt-text wow fadeInUp" data-wow-delay=".5s">
-                    {description}
-                  </p>
-                  <div className="gt-counter-box wow fadeInUp" data-wow-delay=".3s">
-                    {stats.length > 0
-                      ? stats.map((s, i) => (
-                          <div key={i} className="gt-count-item">
-                            <h2>
-                              <span className="gt-count">{s.value}</span>
-                              {s.suffix || ""}
-                            </h2>
-                            <p>{s.label}</p>
-                          </div>
-                        ))
-                      : [
-                          { value: "25", label: "Our Visionary Speakers", suffix: "+" },
-                          { value: "897", label: "Event Participants", suffix: "+" },
-                          { value: "69", label: "International Sponsors", suffix: "+" },
-                        ].map((s, i) => (
-                          <div key={i} className="gt-count-item">
-                            <h2>
-                              <span className="gt-count">{s.value}</span>
-                              {s.suffix}
-                            </h2>
-                            <p>{s.label}</p>
-                          </div>
-                        ))}
-                  </div>
-                  <div className="gt-about-button wow fadeInUp" data-wow-delay=".5s">
-                    <Link href="/events" className="gt-theme-btn gt-theme-btn-3">
-                      <i className="fa-solid fa-arrow-up"></i> get tickets
-                    </Link>
-                    <ul className="gt-button">
-                      <li>
-                        <i className="fa-solid fa-phone-volume"></i>
-                        <a href={`tel:${phoneNumber.replace(/\s/g, "")}`}>{phoneNumber}</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AboutConferenceSection
+        badge={badge}
+        title={title}
+        description={description}
+        image={aboutContent.image as string}
+        stats={stats}
+        phoneNumber={phoneNumber}
+      />
 
       <section className="gt-event-ticket-section-2 section-padding fix">
         <div className="gt-top-shape float-bob-y">
-          <img src="/assets/img/decorations/box-shape-1.png" alt="img" />
+          <img src={themeAssets.decorations.box1} alt="img" />
         </div>
         <div className="gt-left-shape float-bob-y">
-          <img src="/assets/img/decorations/box-shape-1.png" alt="img" />
+          <img src={themeAssets.decorations.box1} alt="img" />
         </div>
         <div className="gt-right-shape float-bob-y">
-          <img src="/assets/img/decorations/box-shape-2.png" alt="img" />
+          <img src={themeAssets.decorations.box2} alt="img" />
         </div>
         <div className="gt-right-shape-2">
-          <img src="/assets/img/decorations/blur-shape-2.png" alt="img" />
+          <img src={themeAssets.decorations.blur2} alt="img" />
         </div>
         <div className="container">
           <div className="gt-section-title-area">
@@ -312,7 +217,7 @@ export default async function AboutPage() {
               </div>
               <div className="col-lg-6">
                 <div className="gt-testimonial-image">
-                  <img src={themeAssets.speakers.photos[0]} alt="Conference attendee" />
+                  <img src={themeAssets.testimonial} alt="Conference attendee" />
                 </div>
               </div>
             </div>

@@ -10,6 +10,11 @@ export default function RegisterPage() {
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "", phone: "", college: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otpError, setOtpError] = useState("");
+  const [otpSending, setOtpSending] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,11 +24,71 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
       const data = await res.json();
       if (!data.success) { alert(data.error); setLoading(false); return; }
-      const result = await signIn("credentials", { email: form.email, password: form.password, redirect: false });
-      if (result?.ok) { window.location.href = "/my-tickets"; } else { alert("Account created, please log in"); window.location.href = "/login"; }
+      if (data.requiresOTP) {
+        setRegisteredEmail(form.email);
+        setStep("otp");
+      } else {
+        const result = await signIn("credentials", { email: form.email, password: form.password, redirect: false });
+        if (result?.ok) { window.location.href = "/my-tickets"; } else { window.location.href = "/login"; }
+      }
     } catch {
       alert("Something went wrong");
-      setLoading(false);
+    }
+    setLoading(false);
+  }
+
+  async function handleVerifyOTP() {
+    const code = otp.join("");
+    if (code.length !== 6) { setOtpError("Enter the complete 6-digit code"); return; }
+    setOtpSending(true);
+    setOtpError("");
+    try {
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: registeredEmail, otp: code }),
+      });
+      const data = await res.json();
+      if (!data.success) { setOtpError(data.error || "Invalid code"); setOtpSending(false); return; }
+      const result = await signIn("credentials", { email: registeredEmail, password: form.password, redirect: false });
+      if (result?.ok) { window.location.href = "/my-tickets"; } else { window.location.href = "/login"; }
+    } catch {
+      setOtpError("Something went wrong");
+    }
+    setOtpSending(false);
+  }
+
+  async function handleResendOTP() {
+    setOtpSending(true);
+    setOtpError("");
+    try {
+      await fetch("/api/auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: registeredEmail }),
+      });
+      setOtp(["", "", "", "", "", ""]);
+    } catch {
+      setOtpError("Failed to resend code");
+    }
+    setOtpSending(false);
+  }
+
+  function handleOtpChange(index: number, value: string) {
+    if (value.length > 1) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    if (value && index < 5) {
+      const next = document.getElementById(`otp-${index + 1}`);
+      next?.focus();
+    }
+  }
+
+  function handleOtpKeyDown(index: number, e: React.KeyboardEvent) {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      const prev = document.getElementById(`otp-${index - 1}`);
+      prev?.focus();
     }
   }
 
@@ -37,6 +102,75 @@ export default function RegisterPage() {
       if (result?.error) { alert("Sign in failed"); } else { window.location.href = "/my-tickets"; }
     } catch { alert("Something went wrong"); }
     setSocialLoading(null);
+  }
+
+  if (step === "otp") {
+    return (
+      <div className="gt-auth-wrapper">
+        <div className="gt-auth-card" style={{ maxWidth: "440px" }}>
+          <div className="gt-auth-logo">
+            <Link href="/"><img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "40px" }} /></Link>
+          </div>
+          <h1 className="gt-auth-title">Verify Your Account</h1>
+          <p className="gt-auth-subtitle">
+            We sent a 6-digit code to your registered contact channels
+          </p>
+
+          <div style={{ display: "flex", gap: "8px", justifyContent: "center", margin: "32px 0" }}>
+            {otp.map((digit, i) => (
+              <input
+                key={i}
+                id={`otp-${i}`}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleOtpChange(i, e.target.value)}
+                onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                style={{
+                  width: "48px",
+                  height: "56px",
+                  textAlign: "center",
+                  fontSize: "24px",
+                  fontWeight: 700,
+                  borderRadius: "8px",
+                  border: `2px solid ${otpError ? "#ef4444" : "#374151"}`,
+                  background: "#1f2937",
+                  color: "#fff",
+                  outline: "none",
+                }}
+              />
+            ))}
+          </div>
+
+          {otpError && (
+            <p style={{ color: "#ef4444", fontSize: "14px", textAlign: "center", marginBottom: "16px" }}>
+              {otpError}
+            </p>
+          )}
+
+          <button
+            onClick={handleVerifyOTP}
+            disabled={otpSending}
+            className="gt-admin-btn gt-admin-btn-primary w-100"
+            style={{ marginBottom: "12px", padding: "12px" }}
+          >
+            {otpSending ? "Verifying..." : "Verify & Continue"}
+          </button>
+
+          <p style={{ textAlign: "center", color: "#9ca3af", fontSize: "14px" }}>
+            Didn&apos;t receive it?{" "}
+            <button
+              onClick={handleResendOTP}
+              disabled={otpSending}
+              style={{ background: "none", border: "none", color: "#a78bfa", cursor: "pointer", padding: 0, fontSize: "14px" }}
+            >
+              Resend code
+            </button>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -91,6 +225,10 @@ export default function RegisterPage() {
           <div className="gt-admin-form-group">
             <label className="gt-admin-label">Confirm Password</label>
             <input type="password" className="gt-admin-input" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} required />
+          </div>
+          <div className="gt-admin-form-group">
+            <label className="gt-admin-label">Phone (for WhatsApp OTP)</label>
+            <input type="tel" className="gt-admin-input" placeholder="+919876543210" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
           <button type="submit" className="gt-admin-btn gt-admin-btn-primary w-100" disabled={loading}>
             {loading ? "Creating Account..." : "Create Account"}

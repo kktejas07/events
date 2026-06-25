@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { ALL_NOTIFICATION_TYPES, ALL_CHANNELS, channelKey } from "@/services/notification";
+import { invalidateNotificationConfigCache } from "@/services/notification";
 
 const SETTING_KEYS = [
   "RAZORPAY_KEY_ID",
@@ -27,7 +29,21 @@ const SETTING_KEYS = [
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
   "NEXT_PUBLIC_APP_NAME",
+  "WHATSAPP_API_URL",
+  "WHATSAPP_API_KEY",
 ];
+
+function getNotificationKeys(): string[] {
+  const keys: string[] = [];
+  for (const type of ALL_NOTIFICATION_TYPES) {
+    for (const channel of ALL_CHANNELS) {
+      keys.push(channelKey(type, channel));
+    }
+  }
+  return keys;
+}
+
+const ALL_KEYS = [...SETTING_KEYS, ...getNotificationKeys()];
 
 export async function GET() {
   const session = await auth();
@@ -40,7 +56,7 @@ export async function GET() {
   const settingsMap = Object.fromEntries(dbSettings.map((s) => [s.key, s.value]));
 
   const result: Record<string, string> = {};
-  for (const key of SETTING_KEYS) {
+  for (const key of ALL_KEYS) {
     result[key] = settingsMap[key] ?? process.env[key] ?? "";
   }
 
@@ -56,7 +72,7 @@ export async function POST(req: Request) {
 
   const { settings } = await req.json();
 
-  const upserts = SETTING_KEYS.map((key) => {
+  const upserts = ALL_KEYS.map((key) => {
     if (settings[key] !== undefined) {
       return db.platformSetting.upsert({
         where: { key },
@@ -74,9 +90,13 @@ export async function POST(req: Request) {
                   ? "integration"
                   : key.includes("UPSTASH")
                     ? "rate-limit"
-                    : key.includes("AUTH_") || key === "AUTH_SECRET"
-                      ? "auth"
-                      : "general",
+                    : key.includes("WHATSAPP")
+                      ? "notifications"
+                      : key.startsWith("notify_")
+                        ? "notifications"
+                        : key.includes("AUTH_") || key === "AUTH_SECRET"
+                          ? "auth"
+                          : "general",
         },
       });
     }
@@ -84,6 +104,7 @@ export async function POST(req: Request) {
   }).filter(Boolean);
 
   await Promise.all(upserts);
+  invalidateNotificationConfigCache();
 
   return NextResponse.json({ success: true });
 }

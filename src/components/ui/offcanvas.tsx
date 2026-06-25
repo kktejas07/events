@@ -2,16 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/events", label: "Events" },
-  { href: "/speakers", label: "Speakers" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact Us" },
-  { href: "/blog", label: "Blog" },
-  { href: "/pricing", label: "Pricing" },
-];
+import { publicNav } from "@/lib/site-nav";
 
 export function Offcanvas() {
   const [isOpen, setIsOpen] = useState(false);
@@ -82,7 +73,10 @@ export function Offcanvas() {
             <div className="mobile-menus fix mb-3">
               <nav>
                 <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                  {navLinks.map((link) => (
+                  {publicNav.flatMap((item) => [
+                    { href: item.href, label: item.label },
+                    ...(item.children || []),
+                  ]).map((link) => (
                     <li key={link.href} style={{ borderBottom: "1px solid #eee" }}>
                       <Link
                         href={link.href}

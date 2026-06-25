@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { themeAssets } from "@/lib/theme-images";
+import { resolveThemeImage } from "@/lib/resolve-theme-image";
 import { ArrowRight, Building2, MapPin, Calendar } from "lucide-react";
 import { WaveDivider } from "@/components/ui/section-dividers";
 
@@ -39,15 +41,11 @@ export default async function CollegesPage() {
                 className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.12] hover:shadow-xl hover:shadow-purple-500/5"
               >
                 <div className="mb-4 h-16 w-16 overflow-hidden rounded-xl">
-                  {org.logo ? (
-                    <img src={org.logo} alt={org.name} className="h-full w-full object-cover" />
-                  ) : (
                     <img
-                      src="https://images.unsplash.com/photo-1607237130085-3e1b0c93ac44?w=100&q=80"
+                      src={resolveThemeImage(org.logo, themeAssets.collegeLogo)}
                       alt={org.name}
                       className="h-full w-full object-cover"
                     />
-                  )}
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-white group-hover:text-purple-400">
                   {org.name}

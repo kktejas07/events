@@ -4,6 +4,10 @@ const config = {
   darkMode: ["class"],
   content: ["./src/**/*.{ts,tsx}"],
   prefix: "",
+  /* Bootstrap theme uses .container — never emit Tailwind's .container utility */
+  corePlugins: {
+    container: false,
+  },
   theme: {
     container: {
       center: false,

@@ -30,13 +30,11 @@ const swiperOpts = {
   freeMode: true,
   centeredSlides: true,
   loop: true,
-  loopAdditionalSlides: 6,
   speed: 6000,
   allowTouchMove: false,
   autoplay: {
     delay: 1,
-    disableOnInteraction: false,
-    pauseOnMouseEnter: false,
+    disableOnInteraction: true,
   },
 };
 

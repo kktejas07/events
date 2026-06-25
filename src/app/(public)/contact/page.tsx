@@ -3,6 +3,7 @@ export const revalidate = 0;
 
 import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { db } from "@/lib/db";
 
 export default async function ContactPage() {
@@ -25,38 +26,7 @@ export default async function ContactPage() {
 
   return (
     <>
-      <div className="gt-breadcrumb-wrapper fix">
-        <div className="gt-top-shape">
-          <img src="/assets/img/inner-page/breadcrumb/bg-shape.png" alt="img" />
-        </div>
-        <div className="gt-line-shape">
-          <img src="/assets/img/inner-page/breadcrumb/line-shape.png" alt="img" />
-        </div>
-        <div className="gt-arrow-shape float-bob-y">
-          <img src="/assets/img/inner-page/breadcrumb/arrow.png" alt="img" />
-        </div>
-        <div
-          className="gt-page-heading bg-cover"
-          style={{ backgroundImage: "url(/assets/img/inner-page/breadcrumb/bg.png)" }}
-        >
-          <div className="gt-breadcrumb-sub-title">
-            <h1 className="wow fadeInUp" data-wow-delay=".3s">
-              CONTACT US
-            </h1>
-          </div>
-          <ul className="gt-breadcrumb-items wow fadeInUp" data-wow-delay=".5s">
-            <li>
-              <Link href="/">Home</Link>
-            </li>
-            <li>
-              <i className="fa-solid fa-chevron-right"></i>
-            </li>
-            <li>
-              <span>CONTACT US</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <Breadcrumb title="CONTACT US" />
 
       <section className="gt-contact-section section-padding fix">
         <div className="container">

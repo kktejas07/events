@@ -103,7 +103,7 @@ export const defaultContent: Record<string, unknown> = {
     title: "Building The Future of digital design & Conferences",
     image: themeAssets.about.image,
     description:
-      "Welcome to our design conference hub, where innovation meets ingenuity!",
+      "Welcome to our design conference hub, where creativity meets innovation! We are a community of forward-thinking designers, industry leaders, and creative experts, united by our shared passion for digital excellence.",
     stats: [
       { value: "25", label: "Our Visionary Speakers", suffix: "+" },
       { value: "897", label: "Event Participants", suffix: "+" },

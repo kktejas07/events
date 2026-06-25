@@ -5,6 +5,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { db } from "@/lib/db";
 import { defaultContent } from "@/lib/landing-defaults";
 import { mergeSiteContent } from "@/lib/site-content";
+import { newsImage } from "@/lib/theme-images";
 import HomePageClient from "./_HomePageClient";
 import { hyderabadColleges } from "@/lib/hyderabad-colleges";
 
@@ -116,7 +117,7 @@ export default async function HomePage() {
           ? p.publishedAt.toLocaleString("default", { month: "short" })
           : "april",
         excerpt: p.excerpt || "",
-        image: p.coverImage || null,
+        image: newsImage(blogPosts.indexOf(p), p.coverImage),
       }));
     }
 
