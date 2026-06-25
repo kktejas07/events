@@ -3,8 +3,10 @@ import { db } from "@/lib/db";
 
 export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
   try {
+    const isId = /^[a-z0-9]{20,}$/i.test(params.slug) && !params.slug.includes("-");
+
     const event = await db.event.findUnique({
-      where: { slug: params.slug },
+      where: isId ? { id: params.slug } : { slug: params.slug },
       include: {
         ticketTypes: { where: { isActive: true }, orderBy: { sortOrder: "asc" } },
         venue: true,

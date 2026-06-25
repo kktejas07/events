@@ -12,13 +12,22 @@ export default async function PricingPage() {
   noStore();
 
   let pricingContent: Record<string, unknown> = {};
+  let firstEventSlug = "";
 
   try {
     const row = await db.siteContent.findFirst({ where: { section: "pricing-page" } });
     if (row?.data) pricingContent = row.data as Record<string, unknown>;
+    const firstEvent = await db.event.findFirst({
+      where: { status: "PUBLISHED" },
+      select: { slug: true },
+      orderBy: { startDate: "asc" },
+    });
+    if (firstEvent) firstEventSlug = firstEvent.slug;
   } catch (error) {
     console.error("Pricing page fetch error:", error);
   }
+
+  const ticketHref = firstEventSlug ? `/events/${firstEventSlug}` : "/events";
 
   const badge = (pricingContent.badge as string) || "buy ticket";
   const title = (pricingContent.title as string) || "buy a ticket be the first one";
@@ -65,7 +74,7 @@ export default async function PricingPage() {
                 )}
               </h2>
             </div>
-            <Link href="/events" className="gt-theme-btn gt-theme-btn-2 gt-border-btn">
+            <Link href={ticketHref} className="gt-theme-btn gt-theme-btn-2 gt-border-btn">
               <i className="fa-solid fa-ticket-simple"></i> PURCHASE TICKET
             </Link>
           </div>
@@ -117,7 +126,7 @@ export default async function PricingPage() {
                         </div>
                         <div className="gt-item">
                           <span>Sub Total :</span>
-                          <p>18$</p>
+                          <p>{t.price}</p>
                         </div>
                       </div>
                     </div>
@@ -140,7 +149,7 @@ export default async function PricingPage() {
                       )}
                     </ul>
                     <div className="gt-card-button">
-                      <Link href="/events" className="gt-theme-btn gt-theme-btn-2">
+                      <Link href={ticketHref} className="gt-theme-btn gt-theme-btn-2">
                         PURCHASE TICKET
                       </Link>
                     </div>
@@ -163,7 +172,7 @@ export default async function PricingPage() {
               our events Schedule
             </h2>
           </div>
-          <EventScheduleTabs embedded defaultTicketHref="/events" />
+          <EventScheduleTabs embedded defaultTicketHref={ticketHref} />
         </div>
       </section>
     </>

@@ -77,7 +77,7 @@ export default async function SponsorPage() {
         </div>
       </section>
 
-      <section className="gt-sponsor-bg-section fix">
+      <section className="gt-sponsor-bg-section fix" style={{ paddingBottom: "80px" }}>
         <div className="container">
           <div
             className="gt-sponsor-bg-wrapper bg-cover"

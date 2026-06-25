@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = (session.user as { id: string }).id;
-    const { eventId, items, promoCode } = parsed.data;
+    const { eventId, items, promoCode, attendeeDetails } = parsed.data;
 
     // Calculate totals
     let subtotal = 0;
@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
         tax,
         total,
         promoCode,
+        notes: attendeeDetails ? JSON.stringify({ attendee: attendeeDetails }) : undefined,
         items: {
           create: orderItems.map((item) => ({
             ticketTypeId: item.ticketTypeId,

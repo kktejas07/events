@@ -37,5 +37,15 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
 
   const serialized = JSON.parse(JSON.stringify(event));
 
-  return <EventDetailClient event={serialized} />;
+  let socialLinks: Record<string, string> = {};
+  try {
+    const rows = await db.platformSetting.findMany({
+      where: { key: { in: ["SOCIAL_TWITTER_URL", "SOCIAL_FACEBOOK_URL", "SOCIAL_INSTAGRAM_URL", "SOCIAL_YOUTUBE_URL", "SOCIAL_LINKEDIN_URL"] } },
+    });
+    for (const r of rows) {
+      socialLinks[r.key] = r.value;
+    }
+  } catch {}
+
+  return <EventDetailClient event={serialized} socialLinks={socialLinks} />;
 }

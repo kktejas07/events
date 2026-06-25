@@ -12,7 +12,6 @@ export const publicNav: NavItem[] = [
     label: "Pages",
     href: "/about",
     children: [
-      { label: "Our Services", href: "/service" },
       { label: "Sponsor", href: "/sponsor" },
       { label: "Our Pricing", href: "/pricing" },
     ],

@@ -34,6 +34,11 @@ interface Settings {
   UPSTASH_REDIS_REST_TOKEN: string;
   WHATSAPP_API_URL: string;
   WHATSAPP_API_KEY: string;
+  SOCIAL_TWITTER_URL: string;
+  SOCIAL_FACEBOOK_URL: string;
+  SOCIAL_INSTAGRAM_URL: string;
+  SOCIAL_YOUTUBE_URL: string;
+  SOCIAL_LINKEDIN_URL: string;
 }
 
 const NOTIFICATION_TYPES = [
@@ -76,6 +81,11 @@ const defaults: Settings = {
   UPSTASH_REDIS_REST_TOKEN: "",
   WHATSAPP_API_URL: "",
   WHATSAPP_API_KEY: "",
+  SOCIAL_TWITTER_URL: "",
+  SOCIAL_FACEBOOK_URL: "",
+  SOCIAL_INSTAGRAM_URL: "",
+  SOCIAL_YOUTUBE_URL: "",
+  SOCIAL_LINKEDIN_URL: "",
 };
 
 type TabId = "general" | "payments" | "auth" | "integrations" | "notifications";
@@ -324,6 +334,52 @@ export default function AdminSettingsPage() {
                   />
                 </div>
               )}
+            </div>
+
+            <div className="border-t pt-6">
+              <h4 className="mb-4 text-sm font-semibold">Social Media Links</h4>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label>Twitter / X URL</Label>
+                  <Input
+                    placeholder="https://twitter.com/yourhandle"
+                    value={settings.SOCIAL_TWITTER_URL}
+                    onChange={(e) => update("SOCIAL_TWITTER_URL", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Facebook URL</Label>
+                  <Input
+                    placeholder="https://facebook.com/yourpage"
+                    value={settings.SOCIAL_FACEBOOK_URL}
+                    onChange={(e) => update("SOCIAL_FACEBOOK_URL", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Instagram URL</Label>
+                  <Input
+                    placeholder="https://instagram.com/yourhandle"
+                    value={settings.SOCIAL_INSTAGRAM_URL}
+                    onChange={(e) => update("SOCIAL_INSTAGRAM_URL", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>YouTube URL</Label>
+                  <Input
+                    placeholder="https://youtube.com/@yourchannel"
+                    value={settings.SOCIAL_YOUTUBE_URL}
+                    onChange={(e) => update("SOCIAL_YOUTUBE_URL", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>LinkedIn URL</Label>
+                  <Input
+                    placeholder="https://linkedin.com/company/yourcompany"
+                    value={settings.SOCIAL_LINKEDIN_URL}
+                    onChange={(e) => update("SOCIAL_LINKEDIN_URL", e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

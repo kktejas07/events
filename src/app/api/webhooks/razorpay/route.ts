@@ -35,9 +35,22 @@ export async function POST(req: NextRequest) {
         include: {
           items: { include: { ticketType: true } },
           user: true,
-          event: true,
+          event: { include: { venue: true } },
         },
       });
+
+      // Parse attendee details from order notes (submitted during checkout)
+      let attendeeName = order.user.email;
+      let attendeeEmail = order.user.email;
+      if (order.notes) {
+        try {
+          const parsed = JSON.parse(order.notes);
+          if (parsed.attendee) {
+            attendeeName = `${parsed.attendee.firstName || ""} ${parsed.attendee.lastName || ""}`.trim() || order.user.email;
+            attendeeEmail = parsed.attendee.email || order.user.email;
+          }
+        } catch {}
+      }
 
       // Generate tickets for each order item
       for (const item of order.items) {
@@ -50,11 +63,8 @@ export async function POST(req: NextRequest) {
               eventId: order.eventId,
               ticketTypeId: item.ticketTypeId,
               userId: order.userId,
-              attendeeName:
-                order.user.firstName && order.user.lastName
-                  ? `${order.user.firstName} ${order.user.lastName}`
-                  : order.user.email,
-              attendeeEmail: order.user.email,
+              attendeeName,
+              attendeeEmail,
               barcode,
             },
           });
@@ -72,7 +82,7 @@ export async function POST(req: NextRequest) {
 
       // Send ticket confirmation notification
       const ticketHtml = renderTicketPurchaseEmail({
-        firstName: order.user.firstName || "Valued Customer",
+        firstName: attendeeName,
         orderId: order.id,
         eventName: order.event.title,
         eventDate: order.event.startDate
@@ -89,14 +99,14 @@ export async function POST(req: NextRequest) {
 
       await notify(
         NotificationType.TICKET_CONFIRMATION,
-        { email: order.user.email, phone: order.user.phone || undefined },
+        { email: attendeeEmail, phone: order.user.phone || undefined },
         `Your tickets for ${order.event.title}`,
         ticketHtml
       );
 
       // Send order receipt notification
       const receiptHtml = renderOrderReceiptEmail({
-        firstName: order.user.firstName || "Valued Customer",
+        firstName: attendeeName,
         orderId: order.id,
         eventName: order.event.title,
         paymentMethod: "Razorpay",

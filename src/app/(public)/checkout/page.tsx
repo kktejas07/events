@@ -20,11 +20,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId");
-  const ticketTypeId = searchParams.get("ticketTypeId");
+  const selectedParam = searchParams.get("selected");
 
-  const [event, setEvent] = useState<{ id: string; title: string; venue?: string } | null>(null);
-  const [ticketType, setTicketType] = useState<{ id: string; name: string; price: number } | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  const [event, setEvent] = useState<{ id: string; title: string } | null>(null);
+  const [ticketTypes, setTicketTypes] = useState<{ id: string; name: string; price: number }[]>([]);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [attendee, setAttendee] = useState({ firstName: "", lastName: "", email: "", phone: "" });
@@ -32,13 +32,25 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!eventId) return;
     fetch(`/api/events/${eventId}`).then((r) => r.json()).then((d) => {
-      setEvent(d.event || d);
-      if (ticketTypeId) {
-        const tt = d.ticketTypes?.find((t: { id: string }) => t.id === ticketTypeId);
-        if (tt) setTicketType(tt);
+      const ev = d.event || d.data || d;
+      setEvent(ev);
+      if (ev.ticketTypes) {
+        setTicketTypes(ev.ticketTypes);
+        if (selectedParam) {
+          try {
+            const parsed = JSON.parse(decodeURIComponent(selectedParam)) as Record<string, number>;
+            setQuantities(parsed);
+          } catch {
+            const first = ev.ticketTypes[0];
+            if (first) setQuantities({ [first.id]: 1 });
+          }
+        } else {
+          const first = ev.ticketTypes[0];
+          if (first) setQuantities({ [first.id]: 1 });
+        }
       }
     });
-  }, [eventId, ticketTypeId]);
+  }, [eventId, selectedParam]);
 
   useEffect(() => {
     if (session?.user) {
@@ -52,12 +64,23 @@ export default function CheckoutPage() {
     }
   }, [session]);
 
-  const total = ticketType ? Number(ticketType.price) * quantity : 0;
+  const items = ticketTypes
+    .filter((t) => (quantities[t.id] || 0) > 0)
+    .map((t) => ({ ticketTypeId: t.id, quantity: quantities[t.id] || 0 }));
+
+  const total = ticketTypes.reduce(
+    (sum, t) => sum + (quantities[t.id] || 0) * Number(t.price),
+    0
+  );
 
   async function handleCheckout() {
     if (!session) { router.push("/login"); return; }
     if (!attendee.firstName || !attendee.lastName || !attendee.email) {
       setError("Please fill in your name and email.");
+      return;
+    }
+    if (items.length === 0) {
+      setError("No tickets selected.");
       return;
     }
     setError("");
@@ -68,7 +91,7 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           eventId,
-          items: [{ ticketTypeId, quantity }],
+          items,
           attendeeDetails: {
             firstName: attendee.firstName,
             lastName: attendee.lastName,
@@ -137,19 +160,24 @@ export default function CheckoutPage() {
 
         <div style={{ background: "#f8f9fe", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
           <h5 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "12px" }}>{event.title}</h5>
-          {ticketType && (
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <p style={{ margin: 0, fontWeight: 500 }}>{ticketType.name} Ticket</p>
-                <p style={{ margin: "4px 0 0", color: "#888", fontSize: "13px" }}>₹{Number(ticketType.price).toLocaleString()} each</p>
+          {items.length === 0 && <p style={{ color: "#888", fontSize: "14px" }}>No tickets selected</p>}
+          {items.map((item) => {
+            const tt = ticketTypes.find((t) => t.id === item.ticketTypeId);
+            if (!tt) return null;
+            return (
+              <div key={item.ticketTypeId} className="d-flex justify-content-between align-items-center py-2 border-bottom border-light">
+                <div>
+                  <p style={{ margin: 0, fontWeight: 500 }}>{tt.name} Ticket</p>
+                  <p style={{ margin: "4px 0 0", color: "#888", fontSize: "13px" }}>₹{Number(tt.price).toLocaleString()} each</p>
+                </div>
+                <div className="d-flex align-items-center gap-3">
+                  <button onClick={() => setQuantities((prev) => ({ ...prev, [item.ticketTypeId]: Math.max(1, (prev[item.ticketTypeId] || 1) - 1) }))} className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ width: "32px", height: "32px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>-</button>
+                  <span style={{ fontWeight: 600, fontSize: "16px", minWidth: "24px", textAlign: "center" }}>{item.quantity}</span>
+                  <button onClick={() => setQuantities((prev) => ({ ...prev, [item.ticketTypeId]: (prev[item.ticketTypeId] || 1) + 1 }))} className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ width: "32px", height: "32px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                </div>
               </div>
-              <div className="d-flex align-items-center gap-3">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ width: "32px", height: "32px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>-</button>
-                <span style={{ fontWeight: 600, fontSize: "16px", minWidth: "24px", textAlign: "center" }}>{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ width: "32px", height: "32px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
-              </div>
-            </div>
-          )}
+            );
+          })}
         </div>
 
         <div style={{ background: "#f8f9fe", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
@@ -170,17 +198,23 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <span style={{ fontSize: "14px", color: "#888" }}>Subtotal</span>
-          <span style={{ fontWeight: 600 }}>₹{total.toLocaleString("en-IN")}</span>
-        </div>
+        {items.map((item) => {
+          const tt = ticketTypes.find((t) => t.id === item.ticketTypeId);
+          if (!tt) return null;
+          return (
+            <div key={item.ticketTypeId} className="d-flex justify-content-between align-items-center mb-1">
+              <span style={{ fontSize: "14px", color: "#888" }}>{tt.name} x{item.quantity}</span>
+              <span style={{ fontWeight: 500 }}>₹{(item.quantity * Number(tt.price)).toLocaleString("en-IN")}</span>
+            </div>
+          );
+        })}
         <hr />
         <div className="d-flex justify-content-between align-items-center mb-4">
           <span style={{ fontSize: "18px", fontWeight: 700 }}>Total</span>
           <span style={{ fontSize: "24px", fontWeight: 700, color: "#8B5CF6" }}>₹{total.toLocaleString("en-IN")}</span>
         </div>
 
-        <button onClick={handleCheckout} className="gt-admin-btn gt-admin-btn-primary w-100" disabled={loading} style={{ fontSize: "16px", padding: "14px" }}>
+        <button onClick={handleCheckout} disabled={loading || items.length === 0} className="gt-admin-btn gt-admin-btn-primary w-100" style={{ fontSize: "16px", padding: "14px" }}>
           {loading ? <><i className="fa-solid fa-spinner fa-spin me-2"></i> Processing...</> : <><i className="fa-regular fa-credit-card me-2"></i> Pay ₹{total.toLocaleString("en-IN")}</>}
         </button>
       </div>

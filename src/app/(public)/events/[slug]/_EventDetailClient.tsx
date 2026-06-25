@@ -50,14 +50,22 @@ interface EventData {
 }
 
 
-export default function EventDetailClient({ event }: { event: EventData }) {
+const SOCIAL_ICONS: { key: string; icon: string }[] = [
+  { key: "SOCIAL_TWITTER_URL", icon: "fab fa-twitter" },
+  { key: "SOCIAL_YOUTUBE_URL", icon: "fa-brands fa-youtube" },
+  { key: "SOCIAL_INSTAGRAM_URL", icon: "fa-brands fa-instagram" },
+  { key: "SOCIAL_FACEBOOK_URL", icon: "fab fa-facebook-f" },
+  { key: "SOCIAL_LINKEDIN_URL", icon: "fa-brands fa-linkedin-in" },
+];
+
+export default function EventDetailClient({ event, socialLinks = {} }: { event: EventData; socialLinks?: Record<string, string> }) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (event.ticketTypes.length > 0) {
       const initial: Record<string, number> = {};
       event.ticketTypes.forEach((t) => {
-        initial[t.id] = 1;
+        initial[t.id] = 0;
       });
       setQuantities(initial);
     }
@@ -353,25 +361,18 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                     </ul>
                   </div>
 
-                  <div className="gt-event-sideber-widget">
-                    <div className="gt-widget-title">
-                      <h3>We&apos;re in the social</h3>
+                    <div className="gt-event-sideber-widget">
+                      <div className="gt-widget-title">
+                        <h3>We&apos;re in the social</h3>
+                      </div>
+                      <div className="gt-social-icon d-flex align-items-center">
+                        {SOCIAL_ICONS.filter((s) => socialLinks[s.key]).map((s) => (
+                          <a key={s.key} href={socialLinks[s.key]} target="_blank" rel="noopener noreferrer">
+                            <i className={s.icon}></i>
+                          </a>
+                        ))}
+                      </div>
                     </div>
-                    <div className="gt-social-icon d-flex align-items-center">
-                      <a href="#">
-                        <i className="fab fa-twitter"></i>
-                      </a>
-                      <a href="#">
-                        <i className="fa-brands fa-youtube"></i>
-                      </a>
-                      <a href="#">
-                        <i className="fa-brands fa-instagram"></i>
-                      </a>
-                      <a href="#">
-                        <i className="fab fa-facebook-f"></i>
-                      </a>
-                    </div>
-                  </div>
 
                   <div className="gt-event-sideber-widget mb-0">
                     <div className="gt-widget-title">
@@ -395,7 +396,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                                 onClick={() =>
                                   setQuantities((prev) => ({
                                     ...prev,
-                                    [tier.id]: Math.max(1, (prev[tier.id] || 1) - 1),
+                                    [tier.id]: Math.max(0, (prev[tier.id] || 0) - 1),
                                   }))
                                 }
                               >
@@ -403,14 +404,14 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                               </button>
                               <input
                                 type="number"
-                                min="1"
+                                min="0"
                                 max="10"
                                 step="1"
-                                value={quantities[tier.id] || 1}
+                                value={quantities[tier.id] || 0}
                                 onChange={(e) =>
                                   setQuantities((prev) => ({
                                     ...prev,
-                                    [tier.id]: Math.max(1, parseInt(e.target.value) || 1),
+                                    [tier.id]: Math.max(0, parseInt(e.target.value) || 0),
                                   }))
                                 }
                               />
@@ -419,7 +420,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                                 onClick={() =>
                                   setQuantities((prev) => ({
                                     ...prev,
-                                    [tier.id]: Math.min(10, (prev[tier.id] || 1) + 1),
+                                    [tier.id]: Math.min(10, (prev[tier.id] || 0) + 1),
                                   }))
                                 }
                               >
@@ -430,7 +431,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                           <div className="gt-item">
                             <span>Sub Total :</span>
                             <p>
-                              ₹{((quantities[tier.id] || 1) * Number(tier.price)).toLocaleString()}
+                              ₹{((quantities[tier.id] || 0) * Number(tier.price)).toLocaleString()}
                             </p>
                           </div>
                         </div>
@@ -444,12 +445,18 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                         <span>Total Price:</span> ₹{totalPrice.toLocaleString()}
                       </li>
                     </ul>
-                    <Link
-                      href={`/checkout?eventId=${event.id}&ticketTypeId=${event.ticketTypes.find((t) => (quantities[t.id] || 0) > 0)?.id || event.ticketTypes[0]?.id || ""}`}
-                      className="gt-theme-btn d-block w-100 text-center"
-                    >
-                      PURCHASE TICKET <i className="fa-solid fa-arrow-right ms-2"></i>
-                    </Link>
+                    {totalQuantity > 0 ? (
+                      <Link
+                        href={`/checkout?eventId=${event.id}&selected=${encodeURIComponent(JSON.stringify(Object.fromEntries(event.ticketTypes.filter((t) => (quantities[t.id] || 0) > 0).map((t) => [t.id, quantities[t.id] || 0]))))}`}
+                        className="gt-theme-btn d-block w-100 text-center"
+                      >
+                        PURCHASE TICKET <i className="fa-solid fa-arrow-right ms-2"></i>
+                      </Link>
+                    ) : (
+                      <button className="gt-theme-btn d-block w-100 text-center" disabled style={{ opacity: 0.5, cursor: "not-allowed" }}>
+                        SELECT TICKETS <i className="fa-solid fa-arrow-right ms-2"></i>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

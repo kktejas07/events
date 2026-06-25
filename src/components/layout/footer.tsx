@@ -1,8 +1,28 @@
 import Link from "next/link";
+import { db } from "@/lib/db";
 import { NewsletterForm } from "@/components/ui/newsletter-form";
 import { themeAssets } from "@/lib/theme-images";
 
-export function Footer() {
+const SOCIAL_ICONS: { key: string; icon: string }[] = [
+  { key: "SOCIAL_FACEBOOK_URL", icon: "fab fa-facebook-f" },
+  { key: "SOCIAL_TWITTER_URL", icon: "fab fa-twitter" },
+  { key: "SOCIAL_LINKEDIN_URL", icon: "fa-brands fa-linkedin-in" },
+  { key: "SOCIAL_INSTAGRAM_URL", icon: "fa-brands fa-instagram" },
+];
+
+async function getSocialLinks(): Promise<Record<string, string>> {
+  try {
+    const rows = await db.platformSetting.findMany({
+      where: { key: { in: SOCIAL_ICONS.map((s) => s.key) } },
+    });
+    return Object.fromEntries(rows.map((r) => [r.key, r.value]));
+  } catch {
+    return {};
+  }
+}
+
+export async function Footer() {
+  const socialLinks = await getSocialLinks();
   return (
     <footer
       className="gt-footer-section-3 fix bg-cover"
@@ -45,18 +65,11 @@ export function Footer() {
                   className="gt-social-icon d-flex align-items-center wow fadeInRight"
                   data-wow-delay=".5s"
                 >
-                  <a href="#">
-                    <i className="fab fa-facebook-f"></i>
-                  </a>
-                  <a href="#">
-                    <i className="fab fa-twitter"></i>
-                  </a>
-                  <a href="#">
-                    <i className="fa-brands fa-linkedin-in"></i>
-                  </a>
-                  <a href="#">
-                    <i className="fa-brands fa-instagram"></i>
-                  </a>
+                  {SOCIAL_ICONS.filter((s) => socialLinks[s.key]).map((s) => (
+                    <a key={s.key} href={socialLinks[s.key]} target="_blank" rel="noopener noreferrer">
+                      <i className={s.icon}></i>
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
