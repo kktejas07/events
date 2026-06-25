@@ -103,3 +103,68 @@
 .gt-auth-footer a:hover {
   color: #211C84;
 }
+
+/* Form styles (shared with admin, defined here so auth pages don't depend on admin.css) */
+.gt-admin-form-group {
+  margin-bottom: 20px;
+}
+
+.gt-admin-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.gt-admin-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #333;
+  background: #fff;
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+
+.gt-admin-input:focus {
+  border-color: #1539EE;
+  color: #333;
+}
+
+.gt-admin-input::placeholder {
+  color: #aaa;
+}
+
+.gt-admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.gt-admin-btn-primary {
+  background: #1539EE;
+  color: #fff;
+}
+
+.gt-admin-btn-primary:hover {
+  background: #0f2bb5;
+}
+
+.gt-admin-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.w-100 {
+  width: 100%;
+}
