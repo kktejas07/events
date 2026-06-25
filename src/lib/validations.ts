@@ -46,6 +46,7 @@ export const registerSchema = z.object({
   college: z.string().optional(),
   graduationYear: z.coerce.number().int().min(1900).max(2100).optional(),
   gender: z.enum(["male", "female", "other", ""]).optional(),
+  organizationId: z.string().optional(),
 });
 
 export const orderCreateSchema = z.object({

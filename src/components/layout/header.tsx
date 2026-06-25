@@ -1,195 +1,167 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
-import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { defaultContent } from "@/lib/landing-defaults";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/events", label: "Events" },
-  { href: "/#schedule", label: "Schedule" },
-  { href: "/#speakers", label: "Speakers" },
-  { href: "/#tickets", label: "Tickets" },
-  { href: "/#sponsors", label: "Sponsors" },
-  { href: "/#faq", label: "FAQ" },
-];
+type SiteSettings = {
+  headerAddress: string;
+  ticketButtonText: string;
+  ticketButtonLink: string;
+};
 
-export function Header() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { data: session } = useSession();
-  const isAdmin =
-    (session?.user as { role?: string })?.role === "ADMIN" ||
-    (session?.user as { role?: string })?.role === "SUPER_ADMIN";
+const defaultSite: SiteSettings = {
+  headerAddress:
+    (defaultContent.site as SiteSettings)?.headerAddress || "4233 w. 65th st. chicago il 60629",
+  ticketButtonText: (defaultContent.site as SiteSettings)?.ticketButtonText || "get ticket",
+  ticketButtonLink: (defaultContent.site as SiteSettings)?.ticketButtonLink || "/events",
+};
+
+function NavLinks({ isHome }: { isHome: boolean }) {
+  const pathname = usePathname();
+  const isActive = (path: string) => (pathname === path ? "active" : "");
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#0a0a1a]/80 backdrop-blur-xl">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 shadow-lg shadow-purple-600/30">
-            <span className="text-lg font-bold text-white">E</span>
-          </div>
-          <span className="text-xl font-bold text-white">Events</span>
-        </Link>
+    <ul>
+      <li className={`has-dropdown ${isActive("/") ? "active" : ""}`}>
+        <a href="/" className={isHome ? "border-none" : undefined}>
+          Home
+        </a>
+        <ul className="submenu">
+          <li><a href="/">Design Conference</a></li>
+        </ul>
+      </li>
+      <li
+        className={`has-dropdown ${
+          isActive("/about") ||
+          isActive("/sponsor") ||
+          isActive("/pricing") ||
+          isActive("/service") ||
+          isActive("/service-details")
+            ? "active"
+            : ""
+        }`}
+      >
+        <a href="/about">Pages</a>
+        <ul className="submenu">
+          <li><a href="/about">About Us</a></li>
+          <li className="has-dropdown">
+            <a href="/service-details">
+              Our Service <i className="fas fa-angle-right"></i>
+            </a>
+            <ul className="submenu">
+              <li><a href="/service">Our Services</a></li>
+              <li><a href="/service-details">Service Details</a></li>
+            </ul>
+          </li>
+          <li><a href="/sponsor">Sponsor</a></li>
+          <li><a href="/pricing">Our Pricing</a></li>
+        </ul>
+      </li>
+      <li className={`has-dropdown ${isActive("/events") || isActive("/event-details") ? "active" : ""}`}>
+        <a href="/events">event</a>
+        <ul className="submenu">
+          <li><a href="/events">Event</a></li>
+          <li><a href="/event-details">Event Details</a></li>
+        </ul>
+      </li>
+      <li className={`has-dropdown ${isActive("/speakers") || isActive("/speaker-details") ? "active" : ""}`}>
+        <a href="/speakers">Speaker</a>
+        <ul className="submenu">
+          <li><a href="/speakers">Speaker</a></li>
+          <li><a href="/speaker-details">Speaker Details</a></li>
+        </ul>
+      </li>
+      <li className={`has-dropdown ${isActive("/blog") || isActive("/news-grid") || isActive("/news-details") ? "active" : ""}`}>
+        <a href="/blog">Blog</a>
+        <ul className="submenu">
+          <li><a href="/news-grid">Blog Grid</a></li>
+          <li><a href="/blog">Blog Standard</a></li>
+          <li><a href="/news-details">Blog Details</a></li>
+        </ul>
+      </li>
+      <li className={isActive("/contact")}>
+        <a href="/contact">Contact Us</a>
+      </li>
+    </ul>
+  );
+}
 
-        <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="text-sm font-medium text-gray-400 transition-colors hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+export function Header() {
+  const { data: session } = useSession();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [site, setSite] = useState<SiteSettings>(defaultSite);
 
-        <div className="hidden items-center gap-3 md:flex">
-          {session ? (
-            <>
-              {isAdmin && (
-                <Link href="/admin">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1.5 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
-                  >
-                    <LayoutDashboard className="h-4 w-4" /> Admin
-                  </Button>
-                </Link>
-              )}
-              <Link href="/my-tickets">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-400 hover:bg-white/10 hover:text-white"
-                >
-                  My Tickets
-                </Button>
-              </Link>
-              <Link href="/profile">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-400 hover:bg-white/10 hover:text-white"
-                >
-                  <User className="mr-1.5 h-4 w-4" />
-                  {session.user?.name || "Profile"}
-                </Button>
-              </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => signOut()}
-                className="text-gray-500 hover:bg-red-500/10 hover:text-red-400"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-400 hover:bg-white/10 hover:text-white"
-                >
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl"
-                >
-                  Get Tickets
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
+  useEffect(() => {
+    fetch("/api/site-content")
+      .then((r) => r.json())
+      .then((data) => {
+        const siteData = (data?.site || {}) as Partial<SiteSettings>;
+        setSite({ ...defaultSite, ...siteData });
+      })
+      .catch(() => {});
+  }, []);
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white hover:bg-white/10 md:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
-      </div>
+  useEffect(() => {
+    document.querySelector(".offcanvas__info")?.classList.remove("info-open");
+    document.querySelector(".offcanvas__overlay")?.classList.remove("overlay-open");
+  }, [pathname]);
 
-      {mobileOpen && (
-        <div className="border-t border-white/10 bg-[#0a0a1a] md:hidden">
-          <nav className="container flex flex-col gap-2 py-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-gray-400 hover:bg-white/10 hover:text-white"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
+  const ticketHref = session ? "/dashboard" : site.ticketButtonLink;
+  const ticketLabel = session ? "dashboard" : site.ticketButtonText;
+  const logoSrc = isHome ? "/assets/img/logo/blue-logo.svg" : "/assets/img/logo/black-logo.svg";
+  const navId = isHome ? "mobile-menus" : "mobile-menu";
+
+  return (
+    <header id="header-sticky" className={isHome ? "header-1 header-3" : "header-1"}>
+      <div className={isHome ? "container" : "container-fluid"}>
+        <div className="mega-menu-wrapper">
+          <div className="header-main">
+            {isHome && (
+              <div className="header-left">
+                <ul className="gt-left">
+                  <li>
+                    <i className="fa-solid fa-location-dot"></i>
+                    {site.headerAddress}
+                  </li>
+                </ul>
+              </div>
+            )}
+            <div className="logo">
+              <Link href="/" className="header-logo">
+                <img src={logoSrc} alt="logo-img" />
               </Link>
-            ))}
-            <div className="flex gap-2 pt-2">
-              {session ? (
-                <>
-                  {isAdmin && (
-                    <Link href="/admin" className="flex-1">
-                      <Button
-                        variant="outline"
-                        className="w-full border-purple-500/30 text-purple-400"
-                        size="sm"
-                      >
-                        Admin
-                      </Button>
-                    </Link>
-                  )}
-                  <Link href="/my-tickets" className="flex-1">
-                    <Button
-                      variant="outline"
-                      className="w-full border-white/10 text-white"
-                      size="sm"
-                    >
-                      My Tickets
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    className="border-white/10 text-red-400"
-                    size="sm"
-                    onClick={() => signOut()}
-                  >
-                    Logout
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" className="flex-1">
-                    <Button
-                      variant="outline"
-                      className="w-full border-white/10 text-white"
-                      size="sm"
-                    >
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/register" className="flex-1">
-                    <Button
-                      className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
-                      size="sm"
-                    >
-                      Get Tickets
-                    </Button>
-                  </Link>
-                </>
-              )}
             </div>
-          </nav>
+            <div className="header-right d-flex justify-content-end align-items-center mt-0">
+              <div className="mean__menu-wrapper">
+                <div className="main-menu">
+                  <nav id={navId}>
+                    <NavLinks isHome={isHome} />
+                  </nav>
+                </div>
+              </div>
+              <div className="header-right-icon">
+                <a href="#" className="main-header__search search-toggler">
+                  <i className="fa-regular fa-magnifying-glass"></i>
+                </a>
+              </div>
+              <div className={`header-button${isHome ? " mt-2" : ""}`}>
+                <Link href={ticketHref} className="gt-theme-btn">
+                  <i className="fa-solid fa-ticket-simple"></i> {ticketLabel}
+                </Link>
+              </div>
+              <div className="header__hamburger d-xl-block my-auto">
+                <div className="sidebar__toggle" role="button" tabIndex={0} aria-label="Open menu">
+                  <i className="fas fa-bars"></i>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

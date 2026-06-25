@@ -8,39 +8,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Save, RotateCcw } from "lucide-react";
 import { defaultContent } from "@/lib/landing-defaults";
+import { landingSectionKeys, type LandingSectionKey } from "@/lib/site-content";
 import { ListEditor } from "@/components/ui/forms/list-editor";
 
-type SectionKey =
-  | "hero"
-  | "stats"
-  | "marquee"
-  | "about"
-  | "whyAttend"
-  | "testimonials"
-  | "speakers"
-  | "tickets"
-  | "sponsors"
-  | "faq"
-  | "newsletter"
-  | "cta"
-  | "quoteMarquee";
-
-const sections: { key: SectionKey; label: string }[] = [
+const sections: { key: LandingSectionKey; label: string }[] = [
+  { key: "site", label: "Header / Site" },
   { key: "hero", label: "Hero" },
   { key: "about", label: "About" },
   { key: "stats", label: "Stats" },
-  { key: "marquee", label: "Marquee" },
-  { key: "quoteMarquee", label: "Quote Strap" },
-  { key: "whyAttend", label: "Benefits" },
-  { key: "testimonials", label: "Testimonials" },
   { key: "speakers", label: "Speakers" },
+  { key: "testimonials", label: "Testimonials" },
+  { key: "faq", label: "Why Join (FAQ)" },
   { key: "tickets", label: "Tickets" },
   { key: "sponsors", label: "Sponsors" },
-  { key: "faq", label: "FAQ" },
   { key: "newsletter", label: "Newsletter" },
-  { key: "cta", label: "CTA" },
+  { key: "about-page", label: "About Page" },
+  { key: "pricing-page", label: "Pricing Page" },
+  { key: "contact-page", label: "Contact Page" },
 ];
 
+type SectionKey = LandingSectionKey;
 type ContentData = Record<string, unknown>;
 
 export default function AdminLandingPage() {
@@ -98,7 +85,9 @@ export default function AdminLandingPage() {
 
   function saveAll() {
     setSaving(true);
-    const promises = Object.entries(content).map(async ([key, value]) => {
+    const promises = landingSectionKeys.map(async (key) => {
+      const value = content[key] ?? defaultContent[key];
+      if (!value) return { success: true };
       try {
         const res = await fetch("/api/admin/site-content", {
           method: "PUT",
@@ -120,6 +109,29 @@ export default function AdminLandingPage() {
       .finally(() => setSaving(false));
   }
 
+  async function resetAndSaveDefaults() {
+    setSaving(true);
+    setContent(defaultContent as ContentData);
+    try {
+      const results = await Promise.all(
+        landingSectionKeys.map(async (key) => {
+          const res = await fetch("/api/admin/site-content", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ section: key, data: defaultContent[key] }),
+          });
+          return res.json();
+        })
+      );
+      const failed = results.filter((r) => !r.success);
+      if (failed.length === 0) toast.success("Theme defaults saved to database");
+      else toast.error(`${failed.length} sections failed to save`);
+    } catch {
+      toast.error("Failed to reset defaults");
+    }
+    setSaving(false);
+  }
+
   function getList(key: SectionKey) {
     return (content[key] as unknown[]) || [];
   }
@@ -132,6 +144,27 @@ export default function AdminLandingPage() {
     const d = getObj(activeSection);
 
     switch (activeSection) {
+      case "site":
+        return (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field
+              label="Header Address"
+              value={d.headerAddress}
+              onChange={(v) => updateNested("site", "headerAddress", v)}
+            />
+            <Field
+              label="Get Ticket Button Text"
+              value={d.ticketButtonText}
+              onChange={(v) => updateNested("site", "ticketButtonText", v)}
+            />
+            <Field
+              label="Get Ticket Button Link"
+              value={d.ticketButtonLink}
+              onChange={(v) => updateNested("site", "ticketButtonLink", v)}
+            />
+          </div>
+        );
+
       case "hero":
         return (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -192,12 +225,22 @@ export default function AdminLandingPage() {
               value={d.venueAddress}
               onChange={(v) => updateNested("hero", "venueAddress", v)}
             />
+            <Field
+              label="Background Image URL"
+              value={d.backgroundImage}
+              onChange={(v) => updateNested("hero", "backgroundImage", v)}
+            />
+            <Field
+              label="Shape Image URL"
+              value={d.heroImage}
+              onChange={(v) => updateNested("hero", "heroImage", v)}
+            />
             <div className="col-span-full space-y-1">
-              <Label className="text-xs text-gray-400">Description</Label>
+              <Label className="gt-admin-field-label text-xs">Description</Label>
               <textarea
                 value={String(d.description || "")}
                 onChange={(e) => updateNested("hero", "description", e.target.value)}
-                className="min-h-[80px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+                className="gt-admin-textarea min-h-[80px] text-sm"
               />
             </div>
           </div>
@@ -217,13 +260,18 @@ export default function AdminLandingPage() {
               onChange={(v) => updateNested("about", "title", v)}
             />
             <div className="col-span-full space-y-1">
-              <Label className="text-xs text-gray-400">Description</Label>
+              <Label className="gt-admin-field-label text-xs">Description</Label>
               <textarea
                 value={String(d.description || "")}
                 onChange={(e) => updateNested("about", "description", e.target.value)}
-                className="min-h-[80px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+                className="gt-admin-textarea min-h-[80px] text-sm"
               />
             </div>
+            <Field
+              label="Image URL"
+              value={d.image}
+              onChange={(v) => updateNested("about", "image", v)}
+            />
           </div>
         );
 
@@ -232,94 +280,12 @@ export default function AdminLandingPage() {
           <ListEditor
             items={getList("stats") as Record<string, unknown>[]}
             fields={[
-              { key: "icon", label: "Icon Name" },
               { key: "value", label: "Value" },
               { key: "label", label: "Label" },
+              { key: "suffix", label: "Suffix (e.g. +)" },
             ]}
             onChange={(items) => update("stats", items)}
           />
-        );
-
-      case "marquee":
-      case "quoteMarquee": {
-        const arr =
-          activeSection === "quoteMarquee"
-            ? ((content.quoteMarquee as Record<string, unknown>)?.texts as string[]) || []
-            : (getList(activeSection) as string[]);
-        const onArrChange = (items: string[]) => {
-          if (activeSection === "quoteMarquee") {
-            update("quoteMarquee", { texts: items });
-          } else {
-            update("marquee", items);
-          }
-        };
-        return (
-          <div className="space-y-3">
-            {arr.map((text, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <Input
-                  value={text}
-                  onChange={(e) => {
-                    const updated = [...arr];
-                    updated[i] = e.target.value;
-                    onArrChange(updated);
-                  }}
-                  className="flex-1 border-white/10 bg-white/[0.05] text-sm text-white"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0 text-red-400 hover:text-red-300"
-                  onClick={() => onArrChange(arr.filter((_, j) => j !== i))}
-                >
-                  <RotateCcw className="h-3 w-3" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              onClick={() => onArrChange([...arr, ""])}
-              className="w-full border-dashed border-white/20 text-gray-400 hover:border-purple-400/30 hover:text-purple-300"
-            >
-              + Add Text
-            </Button>
-          </div>
-        );
-      }
-
-      case "whyAttend":
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field
-                label="Badge"
-                value={d.badge}
-                onChange={(v) => updateNested("whyAttend", "badge", v)}
-              />
-              <Field
-                label="Title"
-                value={d.title}
-                onChange={(v) => updateNested("whyAttend", "title", v)}
-              />
-              <div className="col-span-full space-y-1">
-                <Label className="text-xs text-gray-400">Description</Label>
-                <textarea
-                  value={String(d.description || "")}
-                  onChange={(e) => updateNested("whyAttend", "description", e.target.value)}
-                  className="min-h-[60px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
-                />
-              </div>
-            </div>
-            <ListEditor
-              items={(d.benefits as Record<string, unknown>[]) || []}
-              fields={[
-                { key: "icon", label: "Icon Name" },
-                { key: "title", label: "Title" },
-                { key: "description", label: "Description", type: "textarea" },
-              ]}
-              onChange={(items) => updateNested("whyAttend", "benefits", items)}
-            />
-          </div>
         );
 
       case "testimonials":
@@ -330,9 +296,6 @@ export default function AdminLandingPage() {
               { key: "quote", label: "Quote", type: "textarea" },
               { key: "name", label: "Name" },
               { key: "role", label: "Role" },
-              { key: "initials", label: "Initials" },
-              { key: "color", label: "Color (eg: from-purple-500 to-pink-500)" },
-              { key: "rating", label: "Rating (1-5)", type: "number" },
             ]}
             onChange={(items) => update("testimonials", items)}
           />
@@ -353,11 +316,11 @@ export default function AdminLandingPage() {
                 onChange={(v) => updateNested("speakers", "title", v)}
               />
               <div className="col-span-full space-y-1">
-                <Label className="text-xs text-gray-400">Description</Label>
+                <Label className="gt-admin-field-label text-xs">Description</Label>
                 <textarea
                   value={String(d.description || "")}
                   onChange={(e) => updateNested("speakers", "description", e.target.value)}
-                  className="min-h-[60px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+                  className="gt-admin-textarea min-h-[60px] text-sm"
                 />
               </div>
             </div>
@@ -366,9 +329,7 @@ export default function AdminLandingPage() {
               fields={[
                 { key: "name", label: "Name" },
                 { key: "role", label: "Role" },
-                { key: "company", label: "Company" },
-                { key: "initials", label: "Initials" },
-                { key: "color", label: "Color" },
+                { key: "photoUrl", label: "Photo URL" },
               ]}
               onChange={(items) => updateNested("speakers", "items", items)}
             />
@@ -390,11 +351,11 @@ export default function AdminLandingPage() {
                 onChange={(v) => updateNested("tickets", "title", v)}
               />
               <div className="col-span-full space-y-1">
-                <Label className="text-xs text-gray-400">Description</Label>
+                <Label className="gt-admin-field-label text-xs">Description</Label>
                 <textarea
                   value={String(d.description || "")}
                   onChange={(e) => updateNested("tickets", "description", e.target.value)}
-                  className="min-h-[60px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+                  className="gt-admin-textarea min-h-[60px] text-sm"
                 />
               </div>
             </div>
@@ -407,37 +368,10 @@ export default function AdminLandingPage() {
               }))}
               fields={[
                 { key: "name", label: "Name" },
-                { key: "price", label: "Price", type: "number" },
-                { key: "color", label: "Color" },
+                { key: "price", label: "Price (e.g. 09$)" },
                 { key: "highlighted", label: "Featured", type: "checkbox" },
-                { key: "featuresStr", label: "Features (comma-separated)" },
               ]}
-              onChange={(items) => {
-                const cleaned = items.map((item) => {
-                  const { featuresStr, ...rest } = item as Record<string, unknown>;
-                  const features = String(featuresStr || "")
-                    .split(",")
-                    .map((s: string) => s.trim())
-                    .filter(Boolean);
-                  return { ...rest, features };
-                });
-                updateNested("tickets", "tiers", cleaned);
-              }}
-              renderExtra={(item, index, fieldUpdate) => {
-                const featuresArr = (item.features as string[]) || [];
-                return (
-                  <div className="mt-2 border-l border-white/5 pl-2">
-                    <Label className="text-[10px] text-gray-500">Features Preview:</Label>
-                    <ul className="mt-1 space-y-0.5">
-                      {featuresArr.map((f, i) => (
-                        <li key={i} className="text-xs text-gray-400">
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              }}
+              onChange={(items) => updateNested("tickets", "tiers", items)}
             />
           </div>
         );
@@ -447,34 +381,22 @@ export default function AdminLandingPage() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field
-                label="Badge"
-                value={d.badge}
-                onChange={(v) => updateNested("sponsors", "badge", v)}
-              />
-              <Field
                 label="Title"
                 value={d.title}
                 onChange={(v) => updateNested("sponsors", "title", v)}
               />
               <div className="col-span-full space-y-1">
-                <Label className="text-xs text-gray-400">Description</Label>
+                <Label className="gt-admin-field-label text-xs">Description</Label>
                 <textarea
                   value={String(d.description || "")}
                   onChange={(e) => updateNested("sponsors", "description", e.target.value)}
-                  className="min-h-[60px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+                  className="gt-admin-textarea min-h-[60px] text-sm"
                 />
               </div>
             </div>
-            <ListEditor
-              items={(d.items as Record<string, unknown>[]) || []}
-              fields={[
-                { key: "name", label: "Name" },
-                { key: "tier", label: "Tier" },
-                { key: "initials", label: "Initials" },
-                { key: "color", label: "Color (hex)" },
-              ]}
-              onChange={(items) => updateNested("sponsors", "items", items)}
-            />
+            <p className="text-xs text-gray-500">
+              Sponsor logos are managed under Admin → Sponsors (Hyderabad colleges).
+            </p>
           </div>
         );
 
@@ -491,6 +413,11 @@ export default function AdminLandingPage() {
                 label="Title"
                 value={d.title}
                 onChange={(v) => updateNested("faq", "title", v)}
+              />
+              <Field
+                label="Side Image URL"
+                value={d.image}
+                onChange={(v) => updateNested("faq", "image", v)}
               />
             </div>
             <ListEditor
@@ -523,50 +450,152 @@ export default function AdminLandingPage() {
               onChange={(v) => updateNested("newsletter", "placeholder", v)}
             />
             <div className="col-span-full space-y-1">
-              <Label className="text-xs text-gray-400">Description</Label>
+              <Label className="gt-admin-field-label text-xs">Description</Label>
               <textarea
                 value={String(d.description || "")}
                 onChange={(e) => updateNested("newsletter", "description", e.target.value)}
-                className="min-h-[60px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+                className="gt-admin-textarea min-h-[60px] text-sm"
               />
             </div>
             <div className="col-span-full space-y-1">
-              <Label className="text-xs text-gray-400">Consent Label</Label>
+              <Label className="gt-admin-field-label text-xs">Consent Label</Label>
               <textarea
                 value={String(d.consentLabel || "")}
                 onChange={(e) => updateNested("newsletter", "consentLabel", e.target.value)}
-                className="min-h-[40px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+                className="gt-admin-textarea min-h-[40px] text-sm"
               />
             </div>
           </div>
         );
 
-      case "cta":
+      case "about-page":
         return (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field
-              label="Title"
-              value={d.title}
-              onChange={(v) => updateNested("cta", "title", v)}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field
+                label="Badge"
+                value={d.badge}
+                onChange={(v) => updateNested("about-page", "badge", v)}
+              />
+              <Field
+                label="Title"
+                value={d.title}
+                onChange={(v) => updateNested("about-page", "title", v)}
+              />
+              <Field
+                label="Phone Number"
+                value={d.phoneNumber}
+                onChange={(v) => updateNested("about-page", "phoneNumber", v)}
+              />
+              <Field
+                label="Image URL"
+                value={d.image}
+                onChange={(v) => updateNested("about-page", "image", v)}
+              />
+              <div className="col-span-full space-y-1">
+                <Label className="gt-admin-field-label text-xs">Description</Label>
+                <textarea
+                  value={String(d.description || "")}
+                  onChange={(e) => updateNested("about-page", "description", e.target.value)}
+                  className="gt-admin-textarea min-h-[80px] text-sm"
+                />
+              </div>
+            </div>
+            <ListEditor
+              items={(d.stats as Record<string, unknown>[]) || []}
+              fields={[
+                { key: "value", label: "Value" },
+                { key: "label", label: "Label" },
+                { key: "suffix", label: "Suffix (e.g. +)" },
+              ]}
+              onChange={(items) => updateNested("about-page", "stats", items)}
             />
-            <Field
-              label="Button Text"
-              value={d.buttonText}
-              onChange={(v) => updateNested("cta", "buttonText", v)}
+            <ListEditor
+              items={(d.ticketPackages as Record<string, unknown>[]) || []}
+              fields={[
+                { key: "name", label: "Package Name" },
+                { key: "price", label: "Price" },
+                { key: "highlighted", label: "Featured", type: "checkbox" },
+                { key: "featuresStr", label: "Features (comma-separated)" },
+              ]}
+              onChange={(items) => {
+                const cleaned = items.map((item) => {
+                  const { featuresStr, ...rest } = item as Record<string, unknown>;
+                  const features = String(featuresStr || "")
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  return { ...rest, features };
+                });
+                updateNested("about-page", "ticketPackages", cleaned);
+              }}
             />
-            <Field
-              label="Button Link"
-              value={d.buttonLink}
-              onChange={(v) => updateNested("cta", "buttonLink", v)}
-            />
-            <div className="col-span-full space-y-1">
-              <Label className="text-xs text-gray-400">Description</Label>
-              <textarea
-                value={String(d.description || "")}
-                onChange={(e) => updateNested("cta", "description", e.target.value)}
-                className="min-h-[60px] w-full resize-y rounded-md border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white"
+          </div>
+        );
+
+      case "pricing-page":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field
+                label="Badge"
+                value={d.badge}
+                onChange={(v) => updateNested("pricing-page", "badge", v)}
+              />
+              <Field
+                label="Title"
+                value={d.title}
+                onChange={(v) => updateNested("pricing-page", "title", v)}
               />
             </div>
+            <ListEditor
+              items={(d.packages as Record<string, unknown>[]) || []}
+              fields={[
+                { key: "name", label: "Package Name" },
+                { key: "price", label: "Price" },
+                { key: "highlighted", label: "Featured", type: "checkbox" },
+                { key: "featuresStr", label: "Features (comma-separated)" },
+              ]}
+              onChange={(items) => {
+                const cleaned = items.map((item) => {
+                  const { featuresStr, ...rest } = item as Record<string, unknown>;
+                  const features = String(featuresStr || "")
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  return { ...rest, features };
+                });
+                updateNested("pricing-page", "packages", cleaned);
+              }}
+            />
+          </div>
+        );
+
+      case "contact-page":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field
+                label="Address"
+                value={d.address}
+                onChange={(v) => updateNested("contact-page", "address", v)}
+              />
+              <Field
+                label="Google Maps Embed URL"
+                value={d.mapUrl}
+                onChange={(v) => updateNested("contact-page", "mapUrl", v)}
+              />
+            </div>
+            <ListEditor
+              items={(d.phones as Record<string, unknown>[]) || []}
+              fields={[{ key: "label", label: "Phone Number" }]}
+              onChange={(items) => updateNested("contact-page", "phones", items)}
+            />
+            <ListEditor
+              items={(d.emails as Record<string, unknown>[]) || []}
+              fields={[{ key: "label", label: "Email Address" }]}
+              onChange={(items) => updateNested("contact-page", "emails", items)}
+            />
           </div>
         );
 
@@ -576,38 +605,48 @@ export default function AdminLandingPage() {
   }
 
   if (loading) {
-    return <div className="p-6 text-gray-400">Loading landing page content...</div>;
+    return <div className="p-6 text-muted-foreground">Loading landing page content...</div>;
   }
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">Landing Page Content</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="gt-admin-page-title text-2xl">Landing Page Content</h2>
+          <p className="gt-admin-page-subtitle text-sm">
             Countdown is configured in the Hero section (Countdown Target field). Set an ISO date
-            like <code className="text-purple-400">2026-10-01T09:00:00</code>.
+            like <code className="text-purple-600">2026-10-01T09:00:00</code>.
           </p>
         </div>
-        <Button
-          onClick={saveAll}
-          disabled={saving}
-          className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          {saving ? "Saving..." : "Save All"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={resetAndSaveDefaults}
+            disabled={saving}
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Reset & Save Defaults
+          </Button>
+          <Button
+            onClick={saveAll}
+            disabled={saving}
+            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {saving ? "Saving..." : "Save All"}
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-1 border-b border-white/10 pb-1">
+      <div className="flex flex-wrap gap-1 border-b border-gray-200 pb-1">
         {sections.map((sec) => (
           <button
             key={sec.key}
             onClick={() => setActiveSection(sec.key)}
             className={`rounded-t-md px-3 py-2 text-xs font-medium transition-colors ${
               activeSection === sec.key
-                ? "border-x border-t border-white/10 bg-white/10 text-white"
-                : "text-gray-500 hover:text-gray-300"
+                ? "gt-admin-tab-active border-x border-t border-gray-200 bg-white"
+                : "gt-admin-tab text-muted-foreground hover:text-foreground"
             }`}
           >
             {sec.label}
@@ -615,9 +654,9 @@ export default function AdminLandingPage() {
         ))}
       </div>
 
-      <Card className="border-white/10 bg-white/[0.03]">
+      <Card className="border border-gray-200 bg-white shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between py-3">
-          <CardTitle className="text-base text-white">
+          <CardTitle className="text-base">
             {sections.find((s) => s.key === activeSection)?.label} Section
           </CardTitle>
           <Button
@@ -625,7 +664,6 @@ export default function AdminLandingPage() {
             size="sm"
             onClick={() => saveSection(activeSection)}
             disabled={saving}
-            className="border-white/10 text-gray-300 hover:bg-white/10"
           >
             <Save className="mr-1 h-3.5 w-3.5" /> Save Section
           </Button>
@@ -647,11 +685,11 @@ function Field({
 }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-gray-400">{label}</Label>
+      <Label className="gt-admin-field-label text-xs">{label}</Label>
       <Input
         value={String(value || "")}
         onChange={(e) => onChange(e.target.value)}
-        className="border-white/10 bg-white/[0.05] text-sm text-white placeholder:text-gray-600"
+        className="gt-admin-input-field text-sm"
       />
     </div>
   );

@@ -52,7 +52,7 @@ export function Pagination({ page, totalPages, total, onPageChange }: Pagination
               onClick={() => onPageChange(p as number)}
               className={
                 p === page
-                  ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
                   : "border-white/10 bg-white/[0.03] text-white hover:bg-white/10"
               }
             >

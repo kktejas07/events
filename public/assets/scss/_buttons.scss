@@ -1,0 +1,273 @@
+//>>>>> Component Button Here <<<<<//
+.gt-theme-btn {
+  font-size: 17px;
+  font-weight: 600;
+  font-family: "Sora";
+  text-transform: capitalize;
+  color: $gt-white;
+  display: inline-block;
+  text-align: center;
+  min-width: 170px;
+  overflow: hidden;
+  border-radius: 100px;
+  padding: 16px 25px;
+  background-size: 200% auto;
+  background-image: linear-gradient(to right, #1539EE 0%, #ffabf4 50%, #1539EE 100%);
+  border-radius: 100px;
+  transition: 0.5s;
+
+  @include breakpoint (max-sm) {
+     padding: 14px 25px;
+  }
+
+  i {
+    color: $gt-theme-color;
+    transform: rotate(45deg);
+    margin-right: 10px;
+  }
+
+  &.gt-style-2 {
+     background-image: none;
+     border: 1px solid rgba(21, 57, 238, 0.20);
+     color: $gt-theme-color;
+     @include transition;
+  }
+
+  &.gt-theme-btn-3 {
+     background-image: linear-gradient(to right, #90F 0%, #FFF600 50%, #90F 100%);
+     padding: 14px 25px;
+     text-transform: uppercase;
+
+     i {
+        color: $gt-white;
+     }
+  }
+
+  &.style-5 {
+    background-image: linear-gradient(to right, #90C 0%, #FF1ABC 50%, #90C 100%);
+
+    i {
+        color: $gt-white;
+    }
+  }
+
+  &:hover {
+    background-position: right center;
+
+    &.gt-style-2 {
+       background-image: linear-gradient(to right, #2ADDC8 0%, #1539EE 50%, #2ADDC8 100%);
+       color: $gt-white;
+       border: 1px solid transparent;
+
+      i {
+          color: $gt-white;
+      }
+    }
+  } 
+  
+  &.gt-theme-btn-2 {
+     background-image: linear-gradient(to right, #211C84 0%, #7A73D1 50%, #211C84 100%);
+     border-radius: 6px;
+     padding: 12px 25px;
+
+     i {
+        transform: rotate(0);
+        color: $gt-white;
+     }
+
+     &.gt-border-btn {
+        border: 1px solid #4D55CC;
+        background-image: none;
+        color: #4D55CC;
+
+        i {
+            margin-right: 10px;
+            color: #4D55CC;
+            transform: rotate(0);
+        }
+
+        &:hover {
+            background-color: #4D55CC;
+            color: $gt-white;
+
+            i {
+                color: $gt-white;
+            }
+        }
+     }
+  }
+}  
+
+
+//>>>>> Component Button End <<<<<//
+
+
+.gt-link-btn {
+    
+  .gt-icon-btn {
+      width: 44px;
+      height: 44px;
+      line-height: 44px;
+      text-align: center;
+      border-radius: 100px;
+      border: 1px solid rgba(77, 85, 204, 0.20);
+      color: $gt-theme-color;
+      margin-right: 5px;
+      display: inline-block;
+      font-size: 17px;
+      @include transition;
+    }
+
+  .gt-radius-btn {
+      font-size: 16px;
+      font-weight: 700;
+      color: $gt-theme-color;
+      padding: 12px 20px;
+      letter-spacing: 0.5px;
+      font-family: Sora;
+      border-radius: 100px;
+      border: 1px solid rgba(77, 85, 204, 0.20);
+      line-height: 1;
+      @include transition;
+  }
+
+   &:hover {
+    .gt-icon-btn,
+    .gt-radius-btn {
+      background-color: $gt-theme-color;
+      color: $gt-white;
+    }
+  }
+}
+
+.gt-links-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #4D55CC;
+    overflow: hidden;
+    transition: 700ms;
+    position: relative;
+    vertical-align: middle;
+    border: none;
+    outline: none !important;
+    z-index: 1;
+
+    .gt-text-btn {
+        font-size: 16px;
+        font-weight: 700;
+        font-family: 'Sora', sans-serif;
+        background-color: $gt-white;
+        border-radius: 6px;
+        border: 1px solid rgba(77, 85, 204, 0.20);
+        line-height: 1;
+        padding: 14px 24px;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        transition: all 700ms ease;
+        text-transform: uppercase;
+        z-index: 99;
+       
+        .gt-text-2 {
+            display: inline-block;
+        }
+
+        &::after {
+            content: "";
+            width: 0%;
+            height: 100%;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background-color: $gt-theme-color-2;
+            z-index: -1;
+            transition: all 500ms ease;
+        }
+    }
+
+    .gt-icon-btn {
+        background-color: $gt-white;
+        line-height: 1;
+        padding: 12px 20px;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        transition: all 500ms ease;
+        z-index: 99;
+        font-size: 18px;
+        border-radius: 6px;
+        border: 1px solid rgba(77, 85, 204, 0.20);
+
+        &::after {
+            content: "";
+            width: 0%;
+            height: 100%;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background-color: $gt-theme-color-2;
+            z-index: -1;
+            transition: all 500ms ease;
+        }
+
+        i {
+            display: inline-block;
+        }
+    }
+
+    &:hover {
+        .gt-text-btn {
+            color: $gt-white;
+
+            .gt-text-2 {
+                animation: slideRight 600ms;
+            }
+            
+            &::after {
+                width: 100%;
+                left: 0px;
+            }
+        }
+
+        .gt-icon-btn {
+           color: $gt-white;
+           
+            &::after {
+                width: 100%;
+                left: 0px;
+            }
+
+            i {
+                animation: slideRight 500ms;
+            }
+        }
+    }
+}
+
+.gt-link-btn-3 {
+    border-radius: 20px 20px 0px 0px;
+    background: $gt-white;
+    padding: 9px 20px;
+    color: $gt-theme-color-2;
+    color: #4D55CC;
+    font-family: 'Sora', sans-serif;
+    @include transition;
+
+    i {
+        color: #4D55CC;
+        margin-right: 10px;
+        transform: rotate(-45deg);
+        @include transition;
+    }
+
+    &:hover {
+        background-color: #4D55CC;
+        color: $gt-white;
+
+        i {
+            color: $gt-white;
+            transform: rotate(0);
+        }
+    }
+}

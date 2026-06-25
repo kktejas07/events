@@ -1,200 +1,62 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScanLine, Info, TicketCheck, ShieldCheck, CheckCircle2, XCircle } from "lucide-react";
-import CameraScanner from "@/components/scanner/camera-scanner";
+import { useState } from "react";
 
-interface ScanLogEntry {
-  barcode: string;
-  timestamp: number;
-  valid: boolean;
-  attendeeName?: string;
-  ticketType?: string;
-  message: string;
-}
+export default function AdminScanPage() {
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState<{ success?: boolean; message?: string; ticket?: { attendeeName: string; attendeeEmail: string; event: { title: string }; status: string } } | null>(null);
+  const [loading, setLoading] = useState(false);
 
-export default function ScanPage() {
-  const [barcode, setBarcode] = useState("");
-  const [scanResult, setScanResult] = useState<{ valid: boolean; message: string } | null>(null);
-  const [scanLog, setScanLog] = useState<ScanLogEntry[]>([]);
-
-  const verifyBarcode = useCallback(async (code: string): Promise<boolean> => {
+  async function handleScan(e: React.FormEvent) {
+    e.preventDefault();
+    if (!code.trim()) return;
+    setLoading(true);
     try {
-      const res = await fetch("/api/admin/tickets/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ barcode: code }),
-      });
-      const json = await res.json();
-      const entry: ScanLogEntry = {
-        barcode: code,
-        timestamp: Date.now(),
-        valid: !!json.success,
-        attendeeName: json.data?.attendeeName,
-        ticketType: json.data?.ticketTypeName,
-        message: json.success
-          ? `${json.data.attendeeName} — ${json.data.ticketTypeName}`
-          : json.error || "Invalid ticket",
-      };
-      setScanLog((prev) => [entry, ...prev].slice(0, 50));
-      return !!json.success;
+      const res = await fetch("/api/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ barcode: code.trim() }) });
+      const data = await res.json();
+      setResult(data);
     } catch {
-      const entry: ScanLogEntry = {
-        barcode: code,
-        timestamp: Date.now(),
-        valid: false,
-        message: "Network error",
-      };
-      setScanLog((prev) => [entry, ...prev].slice(0, 50));
-      return false;
+      setResult({ success: false, message: "Scan failed" });
     }
-  }, []);
-
-  async function handleManualVerify() {
-    if (!barcode.trim()) return;
-    const ok = await verifyBarcode(barcode.trim());
-    setScanResult({
-      valid: ok,
-      message: ok ? "Ticket verified and checked in" : "Invalid ticket",
-    });
-    if (ok) setBarcode("");
+    setLoading(false);
+    setCode("");
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-white">Scan Tickets</h2>
-        <p className="text-gray-400">Verify tickets at the event entrance using camera or manual entry</p>
-      </div>
+    <div>
+      <h2 className="gt-admin-section-title">Scan Tickets</h2>
+      <p className="gt-admin-section-subtitle">Scan ticket barcodes for entry</p>
 
-      <Card className="border-white/10 bg-white/[0.03]">
-        <CardContent className="flex items-start gap-4 pt-6">
-          <Info className="mt-0.5 h-5 w-5 shrink-0 text-purple-400" />
-          <div className="text-sm text-gray-300">
-            <p className="font-medium text-white">Mobile Scanning</p>
-            <p className="mt-1">
-              Open this page on any smartphone. Tap &quot;Start Scanner&quot; and point the camera
-              at the ticket&apos;s barcode or QR code. The ticket will be verified and checked in automatically.
-              Works on both iOS and Android devices — no app install required.
-            </p>
-            <p className="mt-2 text-purple-400">
-              For event staff: share <strong>/scan</strong> with scanner-only accounts (SCANNER role).
-              They won&apos;t have access to the admin panel.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-white/10 bg-white/[0.03]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <ScanLine className="h-5 w-5 text-purple-400" />
-              Camera Scanner
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CameraScanner onScan={verifyBarcode} />
-          </CardContent>
-        </Card>
-
-        <Card className="border-white/10 bg-white/[0.03]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <ShieldCheck className="h-5 w-5 text-purple-400" />
-              Manual Entry
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter barcode (TKT-XXXXXXXX)"
-                value={barcode}
-                onChange={(e) => setBarcode(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleManualVerify()}
-                className="border-white/10 bg-white/[0.03] font-mono text-white placeholder:text-gray-600"
-              />
-              <Button
-                onClick={handleManualVerify}
-                className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
-              >
-                Verify
-              </Button>
+      <div className="gt-admin-card">
+        <form onSubmit={handleScan}>
+          <div className="gt-admin-inline-form">
+            <div className="gt-admin-form-group" style={{ flex: 1 }}>
+              <label className="gt-admin-label">Barcode</label>
+              <input className="gt-admin-input" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Scan or enter barcode..." autoFocus />
             </div>
+            <button type="submit" className="gt-admin-btn gt-admin-btn-primary" disabled={loading} style={{ height: "46px" }}>
+              {loading ? <><i className="fa-solid fa-spinner fa-spin"></i> Scanning...</> : <><i className="fa-regular fa-qrcode"></i> Scan</>}
+            </button>
+          </div>
+        </form>
 
-            {scanResult && (
-              <div
-                className={`rounded-lg border p-4 ${
-                  scanResult.valid
-                    ? "border-green-500/30 bg-green-500/10"
-                    : "border-red-500/30 bg-red-500/10"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <TicketCheck
-                    className={`h-5 w-5 ${scanResult.valid ? "text-green-400" : "text-red-400"}`}
-                  />
-                  <span
-                    className={`font-medium ${
-                      scanResult.valid ? "text-green-400" : "text-red-400"
-                    }`}
-                  >
-                    {scanResult.valid ? "Valid Ticket" : "Invalid Ticket"}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm text-gray-300">{scanResult.message}</p>
+        {result && (
+          <div className="mt-4">
+            <div className={`gt-admin-badge ${result.success ? "success" : "danger"}`} style={{ padding: "8px 16px", fontSize: "14px" }}>
+              {result.success ? "Valid Ticket" : "Invalid"}
+            </div>
+            {result.ticket && (
+              <div className="mt-3" style={{ background: "#f8f9fe", borderRadius: "12px", padding: "16px" }}>
+                <p style={{ margin: 0, fontWeight: 600 }}>{result.ticket.attendeeName}</p>
+                <p style={{ margin: "4px 0 0", color: "#888", fontSize: "13px" }}>{result.ticket.attendeeEmail}</p>
+                <p style={{ margin: "8px 0 0", fontSize: "14px" }}><strong>Event:</strong> {result.ticket.event?.title}</p>
+                <p style={{ margin: "4px 0 0", fontSize: "14px" }}><strong>Status:</strong> {result.ticket.status}</p>
               </div>
             )}
-          </CardContent>
-        </Card>
+            <p className="mt-2" style={{ color: "#666", fontSize: "13px" }}>{result.message}</p>
+          </div>
+        )}
       </div>
-
-      <Card className="border-white/10 bg-white/[0.03]">
-        <CardHeader>
-          <CardTitle className="text-white">Recent Scans</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {scanLog.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-500">
-              No scans yet. Scanned tickets will appear here.
-            </p>
-          ) : (
-            <div className="max-h-96 space-y-2 overflow-y-auto">
-              {scanLog.map((entry, i) => (
-                <div
-                  key={`${entry.barcode}-${entry.timestamp}-${i}`}
-                  className={`flex items-center gap-3 rounded-lg border p-3 ${
-                    entry.valid
-                      ? "border-green-500/20 bg-green-500/5"
-                      : "border-red-500/20 bg-red-500/5"
-                  }`}
-                >
-                  {entry.valid ? (
-                    <CheckCircle2 className="h-5 w-5 shrink-0 text-green-400" />
-                  ) : (
-                    <XCircle className="h-5 w-5 shrink-0 text-red-400" />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">
-                      {entry.valid && entry.attendeeName ? entry.attendeeName : entry.message}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {entry.barcode}
-                      {entry.ticketType && ` — ${entry.ticketType}`}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-xs text-gray-600">
-                    {new Date(entry.timestamp).toLocaleTimeString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

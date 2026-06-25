@@ -1,0 +1,437 @@
+.gt-testimonial-wrapper {
+    @include breakpoint (max-sm) {
+        margin-top: 30px;
+    }
+
+    .swiper-slide {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 1s ease-in-out;
+    
+        &.swiper-slide-shadow {
+            box-shadow: none !important;
+        }
+          
+          .th-testimonial-image {
+                img {
+                    @include imgw;
+                    border-radius: 10px;
+                }
+          }
+      }
+      .swiper-3d .swiper-slide-shadow {
+        background: transparent;
+    }
+
+    .gt-testimonial-card-item {
+       position: relative;
+
+        .array-buttons {
+            position: absolute;
+            bottom: 8px;
+            left: 34%;
+            z-index: 999;
+
+             @include breakpoint (max-xl) {
+                left: 50%;
+            }
+
+            @include breakpoint (max-lg) {
+                left: 60%;
+            }
+        }
+
+        .gt-testimonial-content {
+            .gt-star {
+                color: #FFA620;
+                font-weight: 900;
+                margin-bottom: 10px;
+             }
+
+            p {
+                font-size: 18px;
+                line-height: 36px;
+                color: $gt-text-color-2;
+                max-width: 831px;
+
+                @include breakpoint (max-xl) {
+                    font-size: 16px;
+                }
+            }
+
+            .gt-client-info {
+                margin-top: 70px;
+
+                 @include breakpoint (max-xl) {
+                    margin-top: 30px;
+                }
+
+                span {
+                    font-size: 17px;
+                    color: $gt-theme-color;
+                }
+            }
+        }
+    }
+}
+
+.gt-testimonial-section {
+    position: relative;
+
+    .gt-map-shape {
+        position: absolute;
+        left: 8%;
+        bottom: 0;
+        top: 0;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+
+    .gt-client-image {
+        position: absolute;
+        left: 13%;
+        top: 20%;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+
+    .gt-client-image-2 {
+        position: absolute;
+        left: 9%;
+        bottom: 8%;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+
+    .gt-client-image-3 {
+        position: absolute;
+        top: 8%;
+        right: 15%;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+
+    .gt-client-image-4 {
+        position: absolute;
+        top: 44%;
+        right: 4%;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+
+    .gt-client-image-5 {
+        position: absolute;
+        bottom: 12%;
+        right: 8%;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+}
+
+.gt-testimomnial-wrapper-2 {
+    position: relative;
+
+    .gt-testimonial-card-item {
+        background-color: $gt-white;
+        padding: 30px 30px 100px;
+        max-width: 690px;
+        border-radius: 20px;
+        position: relative;
+
+        @include breakpoint (max-lg) {
+            margin-top: 15px;
+        }
+        
+        .gt-shape {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            right: 0;
+            bottom: 0;
+
+            @include breakpoint (max-xl) {
+                display: none;
+            }
+        }
+
+        .gt-shape-2 {
+            position: absolute;
+            top: 12px;
+            left: 25px;
+            right: 0;
+            bottom: 0;
+
+            @include breakpoint (max-xl) {
+                display: none;
+            }
+        }
+
+        .array-buttons-2 {
+            position: absolute;
+            right: 50px;
+            bottom: 40px;
+        }
+
+        .gt-testmonial-content {
+             position: relative;
+             z-index: 1;
+
+            h3 {
+                color: #4D55CC;
+                margin-bottom: 20px;
+            }
+
+            p {
+                color: #797979;
+                letter-spacing: 0.5px;
+                font-size: 18px;
+                margin-bottom: 40px;
+                max-width: 630px;
+
+                @include breakpoint (max-sm) {
+                    font-size: 16px;
+                }
+            }
+
+            h6 {
+                span {
+                    color: $gt-header-color;
+                    font-weight: 400;
+                }
+            }
+
+            &.style-2 {
+                h3 {
+                    color: #FF1ABC;
+                }
+
+                p {
+                    color: #797979;
+                }
+            }
+        }
+    }
+
+    .gt-testimonial-image {
+        max-width: 440px;
+        margin-left: 100px;
+
+        img {
+            @include imgw;
+        }
+    }
+}
+
+
+.gt-testimonial-section-2 {
+    margin: 0 40px;
+    position: relative;
+    border-radius: 40px;
+
+    @include breakpoint (max-xl) {
+        margin:  0 30px;
+    }
+
+    @include breakpoint (max-lg) {
+        margin:  0 15px;
+    }
+
+    .left-shape {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+    }
+
+    &.gt-margin-bootom {
+        margin-bottom: 120px;
+
+         @include breakpoint (max-xl) {
+          margin-bottom: 100px;
+     }
+
+        @include breakpoint (max-lg) {
+            margin-bottom: 80px;
+        }
+    }
+}
+
+.gt-testimonial-box-wrapper {
+   
+    &.gt-style-1 {
+        margin-bottom: 24px;
+    }
+
+
+    .gt-testimonial-box-item {
+        border-radius: 20px;
+        background-color: $gt-white;
+        padding: 40px 30px;
+        text-align: left;
+
+         @include breakpoint (max-xl) {
+            border: 1px solid $gt-theme-color-3;
+        }
+
+        h3 {
+             color: #4D55CC;
+             margin-bottom: 15px;
+        }
+
+        p {
+            max-width: 630px;
+            font-size: 18px;
+            color: #797979;
+            margin-bottom: 20px;
+        }
+
+        h6 {
+            span {
+                font-weight: 400;
+            }
+        }
+    }
+}
+
+.gt-testimonial-section-3 {
+    position: relative;
+
+    @include breakpoint (max-xxxl) {
+        overflow: hidden;
+   }
+
+    .gt-dark-shape {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: initial;
+        bottom: -70%;
+    }
+}
+
+.gt-testimonial-wrapper-4 {
+    border-radius: 10px;
+    border: 1px solid #242424;
+    background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.10) 100%);
+
+
+    .gt-testimonial-content {
+        padding: 40px 50px 30px;
+        border-bottom: 1px solid  rgba(255, 255, 255, 0.20);
+
+         @include breakpoint (max-md) {
+            padding: 40px;
+        }
+
+        @include breakpoint (max-sm) {
+            padding: 30px;
+        }
+    }
+
+    .gt-testimonial-item-4 {
+        @include flex;
+        justify-content: space-between;
+        padding: 30px 0px 30px 120px;
+        position: relative;
+
+         @include breakpoint (max-xl) {
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 30px 0px 30px 60px;
+        }
+
+         @include breakpoint (max-lg) {
+           padding: 30px 0px 30px 50px;
+        }
+
+         @include breakpoint (max-md) {
+           padding: 30px 0px 30px 40px;
+        }
+
+        @include breakpoint (max-sm) {
+            padding: 30px 0px 30px 30px;
+        }
+
+        .gt-shape {
+            position: absolute;
+            left: 35%;
+            top: 10%;
+
+            @include breakpoint (max-xl) {
+                display: none;
+            }
+        }
+
+        .gt-client-image {
+            position: relative;
+
+            img {
+                @include imgw;
+                border-radius: 100%;
+            }
+
+            .gt-icon {
+                width: 80px;
+                height: 80px;
+                line-height: 80px;
+                border-radius: 100%;
+                font-size: 35px;
+                text-align: center;
+                background-color: $gt-white;
+                color: rgba(21, 57, 238, 1);
+                border: 3px solid rgba(33, 33, 39, 1);
+                position: absolute;
+                top: 26px;
+                right: -27px;
+            }
+        }
+
+        .gt-info-content {
+            .star {
+                color: rgba(255, 255, 0, 1);
+                margin-bottom: 20px;
+            }
+
+            p {
+                max-width: 821px;
+                font-size: 20px;
+                font-weight: 600;
+                color: #C4C4C4;
+                margin-bottom: 20px;
+
+                 @include breakpoint (max-xl) {
+                    font-size: 16px;
+                }
+            }
+
+            h6 {
+                font-weight: 700;
+                color: $gt-white;
+                margin-bottom: 5px;
+            }
+
+            span {
+                font-size: 14px;
+                font-weight: 500;
+                color: #7A7373;
+            }
+        }
+    }
+}

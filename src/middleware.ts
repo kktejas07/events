@@ -6,6 +6,20 @@ export default auth((req) => {
   const pathname = nextUrl.pathname;
   const role = (req.auth?.user as { role?: string })?.role;
 
+  const adminRoles = [
+    "ADMIN",
+    "SUPER_ADMIN",
+    "SCANNER",
+    "ORGANIZATION_ADMIN",
+    "ORGANIZATION_SCANNER",
+  ];
+
+  if (pathname.startsWith("/org-admin")) {
+    if (!["ADMIN", "SUPER_ADMIN", "ORGANIZATION_ADMIN"].includes(role || "")) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+  }
+
   if (pathname.startsWith("/admin")) {
     if (!["ADMIN", "SUPER_ADMIN", "SCANNER"].includes(role || "")) {
       return NextResponse.redirect(new URL("/login", req.url));
@@ -16,7 +30,7 @@ export default auth((req) => {
     if (!req.auth) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
-    if (!["ADMIN", "SUPER_ADMIN", "SCANNER"].includes(role || "")) {
+    if (!adminRoles.includes(role || "")) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }
@@ -32,9 +46,16 @@ export default auth((req) => {
   }
 
   if (pathname.startsWith("/my-tickets") || pathname.startsWith("/profile")) {
-    if (["ADMIN", "SUPER_ADMIN", "SCANNER"].includes(role || "")) {
-      if (role === "SCANNER") {
+    if (
+      ["ADMIN", "SUPER_ADMIN", "SCANNER", "ORGANIZATION_ADMIN", "ORGANIZATION_SCANNER"].includes(
+        role || ""
+      )
+    ) {
+      if (role === "SCANNER" || role === "ORGANIZATION_SCANNER") {
         return NextResponse.redirect(new URL("/scan", req.url));
+      }
+      if (role === "ORGANIZATION_ADMIN") {
+        return NextResponse.redirect(new URL("/org-admin", req.url));
       }
       return NextResponse.redirect(new URL("/admin", req.url));
     }
@@ -44,5 +65,12 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/my-tickets/:path*", "/profile/:path*", "/checkout", "/scan"],
+  matcher: [
+    "/admin/:path*",
+    "/org-admin/:path*",
+    "/my-tickets/:path*",
+    "/profile/:path*",
+    "/checkout",
+    "/scan",
+  ],
 };

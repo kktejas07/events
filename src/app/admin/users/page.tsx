@@ -1,272 +1,87 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Pagination } from "@/components/ui/pagination";
-import { toast } from "sonner";
-import { Eye, Ban, Loader2, Plus, X } from "lucide-react";
-
-interface User {
-  id: string;
-  firstName: string | null;
-  lastName: string | null;
-  email: string;
-  role: string;
-  banned: boolean;
-  _count: { orders: number; tickets: number };
-  createdAt: string;
-}
-
-const roleColor: Record<string, string> = {
-  ADMIN: "bg-purple-500/10 text-purple-400 border-purple-500/30",
-  SUPER_ADMIN: "bg-red-500/10 text-red-400 border-red-500/30",
-  SCANNER: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-  USER: "bg-gray-500/10 text-gray-400 border-gray-500/30",
-};
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<{ id: string; email: string; firstName: string; lastName: string; role: string; banned: boolean; organization?: { name: string } }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [showCreate, setShowCreate] = useState(false);
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
-  const [creating, setCreating] = useState(false);
-
-  const fetchUsers = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/admin/users?page=${page}&limit=20`);
-      const json = await res.json();
-      if (json.success) {
-        setUsers(json.data);
-        setTotalPages(json.meta.totalPages);
-        setTotal(json.meta.total);
-      } else toast.error(json.error || "Failed to load users");
-    } catch {
-      toast.error("Network error");
-    }
-    setLoading(false);
-  }, [page]);
 
   useEffect(() => {
-    setLoading(true);
-    fetchUsers();
-  }, [fetchUsers]);
+    fetch("/api/admin/users").then((r) => r.json()).then((d) => { setUsers(d.data || []); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
 
-  async function handleCreateScanner(e: React.FormEvent) {
-    e.preventDefault();
-    setCreating(true);
-    try {
-      const res = await fetch("/api/admin/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: newUser.email,
-          firstName: newUser.name,
-          lastName: "",
-          role: "SCANNER",
-          password: newUser.password,
-        }),
-      });
-      const json = await res.json();
-      if (json.success || res.ok) {
-        toast.success(`Scanner account created: ${newUser.email}`);
-        setNewUser({ name: "", email: "", password: "" });
-        setShowCreate(false);
-        fetchUsers();
-      } else {
-        toast.error(json.error || "Failed to create scanner");
-      }
-    } catch {
-      toast.error("Network error");
-    }
-    setCreating(false);
+  const roleBadge = (r: string) => ({ ADMIN: "info", SUPER_ADMIN: "info", ORGANIZATION_ADMIN: "warning", SCANNER: "neutral", ORGANIZATION_SCANNER: "neutral", USER: "neutral" }[r] || "neutral");
+
+  async function updateRole(id: string, role: string) {
+    if (!window.confirm(`Change role to ${role}?`)) return;
+    await fetch(`/api/admin/users/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ role }) });
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role } : u)));
   }
 
-  async function handleBan(id: string, banned: boolean) {
-    const action = banned ? "unban" : "ban";
-    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
-    try {
-      const res = await fetch(`/api/admin/users/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ banned: !banned }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        toast.success(`User ${banned ? "unbanned" : "banned"}`);
-        fetchUsers();
-      } else {
-        toast.error(json.error || "Failed to update user");
-      }
-    } catch {
-      toast.error("Network error");
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
-      </div>
-    );
+  async function toggleBan(id: string, banned: boolean) {
+    if (!window.confirm(banned ? "Unban this user?" : "Ban this user?")) return;
+    await fetch(`/api/admin/users/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ banned: !banned }) });
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, banned: !banned } : u)));
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div>
+      <div className="d-flex align-items-center justify-content-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">Users</h2>
-          <p className="text-gray-400">Registered users ({total} total)</p>
+          <h2 className="gt-admin-section-title">Users & Roles</h2>
+          <p className="gt-admin-section-subtitle">Manage users, roles, and access</p>
         </div>
-        <Button
-          onClick={() => setShowCreate(!showCreate)}
-          className="gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
-        >
-          {showCreate ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {showCreate ? "Cancel" : "Create Scanner"}
-        </Button>
       </div>
 
-      {showCreate && (
-        <Card className="border-purple-500/30 bg-purple-500/5">
-          <CardHeader>
-            <CardTitle className="text-white">Create Scanner Account</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreateScanner} className="space-y-4">
-              <p className="text-sm text-gray-400">
-                Scanner accounts can only use the ticket scanning page. They won&apos;t have admin access.
-              </p>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="space-y-1">
-                  <Label className="text-sm text-gray-300">Full Name</Label>
-                  <Input
-                    placeholder="John Doe"
-                    value={newUser.name}
-                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                    required
-                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-sm text-gray-300">Email</Label>
-                  <Input
-                    type="email"
-                    placeholder="scanner@example.com"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    required
-                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-sm text-gray-300">Password</Label>
-                  <Input
-                    type="text"
-                    placeholder="Min 8 characters"
-                    value={newUser.password}
-                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    required
-                    minLength={8}
-                    className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                  />
-                </div>
-              </div>
-              <Button
-                type="submit"
-                disabled={creating}
-                className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
-              >
-                {creating ? "Creating..." : "Create Scanner Account"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card className="border-white/10 bg-white/[0.03]">
-        <CardHeader>
-          <CardTitle className="text-white">All Users</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {users.length === 0 ? (
-            <p className="text-gray-400">No users registered yet.</p>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10 text-left">
-                    <th className="pb-3 font-medium text-gray-400">Name</th>
-                    <th className="pb-3 font-medium text-gray-400">Email</th>
-                    <th className="pb-3 font-medium text-gray-400">Role</th>
-                    <th className="pb-3 font-medium text-gray-400">Orders</th>
-                    <th className="pb-3 font-medium text-gray-400">Tickets</th>
-                    <th className="pb-3 font-medium text-gray-400">Status</th>
-                    <th className="pb-3 font-medium text-gray-400">Joined</th>
-                    <th className="pb-3 font-medium text-gray-400">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id} className="border-b border-white/5 last:border-0">
-                      <td className="py-3 pr-4 font-medium text-white">
-                        {user.firstName} {user.lastName}
-                      </td>
-                      <td className="py-3 pr-4 text-gray-400">{user.email}</td>
-                      <td className="py-3 pr-4">
-                        <span
-                          className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${roleColor[user.role] || "bg-gray-500/10 text-gray-400"}`}
-                        >
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4 text-gray-300">{user._count.orders}</td>
-                      <td className="py-3 pr-4 text-gray-300">{user._count.tickets}</td>
-                      <td className="py-3 pr-4">
-                        {user.banned ? (
-                          <span className="inline-block rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400">
-                            Banned
-                          </span>
-                        ) : (
-                          <span className="inline-block rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-400">
-                            Active
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 text-gray-400">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="py-3">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={`h-8 w-8 ${user.banned ? "text-green-400 hover:bg-green-500/10" : "text-orange-400 hover:bg-orange-500/10"}`}
-                          onClick={() => handleBan(user.id, user.banned)}
-                        >
-                          <Ban className="h-3.5 w-3.5" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              total={total}
-              onPageChange={setPage}
-            />
-          </>
-          )}
-        </CardContent>
-      </Card>
+      <div className="gt-admin-card">
+        {loading ? (
+          <div className="text-center py-5"><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "24px", color: "#8B5CF6" }}></i></div>
+        ) : (
+          <table className="gt-admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Organization</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id}>
+                  <td>
+                    <strong>{user.firstName} {user.lastName}</strong>
+                    <br /><small style={{ color: "#888" }}>{user.email}</small>
+                  </td>
+                  <td>{user.organization?.name || "-"}</td>
+                  <td>
+                    <select className="gt-admin-select" style={{ width: "auto", minWidth: "160px", padding: "6px 30px 6px 10px", fontSize: "12px" }} value={user.role} onChange={(e) => updateRole(user.id, e.target.value)}>
+                      <option value="USER">USER</option>
+                      <option value="ADMIN">ADMIN</option>
+                      <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                      <option value="SCANNER">SCANNER</option>
+                      <option value="ORGANIZATION_ADMIN">ORGANIZATION_ADMIN</option>
+                      <option value="ORGANIZATION_SCANNER">ORGANIZATION_SCANNER</option>
+                    </select>
+                  </td>
+                  <td>
+                    <span className={`gt-admin-badge ${user.banned ? "danger" : "success"}`}>
+                      {user.banned ? "Banned" : "Active"}
+                    </span>
+                  </td>
+                  <td>
+                    <button onClick={() => toggleBan(user.id, user.banned)} className={`gt-admin-btn gt-admin-btn-sm ${user.banned ? "gt-admin-btn-primary" : ""}`} style={user.banned ? {} : { border: "2px solid #EF4444", color: "#EF4444", background: "none" }}>
+                      {user.banned ? "Unban" : "Ban"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }

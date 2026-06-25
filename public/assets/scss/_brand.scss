@@ -1,0 +1,80 @@
+.brand-wrapper {
+    text-align: center;
+
+    h4 {
+        margin-bottom: 50px;
+        position: relative;
+        padding-left: 60px;
+		padding-right: 60px;
+        display: inline-block;
+
+        &::before {
+            position: absolute;
+            content: "";
+            left: -41%;
+            top: 12px;
+            height: 1px;
+            width: 186px;
+            background-color: #C4C4C4;
+
+            @include breakpoint (max-sm) {
+				display: none;
+			}
+        }
+
+         &::after {
+            position: absolute;
+            content: "";
+            right: -40%;
+            top: 12px;
+			left: initial;
+            height: 1px;
+            width: 186px;
+            background-color: #C4C4C4;
+
+            @include breakpoint (max-sm) {
+				display: none;
+			}
+        }
+    }
+
+    .brand-image {
+        text-align: center;
+        filter: grayscale(100%);
+        @include transition;
+        opacity: .4;
+
+        &:hover {
+            filter: initial;
+            opacity: 1;
+        }
+    }
+
+    .swiper-slide.swiper-slide-active{
+        .brand-image {
+            filter: initial;
+            opacity: 1;
+        }
+    }
+
+    &.gt-style-2 {
+       .brand-image {
+            text-align: center;
+            filter: grayscale(100%);
+            @include transition;
+            opacity: 0.4;
+            width: 210px;
+            height: 95px;
+            line-height: 90px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            margin: 0 auto;
+
+            
+            &:hover {
+                filter: initial;
+                opacity: 1;
+            }
+        }
+    }
+}

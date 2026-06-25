@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 
 interface PasswordInputProps {
@@ -10,21 +11,30 @@ interface PasswordInputProps {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
+  labelClassName?: string;
+  inputClassName?: string;
 }
 
-export function PasswordInput({ label, value, onChange, placeholder }: PasswordInputProps) {
+export function PasswordInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  labelClassName,
+  inputClassName,
+}: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
 
   return (
     <div className="space-y-1">
-      <Label>{label}</Label>
+      <Label className={labelClassName}>{label}</Label>
       <div className="relative">
         <Input
           type={visible ? "text" : "password"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="pr-10"
+          className={cn("pr-10", inputClassName)}
         />
         <button
           type="button"

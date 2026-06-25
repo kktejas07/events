@@ -45,7 +45,12 @@ export class BrevoProvider implements EmailProvider {
 
       if (!res.ok) {
         const body = await res.text();
-        return { success: false, provider: "brevo", error: `Brevo API error (${res.status}): ${body}`, latencyMs };
+        return {
+          success: false,
+          provider: "brevo",
+          error: `Brevo API error (${res.status}): ${body}`,
+          latencyMs,
+        };
       }
 
       const data = await res.json();

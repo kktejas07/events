@@ -53,8 +53,9 @@ export default function CameraScanner({ onScan, onClose }: Props) {
         return;
       }
 
-      const rearCamera = cameras.find((c) =>
-        c.label.toLowerCase().includes("back") || c.label.toLowerCase().includes("environment")
+      const rearCamera = cameras.find(
+        (c) =>
+          c.label.toLowerCase().includes("back") || c.label.toLowerCase().includes("environment")
       );
       const cameraId = rearCamera?.id || cameras[0].id;
 
@@ -167,14 +168,10 @@ export default function CameraScanner({ onScan, onClose }: Props) {
             {lastResult && verifyResult !== null && (
               <div
                 className={`absolute inset-x-0 bottom-0 p-3 text-center text-sm font-medium ${
-                  verifyResult
-                    ? "bg-green-500/90 text-white"
-                    : "bg-red-500/90 text-white"
+                  verifyResult ? "bg-green-500/90 text-white" : "bg-red-500/90 text-white"
                 }`}
               >
-                {verifyResult
-                  ? `Scanned — Valid`
-                  : `Invalid ticket`}
+                {verifyResult ? `Scanned — Valid` : `Invalid ticket`}
               </div>
             )}
 
@@ -189,9 +186,7 @@ export default function CameraScanner({ onScan, onClose }: Props) {
         {!scanning && !error && (
           <div className="flex flex-col items-center justify-center gap-3 py-12">
             <Camera className="h-12 w-12 text-gray-600" />
-            <p className="text-sm text-gray-500">
-              Tap &quot;Start Scanner&quot; to begin
-            </p>
+            <p className="text-sm text-gray-500">Tap &quot;Start Scanner&quot; to begin</p>
           </div>
         )}
       </div>
@@ -200,7 +195,7 @@ export default function CameraScanner({ onScan, onClose }: Props) {
         {!scanning ? (
           <Button
             onClick={startScanner}
-            className="gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+            className="gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
           >
             <Camera className="h-4 w-4" />
             Start Scanner

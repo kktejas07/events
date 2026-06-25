@@ -15,8 +15,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { email, password, firstName, lastName, phone, college, graduationYear, gender } =
-      parsed.data;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      phone,
+      college,
+      graduationYear,
+      gender,
+      organizationId,
+    } = parsed.data;
 
     const existing = await db.user.findUnique({ where: { email } });
     if (existing) {
@@ -37,8 +46,20 @@ export async function POST(req: NextRequest) {
         college: college || null,
         graduationYear: graduationYear || null,
         gender: gender || null,
+        organizationId: organizationId || null,
       },
     });
+
+    // If user joined an organization, auto-create organization membership
+    if (organizationId) {
+      await db.organizationMember.create({
+        data: {
+          organizationId,
+          userId: user.id,
+          role: "USER",
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

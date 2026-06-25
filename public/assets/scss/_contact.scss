@@ -1,0 +1,226 @@
+.gt-newsletter-wrapper {
+    @include flex;
+    justify-content: space-between;
+    padding: 48px 55px;
+    position: relative;
+    border-radius: 20px;
+    z-index: 999;
+
+    @include breakpoint (max-xl) {
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+
+    @include breakpoint (max-md) {
+        padding: 40px;
+     }
+
+     @include breakpoint (max-sm) {
+        padding: 30px;
+     }
+
+    .gt-microphone {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+
+    .gt-newsletter-content {
+        h3 {
+            font-size: 30px;
+            color: $gt-white;
+        }
+    }
+
+     form {
+        max-width: 515px;
+        width: 100%;
+    }
+
+    .form-clt {
+        position: relative;
+
+        input {
+            width: 100%;
+            outline: none;
+            border: none;
+            background-color: $gt-white;
+            color: #ABABAB;
+            line-height: 1;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 515px;
+
+            &::placeholder {
+                color: #ABABAB;
+            }
+        }
+
+        
+        .gt-theme-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            padding: 12px 30px;
+            background-image: none;
+            background: #2ADDC8;
+            border-radius: 10px;
+            clip-path: polygon(0 0, 100% 0%, 100% 100%, 11% 100%);
+
+            &:hover {
+                background-color: $gt-theme-color-2;
+            }
+            
+            @include breakpoint (max-xxs){
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    } 
+}
+
+.gt-newsletter-section {
+    margin-bottom: -150px;
+
+    @include breakpoint (max-xxxl) {
+        margin-bottom: 120px;
+    }
+
+    @include breakpoint (max-xl) {
+        margin-bottom: 100px;
+    }
+
+     @include breakpoint (max-lg) {
+        margin-bottom: 80px;
+    }
+}
+
+.gt-contact-us-wrapper {
+
+    .gt-contact-us-box {
+        @include flex;
+        gap: 24px;
+        border-radius: 12px;
+        background: rgba(77, 85, 204, 0.07);
+        padding: 25px;
+        margin-bottom: 20px;
+        max-width: 420px;
+        @include transition;
+
+        @include breakpoint (max-xl) {
+            display: grid;
+        }
+
+         @include breakpoint (max-lg) {
+            max-width: initial;
+             @include flex;
+        }
+
+        @include breakpoint (max-md) {
+           display: grid;
+        }
+
+        .gt-icon {
+            width: 64px;
+            height: 64px;
+            line-height: 64px;
+            text-align: center;
+            background-color: $gt-header-color;
+            font-size: 30px;
+            color: $gt-white;
+            border-radius: 4px;
+        }
+
+        .gt-contact-us-content {
+            span {
+                color: $gt-header-color;
+                margin-bottom: 5px;
+            }
+
+            h5 {
+                br {
+
+                    @include breakpoint (max-xl) {
+                        display: none;
+                    }
+
+                    @include breakpoint (max-lg) {
+                        display: initial;
+                    }
+                }
+            }
+        }
+
+        &:hover {
+            background-color: $gt-white;
+            box-shadow: 0px 4px 60px 0px rgba(21, 57, 238, 0.10);
+
+            .gt-icon {
+                background: linear-gradient(180deg, #1539EE 0%, #2ADDC8 100%);
+            }
+        }
+    }
+    .gt-comment-form-wrap {
+        padding: 40px;
+        border-radius: 24px;
+        background: $gt-white;
+        box-shadow: 0px 4px 60px 0px rgba(21, 57, 238, 0.10);
+
+        @include breakpoint (max-sm) {
+            padding: 30px;
+        }
+
+        h3 {
+           font-size: 40px;
+
+           @include breakpoint (max-sm) {
+               font-size: 28px;
+           }
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        .form-clt {
+            span {
+                color: $gt-header-color;
+                display: inline-block;
+                margin-bottom: 5px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            input,textarea {
+                width: 100%;
+                outline: none;
+                border: none;
+                border-radius: 8px;
+                background: rgba(77, 85, 204, 0.07);
+                padding: 12px 20px;
+                font-weight: 400;
+                font-size: 16px;
+                color: $gt-header-color;
+
+                &::placeholder {
+                    color: $gt-header-color;
+                }
+            }
+
+            textarea {
+                padding-bottom: 80px;
+                resize: none;
+            }
+        } 
+    }
+}

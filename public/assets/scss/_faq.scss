@@ -1,0 +1,146 @@
+.gt-service-wrapper {
+
+    .gt-service-content {
+
+        .gt-text {
+            color: $gt-text-color-2;
+            margin-top: 30px;
+        }
+
+        .gt-service-count {
+            @include flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 30px 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.20);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+            margin-bottom: 50px;
+
+            @include breakpoint (max-xl) {
+                flex-wrap: wrap;
+                gap: 30px;
+            }
+
+            .gt-service-item {
+                p {
+                    font-size: 16px;
+                    font-weight: 400;
+                    color: $gt-header-color;
+                }
+            }
+        }
+    }
+
+     .gt-service-item {
+        border-radius: 10px;
+        background: $gt-white;
+        box-shadow: 0px 0px 200px 0px rgba(33, 28, 132, 0.10);
+        padding: 50px;
+
+        @include breakpoint (max-xl) {
+            padding: 30px;
+        }
+
+        .accordion-item {
+            border: 0;
+            background-color: $gt-white;
+        
+            .accordion-header { 
+                .accordion-button { 
+                    font-weight: 700;
+                    color: $gt-theme-color-2;
+                    border: 0;
+                    border-radius: 0;
+                    box-shadow: none;
+                    background-color: $gt-white;
+                    padding: 25px 30px 0;
+                    text-transform: capitalize;
+                    font-size: 24px;
+                    border: none;
+                    padding: 0 0 0;
+
+                    @include breakpoint (max-xl) {
+                        font-size: 20px;
+                    }
+
+                    span {
+                        font-size: 24px;
+                        font-weight: 300;
+                        color: #D8CEF0;
+
+                         @include breakpoint (max-xl) {
+                           font-size: 18px;
+                       }
+                    }
+    
+                    &::after {
+                        content: "\f078";
+                        font-family: $fa;
+                        background: transparent;
+                        font-weight: 500;
+                        transition: all 0.3s ease-in-out !important;
+                        color: $gt-theme-color-2;
+                    }
+
+                    &:not(.collapsed)::after {
+                        content: "\f077";
+                        font-family: $fa;
+                        background: transparent;
+                        font-weight: 500;
+                        color: $gt-theme-color-2;
+                        transform: rotate(0);
+                    }
+    
+                    &.collapsed {
+                        background-color: $gt-white;
+                        padding-bottom: 40px;
+                        margin-bottom: 40px;
+                        color: $gt-theme-color-2;
+                        border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+                    }
+
+                    &.gt-style-2 {
+                        margin-bottom: 0;
+                        border-bottom: 1px none;
+                        padding-bottom: 0;
+                    }
+                }
+            }
+        
+            .accordion-collapse { 
+    
+                .accordion-body {
+                    padding-right: 0;
+                    padding-left: 0;
+                    padding-top: 15px;
+                    color: $gt-text-color-2;
+                    background-color: $gt-white;
+                    font-weight: 400;
+
+                    .thumb {
+                      margin-top: 30px;
+
+                    img {
+                        @include imgw;
+                        border-radius: 10px;
+                    }
+                  }
+                }
+            }
+        }
+    }
+}
+
+.gt-service-section {
+    position: relative;
+    
+    .gt-star-shape {
+        position: absolute;
+        left: 100px;
+        bottom: 170px;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}

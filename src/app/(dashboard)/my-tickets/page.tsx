@@ -1,54 +1,67 @@
-"use client";
+export const dynamic = "force-dynamic";
 
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Ticket, ArrowRight, Sparkles } from "lucide-react";
+import { headers } from "next/headers";
 
-export default function MyTicketsPage() {
+export default async function MyTicketsPage() {
+  const session = await auth();
+  const userId = (session?.user as { id?: string })?.id;
+  if (!userId) return null;
+
+  const tickets = await db.ticket.findMany({
+    where: { userId },
+    include: { event: true, ticketType: true, order: true },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
-    <div className="min-h-screen bg-[#0a0a1a] py-12">
-      <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-bold text-white">My Tickets</h1>
-          <p className="mt-2 text-gray-400">View and manage your purchased tickets</p>
-        </motion.div>
+    <div className="gt-admin-content">
+      <h2 className="gt-admin-section-title">My Tickets</h2>
+      <p className="gt-admin-section-subtitle">Your booked tickets and event passes</p>
 
-        <motion.div
-          className="mt-8 grid gap-6"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <Card className="col-span-full border border-white/10 bg-white/[0.03] backdrop-blur-sm">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
-                  <Ticket className="h-5 w-5 text-purple-400" />
-                </div>
+      {tickets.length === 0 ? (
+        <div className="gt-admin-card">
+          <div className="gt-admin-empty">
+            <i className="fa-regular fa-ticket-simple"></i>
+            <h3>No tickets yet</h3>
+            <p>Browse events and book your first ticket.</p>
+            <Link href="/events" className="gt-admin-btn gt-admin-btn-primary">
+              <i className="fa-regular fa-calendar-days"></i> Browse Events
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="gt-admin-grid">
+          {tickets.map((ticket) => (
+            <div key={ticket.id} className="gt-admin-card">
+              <div className="d-flex align-items-start justify-content-between mb-3">
                 <div>
-                  <CardTitle className="text-lg text-white">No Tickets Yet</CardTitle>
+                  <h4 style={{ fontSize: "16px", fontWeight: 600, color: "#1a1a2e", margin: 0 }}>{ticket.event?.title || "Event"}</h4>
+                  <p style={{ fontSize: "13px", color: "#888", margin: "4px 0 0" }}>{ticket.ticketType?.name || "Ticket"}</p>
                 </div>
+                <span className={`gt-admin-badge ${ticket.status === "ACTIVE" ? "success" : ticket.status === "CANCELLED" ? "danger" : "neutral"}`}>
+                  {ticket.status}
+                </span>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400">
-                You haven&apos;t purchased any tickets yet. Browse events to get started!
-              </p>
-              <Link href="/events">
-                <Button className="mt-4 gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl">
-                  Browse Events <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+              <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.6 }}>
+                <div><i className="fa-regular fa-user me-2" style={{ width: "16px" }}></i> {ticket.attendeeName}</div>
+                <div><i className="fa-regular fa-envelope me-2" style={{ width: "16px" }}></i> {ticket.attendeeEmail}</div>
+                <div><i className="fa-regular fa-barcode me-2" style={{ width: "16px" }}></i> {ticket.barcode}</div>
+                <div><i className="fa-regular fa-indian-rupee-sign me-2" style={{ width: "16px" }}></i> ₹{Number(ticket.order?.total || 0).toLocaleString("en-IN")}</div>
+              </div>
+              {ticket.pdfUrl && (
+                <div className="mt-3">
+                  <a href={ticket.pdfUrl} target="_blank" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm">
+                    <i className="fa-regular fa-download"></i> Download PDF
+                  </a>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

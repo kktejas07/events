@@ -1,316 +1,190 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, Ticket, ArrowLeft, Calendar, MapPin } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
-
-interface TicketType {
-  id: string;
-  name: string;
-  price: number;
-  currency: string;
-  description: string | null;
-  perks: string[];
-  color: string | null;
-  maxPerOrder: number;
-  quantityLimit: number;
-  quantitySold: number;
-}
-
-interface EventData {
-  id: string;
-  title: string;
-  slug: string;
-  startDate: string;
-  venue: { name: string; city: string } | null;
-  ticketTypes: TicketType[];
-}
 
 declare global {
   interface Window {
-    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+    Razorpay: new (options: Record<string, unknown>) => {
+      open: () => void;
+      on: (event: string, cb: (r: unknown) => void) => void;
+    };
   }
 }
 
 export default function CheckoutPage() {
+  const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
+  const eventId = searchParams.get("eventId");
+  const ticketTypeId = searchParams.get("ticketTypeId");
 
-  const [event, setEvent] = useState<EventData | null>(null);
-  const [ticketType, setTicketType] = useState<TicketType | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [event, setEvent] = useState<{ id: string; title: string; venue?: string } | null>(null);
+  const [ticketType, setTicketType] = useState<{ id: string; name: string; price: number } | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [paying, setPaying] = useState(false);
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
-
-  const eventSlug = searchParams.get("event");
-  const ticketId = searchParams.get("ticket");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [attendee, setAttendee] = useState({ firstName: "", lastName: "", email: "", phone: "" });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-      return;
-    }
-    if (status !== "authenticated" || !eventSlug || !ticketId) return;
-
-    fetch(`/api/events/${eventSlug}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!data.success) throw new Error(data.error);
-        const ev = data.data as EventData;
-        setEvent(ev);
-        const tt = ev.ticketTypes.find((t) => t.id === ticketId);
+    if (!eventId) return;
+    fetch(`/api/events/${eventId}`).then((r) => r.json()).then((d) => {
+      setEvent(d.event || d);
+      if (ticketTypeId) {
+        const tt = d.ticketTypes?.find((t: { id: string }) => t.id === ticketTypeId);
         if (tt) setTicketType(tt);
-        else toast.error("Ticket type not found");
-      })
-      .catch(() => toast.error("Failed to load event"))
-      .finally(() => setLoading(false));
-  }, [status, eventSlug, ticketId, router]);
+      }
+    });
+  }, [eventId, ticketTypeId]);
 
   useEffect(() => {
     if (session?.user) {
       const u = session.user as { name?: string; email?: string };
-      const parts = (u.name || "").split(" ");
-      setForm((prev) => ({
+      setAttendee((prev) => ({
         ...prev,
-        firstName: prev.firstName || parts[0] || "",
-        lastName: prev.lastName || parts.slice(1).join(" ") || "",
-        email: prev.email || u.email || "",
+        firstName: u.name?.split(" ")[0] || prev.firstName,
+        lastName: u.name?.split(" ").slice(1).join(" ") || prev.lastName,
+        email: u.email || prev.email,
       }));
     }
   }, [session]);
 
-  async function handlePayment() {
-    if (!event || !ticketType) return;
-    setPaying(true);
+  const total = ticketType ? Number(ticketType.price) * quantity : 0;
+
+  async function handleCheckout() {
+    if (!session) { router.push("/login"); return; }
+    if (!attendee.firstName || !attendee.lastName || !attendee.email) {
+      setError("Please fill in your name and email.");
+      return;
+    }
+    setError("");
+    setLoading(true);
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          eventId: event.id,
-          items: [{ ticketTypeId: ticketType.id, quantity }],
+          eventId,
+          items: [{ ticketTypeId, quantity }],
           attendeeDetails: {
-            firstName: form.firstName,
-            lastName: form.lastName,
-            email: form.email,
-            phone: form.phone || undefined,
+            firstName: attendee.firstName,
+            lastName: attendee.lastName,
+            email: attendee.email,
+            phone: attendee.phone || undefined,
           },
         }),
       });
-      const data = await res.json();
-      if (!data.success) {
-        toast.error(data.error || "Failed to create order");
-        setPaying(false);
+      const json = await res.json();
+      if (!json.success) {
+        setError(json.error || "Something went wrong.");
+        setLoading(false);
         return;
       }
-
-      const options = {
-        key: data.data.keyId,
-        amount: data.data.amount,
-        currency: data.data.currency,
-        name: "Events Platform",
-        description: `${ticketType.name} x ${quantity}`,
-        order_id: data.data.razorpayOrderId,
-        prefill: {
-          name: `${form.firstName} ${form.lastName}`,
-          email: form.email,
-          contact: form.phone,
-        },
-        handler: () => {
-          toast.success("Payment successful!");
-          router.push("/my-tickets");
-        },
-        modal: {
-          ondismiss: () => {
-            setPaying(false);
-            toast.error("Payment cancelled");
-          },
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch {
-      toast.error("Something went wrong");
-      setPaying(false);
+      const d = json.data;
+      if (d.razorpayOrderId) {
+        if (typeof window.Razorpay === "undefined") {
+          setError("Payment gateway failed to load. Please refresh and try again.");
+          setLoading(false);
+          return;
+        }
+        const rzp = new window.Razorpay({
+          key: d.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
+          amount: d.amount,
+          currency: d.currency || "INR",
+          order_id: d.razorpayOrderId,
+          name: event?.title || "Event",
+          prefill: { email: attendee.email },
+          handler: () => { router.push("/my-tickets"); },
+        });
+        rzp.open();
+      } else {
+        setError("Payment could not be initiated. Check Razorpay configuration in admin settings.");
+      }
+    } catch (e) {
+      console.error(e);
+      setError("Network error. Please try again.");
     }
+    setLoading(false);
   }
 
-  if (status === "loading" || loading) {
+  if (!event) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a1a]">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+        <div className="text-center">
+          <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: "32px", color: "#8B5CF6" }}></i>
+        </div>
       </div>
     );
   }
 
-  const total = ticketType ? Number(ticketType.price) * quantity : 0;
-
   return (
     <>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
-      <div className="min-h-screen bg-[#0a0a1a]">
-        <div className="container max-w-3xl py-8">
-          <Link
-            href={`/events/${eventSlug}`}
-            className="mb-6 flex items-center gap-2 text-sm text-gray-400 hover:text-white"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to Event
-          </Link>
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
+      <div className="container py-5" style={{ maxWidth: "800px" }}>
+      <div style={{ background: "#fff", borderRadius: "20px", padding: "40px", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+        <Link href={`/events/${eventId}`} className="d-inline-flex align-items-center gap-2 mb-4" style={{ color: "#8B5CF6", textDecoration: "none", fontSize: "14px" }}>
+          <i className="fa-regular fa-arrow-left"></i> Back to Event
+        </Link>
 
-          {event && (
-            <div className="mb-6 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
-              <h1 className="text-xl font-bold text-white">{event.title}</h1>
-              <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-400">
-                {event.startDate && (
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4 text-purple-400" />
-                    {new Date(event.startDate).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                )}
-                {event.venue && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 text-purple-400" />
-                    {event.venue.name}, {event.venue.city}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
+        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1a1a2e", marginBottom: "24px" }}>Checkout</h2>
 
+        {error && (
+          <div className="alert alert-danger py-2" role="alert" style={{ fontSize: "14px" }}>{error}</div>
+        )}
+
+        <div style={{ background: "#f8f9fe", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
+          <h5 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "12px" }}>{event.title}</h5>
           {ticketType && (
-            <div className="mb-6 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600">
-                  <Ticket className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-white">{ticketType.name}</h2>
-                  <p className="text-sm text-gray-400">
-                    ₹{Number(ticketType.price).toLocaleString()} each
-                  </p>
-                </div>
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <p style={{ margin: 0, fontWeight: 500 }}>{ticketType.name} Ticket</p>
+                <p style={{ margin: "4px 0 0", color: "#888", fontSize: "13px" }}>₹{Number(ticketType.price).toLocaleString()} each</p>
               </div>
-              {ticketType.description && (
-                <p className="mt-3 text-sm text-gray-500">{ticketType.description}</p>
-              )}
-              {ticketType.perks.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {ticketType.perks.map((perk) => (
-                    <span
-                      key={perk}
-                      className="rounded-full border border-purple-500/20 bg-purple-500/10 px-2.5 py-0.5 text-xs text-purple-300"
-                    >
-                      {perk}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <div className="d-flex align-items-center gap-3">
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ width: "32px", height: "32px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>-</button>
+                <span style={{ fontWeight: 600, fontSize: "16px", minWidth: "24px", textAlign: "center" }}>{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ width: "32px", height: "32px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+              </div>
             </div>
           )}
+        </div>
 
-          <div className="mb-6 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
-              Attendee Details
-            </h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label className="text-xs text-gray-300">First Name</Label>
-                <Input
-                  value={form.firstName}
-                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                  className="border-white/10 bg-white/[0.03] text-white"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-gray-300">Last Name</Label>
-                <Input
-                  value={form.lastName}
-                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                  className="border-white/10 bg-white/[0.03] text-white"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-gray-300">Email</Label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="border-white/10 bg-white/[0.03] text-white"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-gray-300">Phone (optional)</Label>
-                <Input
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="border-white/10 bg-white/[0.03] text-white"
-                />
-              </div>
+        <div style={{ background: "#f8f9fe", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
+          <h5 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>Attendee Details</h5>
+          <div className="row g-3">
+            <div className="col-6">
+              <input type="text" className="form-control" placeholder="First Name *" value={attendee.firstName} onChange={(e) => setAttendee({ ...attendee, firstName: e.target.value })} />
+            </div>
+            <div className="col-6">
+              <input type="text" className="form-control" placeholder="Last Name *" value={attendee.lastName} onChange={(e) => setAttendee({ ...attendee, lastName: e.target.value })} />
+            </div>
+            <div className="col-6">
+              <input type="email" className="form-control" placeholder="Email *" value={attendee.email} onChange={(e) => setAttendee({ ...attendee, email: e.target.value })} />
+            </div>
+            <div className="col-6">
+              <input type="tel" className="form-control" placeholder="Phone (optional)" value={attendee.phone} onChange={(e) => setAttendee({ ...attendee, phone: e.target.value })} />
             </div>
           </div>
-
-          {ticketType && (
-            <div className="mb-6 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-xs text-gray-300">Quantity</Label>
-                  <div className="mt-1 flex items-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="h-8 w-8 border-white/10 p-0 text-white"
-                    >
-                      −
-                    </Button>
-                    <span className="w-8 text-center text-white">{quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setQuantity(Math.min(ticketType.maxPerOrder, quantity + 1))}
-                      className="h-8 w-8 border-white/10 p-0 text-white"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">Total</p>
-                  <p className="text-2xl font-bold text-white">₹{total.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <Button
-            className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 py-6 text-lg text-white shadow-lg shadow-purple-600/30"
-            disabled={paying || !ticketType || !form.firstName || !form.lastName || !form.email}
-            onClick={handlePayment}
-          >
-            {paying ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-            Pay ₹{total.toLocaleString()}
-          </Button>
         </div>
+
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <span style={{ fontSize: "14px", color: "#888" }}>Subtotal</span>
+          <span style={{ fontWeight: 600 }}>₹{total.toLocaleString("en-IN")}</span>
+        </div>
+        <hr />
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <span style={{ fontSize: "18px", fontWeight: 700 }}>Total</span>
+          <span style={{ fontSize: "24px", fontWeight: 700, color: "#8B5CF6" }}>₹{total.toLocaleString("en-IN")}</span>
+        </div>
+
+        <button onClick={handleCheckout} className="gt-admin-btn gt-admin-btn-primary w-100" disabled={loading} style={{ fontSize: "16px", padding: "14px" }}>
+          {loading ? <><i className="fa-solid fa-spinner fa-spin me-2"></i> Processing...</> : <><i className="fa-regular fa-credit-card me-2"></i> Pay ₹{total.toLocaleString("en-IN")}</>}
+        </button>
       </div>
+    </div>
     </>
   );
 }

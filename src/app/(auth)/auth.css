@@ -1,0 +1,105 @@
+.gt-auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fe 0%, #eef1ff 100%);
+  padding: 24px 16px;
+}
+
+.gt-auth-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.06);
+}
+
+.gt-auth-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.gt-auth-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 6px;
+}
+
+.gt-auth-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 28px;
+}
+
+.gt-auth-social-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.gt-auth-social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gt-auth-social-btn:hover {
+  background: #f8f9fe;
+  border-color: #d0d5dd;
+}
+
+.gt-auth-social-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gt-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  color: #bbb;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.gt-auth-divider::before,
+.gt-auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.gt-auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: #888;
+}
+
+.gt-auth-footer a {
+  color: #1539EE;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.gt-auth-footer a:hover {
+  color: #211C84;
+}

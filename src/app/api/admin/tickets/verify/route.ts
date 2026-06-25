@@ -39,11 +39,12 @@ export async function POST(req: NextRequest) {
           eventId: ticket.event.id,
           scannedBy: userId,
           success: ticket.status === "ACTIVE" && !ticket.scanned,
-          result: ticket.status !== "ACTIVE"
-            ? `Ticket is ${ticket.status.toLowerCase()}`
-            : ticket.scanned
-              ? "Already scanned"
-              : "Valid — checked in",
+          result:
+            ticket.status !== "ACTIVE"
+              ? `Ticket is ${ticket.status.toLowerCase()}`
+              : ticket.scanned
+                ? "Already scanned"
+                : "Valid — checked in",
           deviceInfo,
           ipAddress,
           userAgent,

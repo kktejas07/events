@@ -1,0 +1,251 @@
+.gt-sponsor-item {
+    border-radius: 100px;
+    background: rgba(77, 85, 204, 0.07);
+    padding: 25px;
+    margin-top: 30px;
+    position: relative;
+    text-align: center;
+    z-index: 999;
+
+    .gt-hover-bg {
+        border-radius: 100px;
+        background: linear-gradient(90deg, #1539EE 0%, #2ADDC8 100%);
+        padding: 35px 60px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        @include transition;
+        opacity: 0;
+        visibility: hidden;
+
+        h4 {
+            a {
+                color: $gt-white;
+            }
+        }
+    }
+
+    &:hover {
+        .gt-hover-bg {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
+.gt-sponsor-bg-wrapper {
+    border-radius: 20px;
+    @include flex;
+    justify-content: space-between;
+    padding: 60px 150px 90px 60px;
+    position: relative;
+    z-index: 9;
+    overflow: hidden;
+
+    @include breakpoint (max-xl) {
+         padding: 60px;
+     }
+
+     @include breakpoint (max-lg) {
+         padding: 50px;
+         flex-wrap: wrap;
+         gap: 30px;
+     }
+
+     @include breakpoint (max-md) {
+         padding: 40px;
+     }
+
+
+     @include breakpoint (max-sm) {
+         padding: 30px;
+     }
+
+    .gt-right-shape {
+        position: absolute;
+        right: 0;
+        top: 170px;
+
+         @include breakpoint (max-xl) {
+             display: none;
+        }
+    }
+
+    &::before {
+        @include before;
+         inset: 0;
+         border-radius: 20px;
+         background: linear-gradient(90deg, #2ADDC8 0%, #1539EE 100%);
+         opacity: .8;
+         z-index: -1;
+    }
+
+    .gt-sponsor-content {
+        position: relative;
+
+        &.style-5 {
+            h2 {
+                font-family: $gt-heading-font-3;
+            }
+        }
+
+        h2 {
+            color: $gt-white;
+            margin-bottom: 10px;
+        }
+        p  {
+            color: $gt-white;
+            max-width: 690px;
+            margin-bottom: 30px;
+        }
+
+        .gt-theme-btn {
+             background-image: linear-gradient(to right, #fff 0%, #fff 50%, #fff 100%);
+             color: $gt-theme-color;
+
+             &:hover {
+                background-image: linear-gradient(to right, #ffabf4 0%, #1539EE 50%, #ffabf4 100%);
+                color: $gt-white;
+
+                i {
+                    color: $gt-white;
+                }
+             }
+        }
+    }
+
+    .gt-qr-image {
+        img {
+            @include imgw;
+        }
+    }
+}
+
+.gt-sponsor-wrapper-2 {
+    @include breakpoint (max-sm) {
+        margin-top: 30px;
+    }
+
+    .gt-sponsors-item {
+        @include flex;
+        gap: 160px;
+        justify-content: center;
+
+        .gt-sponsor-logo {
+
+            @include breakpoint (max-xxxl) {
+                img {
+                    wwidth: 140px;
+                }
+            }
+
+            @include breakpoint (max-xl) {
+                img {
+                    width: 116px;
+                }
+            }
+
+            @include breakpoint (max-lg) {
+                img {
+                    width: initial;
+                }
+            }
+        }
+
+        @include breakpoint (max-xxxl) {
+            gap: 60px;
+        }
+
+        @include breakpoint (max-xl) {
+            gap: 30px;
+        }
+    }
+
+    .gt-sponsor-large-item {
+        @include flex;
+        gap: 160px;
+
+         @include breakpoint (max-xxxl) {
+            gap: 60px;
+            justify-content: center;
+        }
+
+
+        @include breakpoint (max-xl) {
+            gap: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            justify-content: start;
+        }
+
+        .gt-sponsor-left-item {
+            @include flex;
+            gap: 60px;
+
+                .gt-sponsor-logo {
+
+                @include breakpoint (max-xxxl) {
+                    img {
+                        width: 140px;
+                    }
+                 }
+
+                @include breakpoint (max-xl) {
+                    img {
+                        width: 116px;
+                    }
+                }
+
+                @include breakpoint (max-lg) {
+                    img {
+                        width: initial;
+                    }
+                }
+            }
+
+            @include breakpoint (max-xl) {
+             gap: 30px;
+          }
+        }
+
+            .gt-sponsors-middle-item {
+                @include flex;
+                gap: 160px;
+
+                .gt-sponsor-logo {
+
+                    @include breakpoint (max-xxxl) {
+                        img {
+                            width: 140px;
+                        }
+                  }
+
+                    @include breakpoint (max-xl) {
+                        img {
+                            width: 116px;
+                        }
+                    }
+
+                    @include breakpoint (max-lg) {
+                        img {
+                            width: initial;
+                        }
+                    }
+               }
+
+               @include breakpoint (max-xxxl) {
+               gap: 60px;
+           }
+
+             @include breakpoint (max-xl) {
+               gap: 30px;
+           }
+        }
+    }
+}
+
+.gt-sponsor-section-2 {
+    margin: 0 15px;
+}

@@ -1,0 +1,141 @@
+.gt-about-wrapper-3 {
+
+    .gt-about-image {
+        max-width: 668px;
+        z-index: 9;
+
+        img {
+            @include imgw;
+            border-radius: 100%;
+        }
+
+        .gt-circle-shape {
+            position: absolute;
+            left: 13%;
+            z-index: -1;
+            max-width: initial;
+            bottom: 13%;
+
+            @include breakpoint (max-xxxl) {
+                display: none;
+            }
+
+            img {
+                width: initial;
+                height: initial;
+                border-radius: 0;
+            }
+        }
+    }
+
+    .gt-about-content {
+        .gt-text {
+            margin-top: 30px;
+            max-width: 690px;
+            color: $gt-text-color-2;
+            margin-top: 15px;
+        }
+
+        .gt-counter-box {
+            background-color: $gt-white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 84px 0px rgba(21, 57, 238, 0.10);
+            @include flex;
+            justify-content: space-between;
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 50px;
+
+            @include breakpoint (max-xl) {
+                margin-bottom: 30px;
+                flex-wrap: wrap;
+                gap: 30px;
+            }
+
+            .gt-count-item {
+                h2 {
+                    color: $gt-theme-color;
+                }
+
+                p {
+                    color: $gt-text-color-2;
+                }
+            }
+        }
+
+        .gt-about-button {
+            @include flex;
+            gap: 20px;
+
+            @include breakpoint (max-xl) {
+                flex-wrap: wrap;
+            }
+
+            .gt-button {
+                li {
+                    font-size: 18px;
+                    font-weight: 600;
+                    padding: 12px 20px;
+                    background-color: $gt-theme-color-3;
+                    border-radius: 100px;
+                    
+                    a {
+                        color: $gt-white;
+                    }
+                    i {
+                        margin-right: 5px;
+                        color: $gt-white;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.gt-about-section {
+    position: relative;
+
+     @include breakpoint (max-xl) {
+           margin-bottom: -100px;
+     }
+
+    @include breakpoint (max-lg) {
+           margin-bottom: -80px;
+     }
+
+    .gt-left-shape {
+        position: absolute;
+        left: 0;
+        top: 25%;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+
+    .gt-right-shape {
+        position: absolute;
+        right: 0;
+        bottom: 10%;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+
+    .gt-blur-shape {
+        position: absolute;
+        left: -2%;
+        top: -22%;
+        z-index: -1;
+        max-width: initial;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+}

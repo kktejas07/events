@@ -21,7 +21,10 @@ export async function GET(req: NextRequest) {
 
     const [users, total] = await Promise.all([
       db.user.findMany({
-        include: { _count: { select: { orders: true, tickets: true } } },
+        include: {
+          _count: { select: { orders: true, tickets: true } },
+          organization: { select: { id: true, name: true } },
+        },
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
@@ -55,15 +58,24 @@ export async function POST(req: NextRequest) {
     const { email, firstName, lastName, role: userRole, password } = body;
 
     if (!email || !password) {
-      return NextResponse.json({ success: false, error: "Email and password required" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Email and password required" },
+        { status: 400 }
+      );
     }
     if (password.length < 8) {
-      return NextResponse.json({ success: false, error: "Password must be at least 8 characters" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Password must be at least 8 characters" },
+        { status: 400 }
+      );
     }
 
     const existing = await db.user.findUnique({ where: { email } });
     if (existing) {
-      return NextResponse.json({ success: false, error: "A user with this email already exists" }, { status: 409 });
+      return NextResponse.json(
+        { success: false, error: "A user with this email already exists" },
+        { status: 409 }
+      );
     }
 
     const passwordHash = await bcrypt.hash(password, 12);

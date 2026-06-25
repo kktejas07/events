@@ -1,22 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { BarcodeBars } from "@/components/ui/barcode-bars";
-import {
-  Calendar,
-  MapPin,
-  Clock,
-  Users,
-  Mic,
-  ChevronRight,
-  Check,
-  Sparkles,
-  MoveRight,
-} from "lucide-react";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 interface EventData {
   id: string;
@@ -27,6 +12,7 @@ interface EventData {
   startDate: string;
   endDate: string;
   category: string | null;
+  coverImage: string | null;
   venue: {
     name: string;
     address: string;
@@ -55,55 +41,35 @@ interface EventData {
   faqs: { id: string; question: string; answer: string }[];
 }
 
-const gradients = [
-  "from-purple-600 to-purple-400",
-  "from-cyan-600 to-cyan-400",
-  "from-amber-500 to-orange-400",
-  "from-emerald-600 to-emerald-400",
-  "from-rose-600 to-rose-400",
+const topicImages = [
+  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
 ];
 
-const staggerContainer = {
-  initial: {},
-  whileInView: { transition: { staggerChildren: 0.1 } },
-  viewport: { once: true, margin: "-80px" },
-};
-
-const staggerItem = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5 },
-};
+const unsplashEventDetail =
+  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80";
 
 export default function EventDetailClient({ event }: { event: EventData }) {
   const [activeDay, setActiveDay] = useState(0);
-  const ticketScrollRef = useRef<HTMLDivElement>(null);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    const el = ticketScrollRef.current;
-    if (!el || event.ticketTypes.length < 2) return;
-    const duplicated = [...event.ticketTypes, ...event.ticketTypes];
-    const cardW = 324;
-    const totalW = duplicated.length * cardW;
-    let pos = 0;
-    let rafId: number;
-    const speed = 0.4;
-    const animate = () => {
-      pos += speed;
-      if (pos >= totalW / 2) pos = 0;
-      el.scrollLeft = pos;
-      rafId = requestAnimationFrame(animate);
-    };
-    rafId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId);
+    if (event.ticketTypes.length > 0) {
+      const initial: Record<string, number> = {};
+      event.ticketTypes.forEach((t) => {
+        initial[t.id] = 1;
+      });
+      setQuantities(initial);
+    }
   }, [event.ticketTypes]);
 
   const start = new Date(event.startDate);
   const end = new Date(event.endDate);
-  const dateStr = `${start.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
-  const timeStr = `${start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })} - ${end.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
-  const daysDiff = Math.ceil((end.getTime() - start.getTime()) / 86400000) + 1;
+  const dateStr = start.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   const sessionDays = event.sessions.reduce(
     (acc, s) => {
@@ -114,361 +80,423 @@ export default function EventDetailClient({ event }: { event: EventData }) {
     [] as { day: number; sessions: EventData["sessions"] }[]
   );
 
-  const venueStr = event.venue
-    ? `${event.venue.name}, ${event.venue.city}, ${event.venue.country}`
-    : "";
+  const totalQuantity = Object.values(quantities).reduce((a, b) => a + b, 0);
+  const totalPrice = event.ticketTypes.reduce(
+    (sum, t) => sum + (quantities[t.id] || 0) * Number(t.price),
+    0
+  );
+
+  const speaker = event.sessions.find((s) => s.speaker);
 
   return (
-    <div className="min-h-screen bg-[#0a0a1a]">
-      <section className="relative overflow-hidden bg-gradient-to-br from-purple-900/40 via-[#0a0a1a] to-cyan-900/30 py-20">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
-        <div className="container relative z-10">
-          <motion.div
-            className="mx-auto max-w-3xl text-center text-white"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <motion.span
-              className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-5 py-1.5 text-sm font-medium text-purple-300"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              {event.category || "Event"}
-            </motion.span>
-            <motion.h1
-              className="mt-4 text-4xl font-bold sm:text-5xl"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-            >
-              {event.title}
-            </motion.h1>
-            <motion.p
-              className="mt-4 text-lg text-gray-300"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-            >
-              {event.shortDescription || event.description.slice(0, 120)}
-            </motion.p>
-            <motion.div
-              className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-gray-300"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-            >
-              <span className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4 text-purple-400" />
-                {dateStr}
-              </span>
-              {event.venue && (
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4 text-purple-400" />
-                  {event.venue.city}, {event.venue.country}
-                </span>
-              )}
-              <span className="flex items-center gap-1.5">
-                <Clock className="h-4 w-4 text-purple-400" />
-                {start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Users className="h-4 w-4 text-purple-400" />
-                {daysDiff} {daysDiff === 1 ? "Day" : "Days"}
-              </span>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-            >
-              <Link href="#tickets">
-                <Button
-                  size="lg"
-                  className="mt-8 gap-2 bg-purple-600 text-white hover:bg-purple-700"
-                >
-                  Get Tickets <ChevronRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
+    <>
+      <div className="gt-breadcrumb-wrapper fix">
+        <div className="gt-top-shape">
+          <img src="/assets/img/inner-page/breadcrumb/bg-shape.png" alt="img" />
         </div>
-        <div className="absolute bottom-0 h-32 w-full bg-gradient-to-t from-[#0a0a1a] to-transparent" />
-      </section>
-
-      <motion.section
-        className="py-16"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="container">
-          <div className="mx-auto max-w-3xl">
-            <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
-              About
-            </span>
-            <h2 className="mt-4 text-3xl font-bold text-white">About the Event</h2>
-            <p className="mt-4 leading-relaxed text-gray-400">{event.description}</p>
-          </div>
+        <div className="gt-line-shape">
+          <img src="/assets/img/inner-page/breadcrumb/line-shape.png" alt="img" />
         </div>
-      </motion.section>
-
-      {sessionDays.length > 0 && (
-        <motion.section
-          className="border-y border-white/5 bg-[#0a0a1a] py-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+        <div className="gt-arrow-shape float-bob-y">
+          <img src="/assets/img/inner-page/breadcrumb/arrow.png" alt="img" />
+        </div>
+        <div
+          className="gt-page-heading bg-cover"
+          style={{ backgroundImage: "url(/assets/img/inner-page/breadcrumb/bg.png)" }}
         >
-          <div className="container">
-            <div className="mx-auto max-w-3xl text-center">
-              <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
-                Schedule
-              </span>
-              <h2 className="mt-4 text-3xl font-bold text-white">Event Schedule</h2>
-            </div>
-
-            <div className="mt-8 flex flex-wrap justify-center gap-2">
-              {sessionDays.map((d, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveDay(i)}
-                  className={`rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
-                    activeDay === i
-                      ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30"
-                      : "border border-white/10 text-gray-400 hover:bg-white/5"
-                  }`}
-                >
-                  Day {d.day}
-                </button>
-              ))}
-            </div>
-
-            <div className="mx-auto mt-8 max-w-4xl space-y-3">
-              {sessionDays[activeDay]?.sessions.map((session, idx) => (
-                <motion.div
-                  key={session.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="group flex flex-col gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-5 transition-all duration-300 hover:border-purple-500/30 sm:flex-row sm:items-center"
-                >
-                  <div className="shrink-0 rounded-lg bg-purple-500/10 px-4 py-2 text-center">
-                    <div className="text-sm font-semibold text-purple-400">
-                      {new Date(session.startTime).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-white">{session.title}</h4>
-                    <div className="flex flex-wrap gap-3 text-sm text-gray-400">
-                      {session.speaker && (
-                        <span className="flex items-center gap-1">
-                          <Mic className="h-3 w-3 text-purple-400" /> {session.speaker.firstName}{" "}
-                          {session.speaker.lastName}
-                        </span>
-                      )}
-                      {session.room && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-purple-400" /> {session.room}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="border-purple-500/30 text-purple-400">
-                    Session
-                  </Badge>
-                </motion.div>
-              ))}
-            </div>
+          <div className="gt-breadcrumb-sub-title">
+            <h1 className="wow fadeInUp" data-wow-delay=".3s">
+              EVENT DETAILS
+            </h1>
           </div>
-        </motion.section>
-      )}
+          <ul className="gt-breadcrumb-items wow fadeInUp" data-wow-delay=".5s">
+            <li>
+              <a href="/">Home</a>
+            </li>
+            <li>
+              <i className="fa-solid fa-chevron-right"></i>
+            </li>
+            <li>
+              <span>EVENT DETAILS</span>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-      <motion.section
-        id="tickets"
-        className="py-16"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-      >
+      <section className="gt-events-details-section section-padding fix">
         <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
-              Ticket Options
-            </span>
-            <h2 className="mt-4 text-3xl font-bold text-white">Choose Your Pass</h2>
-            <p className="mt-2 text-gray-400">Select the perfect ticket for your needs.</p>
-          </div>
-          <div className="relative mt-12">
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#0a0a1a] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#0a0a1a] to-transparent" />
-
-            <div
-              ref={ticketScrollRef}
-              className="flex gap-6 overflow-hidden"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {[...event.ticketTypes, ...event.ticketTypes].map((tier, i) => {
-                const isHighlighted = i === 1;
-                return (
-                  <motion.div
-                    key={`${tier.id}-${i}`}
-                    className={`group relative flex w-[280px] shrink-0 flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 sm:w-[300px] ${
-                      isHighlighted
-                        ? "border-2 border-purple-500/50 bg-gradient-to-b from-purple-900/30 to-[#0a0a1a] shadow-xl shadow-purple-500/20"
-                        : "border border-white/10 bg-white/[0.02] opacity-70 hover:border-purple-500/30 hover:bg-white/[0.04] hover:opacity-100"
-                    }`}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    {isHighlighted && (
-                      <div className="absolute right-0 top-0 z-10 rounded-bl-xl bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">
-                        POPULAR
-                      </div>
+          <div className="gt-event-details-wrapper">
+            <div className="row">
+              <div className="col-xl-12">
+                <div className="gt-details-post">
+                  <ul className="gt-event-list">
+                    <li>
+                      <i className="fa-regular fa-calendar-days"></i> {dateStr}
+                    </li>
+                    {speaker?.speaker && (
+                      <li>
+                        <i className="fa-regular fa-door-open"></i> {speaker.speaker.firstName}{" "}
+                        {speaker.speaker.lastName} (Speaker)
+                      </li>
                     )}
-
-                    <div className="flex items-center justify-between px-6 pt-5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 text-sm font-bold text-white shadow-lg shadow-purple-600/30">
-                          E
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-white">
-                            {event.title.slice(0, 10).toUpperCase()}
-                          </p>
-                          <p className="text-[10px] uppercase tracking-wider text-gray-500">
-                            {new Date(event.startDate).getFullYear()}
-                          </p>
-                        </div>
-                      </div>
-                      <BarcodeBars value={`${tier.name}-${tier.price}`} className="h-12" />
+                    {event.venue && (
+                      <li>
+                        <i className="fa-regular fa-location-dot"></i> {event.venue.name},{" "}
+                        {event.venue.city}
+                      </li>
+                    )}
+                  </ul>
+                  <div className="gt-details-image">
+                    <img src={event.coverImage || unsplashEventDetail} alt={event.title} />
+                    <div className="gt-client-image">
+                      <img src="/assets/img/inner-page/event-details/client.png" alt="img" />
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="row g-4">
+              <div className="col-lg-8 col-12">
+                <div className="gt-event-details-content">
+                  <h2>{event.title}</h2>
+                  <p>{event.description}</p>
 
-                    <div className="relative flex flex-1 flex-col p-6 pt-4">
-                      <div
-                        className={`mb-4 h-1 w-16 rounded-full bg-gradient-to-r ${tier.color || "from-purple-600 to-cyan-600"}`}
-                      />
-                      <div className="flex items-end justify-between">
-                        <h3 className="text-lg font-bold text-white">{tier.name}</h3>
-                        <div className="flex items-baseline gap-0.5">
-                          <span className="text-xs text-gray-500">₹</span>
-                          <span className="text-3xl font-bold text-white">
-                            {Number(tier.price).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs text-gray-500">
-                        <Calendar className="h-3.5 w-3.5 shrink-0 text-purple-400" />
-                        <span>
-                          {new Date(event.startDate).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                          })}{" "}
-                          to{" "}
-                          {new Date(event.endDate).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                          })}{" "}
-                          -{" "}
-                          {new Date(event.startDate).toLocaleTimeString("en-US", {
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </div>
-                      <div className="my-5 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                      <ul className="space-y-2.5">
-                        {tier.perks.map((perk) => (
-                          <li key={perk} className="flex items-start gap-2 text-xs text-gray-400">
-                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-purple-400" />
-                            <span>{perk}</span>
+                  <div className="row g-4 mb-4 mt-3">
+                    <div className="col-xl-6 col-lg-12">
+                      <div className="gt-details-list-item">
+                        <h3>Key Topics Covered:</h3>
+                        <ul className="gt-list">
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Predictive Analytics in
+                            Business Strategy
                           </li>
-                        ))}
-                      </ul>
-                      <Link
-                        href={`/checkout?event=${event.slug}&ticket=${tier.id}`}
-                        className="mt-auto block pt-6"
-                      >
-                        <Button
-                          className={`w-full text-sm transition-all duration-300 ${
-                            isHighlighted
-                              ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
-                              : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
-                          }`}
-                        >
-                          Buy Ticket <MoveRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </Link>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Natural Language
+                            Processing (NLP) in Customer Service
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Machine Learning for Risk
+                            Management
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Big Data Infrastructure
+                            and Data Engineering
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Real-Time Analytics and
+                            IoT Integration
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Ethics, Bias, and
+                            Responsible AI
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                  </motion.div>
-                );
-              })}
+                    <div className="col-xl-6 col-lg-12">
+                      <div className="gt-thumb">
+                        <img src={topicImages[0]} alt="img" />
+                      </div>
+                    </div>
+                    <div className="col-xl-6 col-lg-12">
+                      <div className="gt-thumb">
+                        <img src={topicImages[1]} alt="img" />
+                      </div>
+                    </div>
+                    <div className="col-xl-6 col-lg-12">
+                      <div className="gt-details-list-item">
+                        <h3>Who Should Attend:</h3>
+                        <ul className="gt-list">
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Data Scientists and
+                            Machine Learning Engineers
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Business Analysts and
+                            Strategy Professionals
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> AI & Tech Startups
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Academicians and
+                            Researchers
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Students in Data Science
+                            and Business Analytics
+                          </li>
+                          <li>
+                            <i className="fa-solid fa-chevron-right"></i> Policymakers and
+                            Government Technologists
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3>Call for Papers:</h3>
+                  <p className="mb-3 mt-3">
+                    ICDSAIA 2025 welcomes original research papers and case studies in the fields of
+                    AI, Data Science, Machine Learning, and related applications. Accepted papers
+                    will be published in the official conference proceedings with an ISBN and
+                    considered for journal publication.
+                  </p>
+
+                  <h3>Registration Fees:</h3>
+                  <div className="gt-Registration-Fees-item">
+                    <div className="gt-Registration-Fees-title">
+                      <h5>Category</h5>
+                      <h5>Early Bird (by May 30)</h5>
+                      <h5>Regular (after May 30)</h5>
+                    </div>
+                    <ul className="gt-list">
+                      <li>Local Participant</li>
+                      <li>BDT 3,000</li>
+                      <li>BDT 4,500</li>
+                    </ul>
+                    <ul className="gt-list">
+                      <li>International</li>
+                      <li>$80</li>
+                      <li>$100</li>
+                    </ul>
+                    <ul className="gt-list">
+                      <li>Student (BD)</li>
+                      <li>BDT 1,500</li>
+                      <li>BDT 2,000</li>
+                    </ul>
+                  </div>
+
+                  {event.sessions.length > 0 && (
+                    <div className="mb-4 mt-4">
+                      <h3>Event Schedule</h3>
+                      <div className="d-flex mb-4 mt-3 flex-wrap gap-2">
+                        {sessionDays.map((d, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setActiveDay(i)}
+                            className={`btn btn-sm ${activeDay === i ? "gt-theme-btn" : "btn-outline-light"}`}
+                          >
+                            Day {d.day}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="space-y-3">
+                        {sessionDays[activeDay]?.sessions.map((session) => (
+                          <div
+                            key={session.id}
+                            className="gt-card d-flex flex-column flex-sm-row align-items-center gap-4 p-4"
+                          >
+                            <div className="rounded-3 shrink-0 bg-purple-500/10 px-4 py-2 text-center">
+                              <div className="fw-semibold text-purple text-sm">
+                                {new Date(session.startTime).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="fw-semibold text-white">{session.title}</h4>
+                              <div className="d-flex flex-wrap gap-3 text-sm text-gray-400">
+                                {session.speaker && (
+                                  <span>
+                                    <i className="fa-solid fa-microphone text-purple me-1"></i>{" "}
+                                    {session.speaker.firstName} {session.speaker.lastName}
+                                  </span>
+                                )}
+                                {session.room && (
+                                  <span>
+                                    <i className="fa-solid fa-location-dot text-purple me-1"></i>{" "}
+                                    {session.room}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <span className="badge text-purple shrink-0 border border-purple-500/30">
+                              Session
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {event.venue && (
+                    <div className="gt-map-items mt-4">
+                      <h3>Venue Direction:</h3>
+                      <p className="mb-4 mt-2">
+                        {event.venue.name} &mdash; {event.venue.address}, {event.venue.city},{" "}
+                        {event.venue.country}
+                      </p>
+                    </div>
+                  )}
+
+                  {event.faqs.length > 0 && (
+                    <div className="mt-4">
+                      <h3>Frequently Asked Questions</h3>
+                      <div className="mt-3 space-y-3">
+                        {event.faqs.map((faq) => (
+                          <div key={faq.id} className="gt-card p-4">
+                            <h4 className="fw-semibold text-white">{faq.question}</h4>
+                            <p className="mt-2 text-sm text-gray-400">{faq.answer}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="col-lg-4">
+                <div className="gt-event-main-sideber">
+                  <div className="gt-event-sideber-widget">
+                    <ul className="gt-sideber-list">
+                      <li>
+                        <span>Date</span>: {dateStr}
+                      </li>
+                      {event.venue && (
+                        <li>
+                          <span>Venue</span>: {event.venue.city}, {event.venue.country}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+
+                  <div className="gt-event-sideber-widget">
+                    <div className="gt-widget-title">
+                      <h3>Short Details</h3>
+                    </div>
+                    <ul className="gt-sideber-list">
+                      <li>
+                        <span>Start Date</span>: {dateStr}
+                      </li>
+                      {event.venue && (
+                        <li>
+                          <span>Event Venue</span>: {event.venue.name}, {event.venue.city}
+                        </li>
+                      )}
+                      <li>
+                        <span>Organizer</span>: Events Platform
+                      </li>
+                      <li>
+                        <span>Category</span>: {event.category || "Conference"}
+                      </li>
+                      <li>
+                        <span>Phone</span>: +1 (1234)-567-800
+                      </li>
+                      <li>
+                        <span>Location</span>: {event.venue?.city || "N/A"}
+                      </li>
+                      <li>
+                        <span>E-mail</span>: info@eventsplatform.com
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="gt-event-sideber-widget">
+                    <div className="gt-widget-title">
+                      <h3>We&apos;re in the social</h3>
+                    </div>
+                    <div className="gt-social-icon d-flex align-items-center">
+                      <a href="#">
+                        <i className="fab fa-twitter"></i>
+                      </a>
+                      <a href="#">
+                        <i className="fa-brands fa-youtube"></i>
+                      </a>
+                      <a href="#">
+                        <i className="fa-brands fa-instagram"></i>
+                      </a>
+                      <a href="#">
+                        <i className="fab fa-facebook-f"></i>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="gt-event-sideber-widget mb-0">
+                    <div className="gt-widget-title">
+                      <h3>Purchase Ticket</h3>
+                    </div>
+                    {event.ticketTypes.map((tier) => (
+                      <div key={tier.id} className="gt-event-box-item">
+                        <h6>
+                          {tier.name} <span>(Unlimited tickets)</span>
+                        </h6>
+                        <div className="gt-box-item">
+                          <div className="gt-item">
+                            <span>Ticket Price :</span>
+                            <p>₹{Number(tier.price).toLocaleString()}</p>
+                          </div>
+                          <div className="gt-item">
+                            <span>Quantity :</span>
+                            <p className="qty">
+                              <button
+                                className="qtyminus"
+                                onClick={() =>
+                                  setQuantities((prev) => ({
+                                    ...prev,
+                                    [tier.id]: Math.max(1, (prev[tier.id] || 1) - 1),
+                                  }))
+                                }
+                              >
+                                &minus;
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                max="10"
+                                step="1"
+                                value={quantities[tier.id] || 1}
+                                onChange={(e) =>
+                                  setQuantities((prev) => ({
+                                    ...prev,
+                                    [tier.id]: Math.max(1, parseInt(e.target.value) || 1),
+                                  }))
+                                }
+                              />
+                              <button
+                                className="qtyplus"
+                                onClick={() =>
+                                  setQuantities((prev) => ({
+                                    ...prev,
+                                    [tier.id]: Math.min(10, (prev[tier.id] || 1) + 1),
+                                  }))
+                                }
+                              >
+                                +
+                              </button>
+                            </p>
+                          </div>
+                          <div className="gt-item">
+                            <span>Sub Total :</span>
+                            <p>
+                              ₹{((quantities[tier.id] || 1) * Number(tier.price)).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <ul className="gt-sideber-list gt-box">
+                      <li>
+                        <span>Total Quantity:</span> {totalQuantity}
+                      </li>
+                      <li>
+                        <span>Total Price:</span> ₹{totalPrice.toLocaleString()}
+                      </li>
+                    </ul>
+                    <Link
+                      href={`/checkout?eventId=${event.id}&ticketTypeId=${event.ticketTypes.find((t) => (quantities[t.id] || 0) > 0)?.id || event.ticketTypes[0]?.id || ""}`}
+                      className="gt-theme-btn d-block w-100 text-center"
+                    >
+                      PURCHASE TICKET <i className="fa-solid fa-arrow-right ms-2"></i>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </motion.section>
-
-      {event.faqs.length > 0 && (
-        <section className="border-y border-white/5 bg-[#0a0a1a] py-16">
-          <div className="container">
-            <div className="mx-auto max-w-2xl text-center">
-              <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
-                FAQ
-              </span>
-              <h2 className="mt-4 text-3xl font-bold text-white">Frequently Asked Questions</h2>
-            </div>
-            <div className="mx-auto mt-8 max-w-2xl space-y-3">
-              {event.faqs.map((faq) => (
-                <div
-                  key={faq.id}
-                  className="rounded-lg border border-white/10 bg-white/[0.03] p-5 transition-all duration-300 hover:border-purple-500/30"
-                >
-                  <h4 className="font-semibold text-white">{faq.question}</h4>
-                  <p className="mt-2 text-sm text-gray-400">{faq.answer}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {event.venue && (
-        <motion.section
-          className="py-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="container">
-            <div className="mx-auto max-w-2xl text-center">
-              <span className="inline-block rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400">
-                Venue
-              </span>
-              <h2 className="mt-4 text-3xl font-bold text-white">Location & Venue</h2>
-            </div>
-            <div className="mx-auto mt-8 max-w-lg rounded-xl border border-white/10 bg-white/[0.03] p-8 text-center backdrop-blur-sm">
-              <MapPin className="mx-auto h-8 w-8 text-purple-400" />
-              <p className="mt-4 text-lg font-semibold text-white">{event.venue.name}</p>
-              <p className="text-sm text-gray-400">
-                {event.venue.address}, {event.venue.city},{" "}
-                {event.venue.state ? `${event.venue.state}, ` : ""}
-                {event.venue.country} {event.venue.zipCode || ""}
-              </p>
-            </div>
-          </div>
-        </motion.section>
-      )}
-    </div>
+      </section>
+    </>
   );
 }

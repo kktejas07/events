@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
 const STATUSES = ["PENDING", "PROCESSING", "PAID", "FAILED", "REFUNDED", "CANCELLED"];
+const adminCard = "border border-gray-200 bg-white shadow-sm";
 
 export default function EditOrderPage() {
   const params = useParams();
@@ -60,7 +60,7 @@ export default function EditOrderPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
       </div>
     );
   }
@@ -69,56 +69,52 @@ export default function EditOrderPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link href={`/admin/orders/${params.id}`}>
-          <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+          <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
         <div>
-          <h2 className="text-2xl font-bold text-white">Edit Order</h2>
-          <p className="text-gray-400">Order #{String(params.id).slice(0, 8)}</p>
+          <h2 className="gt-admin-page-title text-2xl">Edit Order</h2>
+          <p className="gt-admin-page-subtitle">Order #{String(params.id).slice(0, 8)}</p>
         </div>
       </div>
 
-      <Card className="border-white/10 bg-white/[0.03]">
+      <Card className={adminCard}>
         <CardHeader>
-          <CardTitle className="text-white">Order Details</CardTitle>
+          <CardTitle>Order Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1">
-            <Label className="text-gray-300">Status</Label>
+            <Label className="gt-admin-field-label">Status</Label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="gt-admin-input-field flex h-10 w-full rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               {STATUSES.map((s) => (
-                <option key={s} value={s} className="bg-[#0a0a1a]">
+                <option key={s} value={s}>
                   {s}
                 </option>
               ))}
             </select>
           </div>
           <div className="space-y-1">
-            <Label className="text-gray-300">Notes</Label>
+            <Label className="gt-admin-field-label">Notes</Label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="min-h-[100px] w-full rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-gray-600"
+              className="gt-admin-textarea min-h-[100px] text-sm"
               placeholder="Internal notes..."
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => router.back()}
-              className="border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
-            >
+            <Button variant="outline" onClick={() => router.back()}>
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
             >
               {saving ? "Saving..." : "Save Changes"}
             </Button>

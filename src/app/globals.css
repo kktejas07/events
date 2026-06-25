@@ -1,212 +1,278 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 248 40% 98%;
-    --foreground: 240 30% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 30% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 30% 10%;
-    --primary: 249 75% 63%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 179 100% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 240 5% 96%;
-    --accent-foreground: 240 6% 10%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 249 75% 63%;
-    --radius: 0.75rem;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-  .dark {
-    --background: 240 30% 10%;
-    --foreground: 0 0% 98%;
-    --card: 240 30% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 30% 12%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 249 75% 63%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 179 100% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 4% 16%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 249 75% 63%;
+.header__hamburger {
+  display: flex;
+  align-items: center;
+}
+
+/* Homepage (header-3): nav lives in offcanvas only — hide top bar links like index-3.html */
+.header-1.header-3 .header-main .header-right .mean__menu-wrapper {
+  display: none !important;
+}
+
+.header-1.header-3 .sidebar__toggle,
+.header-1 .sidebar__toggle {
+  cursor: pointer;
+}
+
+/* Header-3: hamburger always visible (opens offcanvas sidebar like original theme) */
+.header-1.header-3 .header__hamburger {
+  display: flex !important;
+}
+
+/* About section: circle decoration behind circular portrait */
+.gt-about-wrapper-3 .gt-about-image {
+  position: relative;
+}
+
+/* Homepage schedule cards (index-3 pill layout) */
+.gt-event-schedule-section-3 .tab-content .event-schedule-box-items-3 .event-schedule-image {
+  overflow: hidden;
+  line-height: 0;
+}
+.gt-event-schedule-section-3 .tab-content .event-schedule-box-items-3 .event-schedule-image img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Events/pricing schedule list layout */
+.gt-event-schedule-wrapper .gt-event-schedule-item {
+  background-color: var(--gt-white);
+}
+.gt-event-schedule-wrapper .gt-event-schedule-item .gt-event-image {
+  flex-shrink: 0;
+  width: 300px;
+  max-width: 300px;
+  overflow: hidden;
+}
+.gt-event-schedule-wrapper .gt-event-schedule-item .gt-event-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Consistent image sizing per section */
+.gt-news-items-3 .gt-news-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gt-sponsor-item .gt-sponsor-logo img {
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.gt-brand-section .brand-image img {
+  max-height: 60px;
+  max-width: 140px;
+  width: auto;
+  object-fit: contain;
+}
+
+.gt-service-wrapper .gt-service-dark-box .gt-service-image img {
+  width: 100%;
+  height: auto;
+  max-width: 525px;
+  object-fit: contain;
+}
+
+/* Header-3 (homepage): dark menu links on white pill header */
+.header-1.header-3 .header-main .header-right .main-menu ul li > a {
+  color: var(--gt-header) !important;
+}
+
+/* Homepage: hide desktop nav on tablet/mobile — use offcanvas hamburger */
+@media (max-width: 1199px) {
+  .header-1:not(.header-3) .header-main .header-right .mean__menu-wrapper {
+    display: none;
   }
 }
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
+/* Inner pages: always show get ticket button */
+.header-1:not(.header-3) .header-right .header-button {
+  display: block !important;
+}
+
+@media (max-width: 575px) {
+  .header-1:not(.header-3) .header-right .header-button .gt-theme-btn {
+    padding: 10px 14px;
+    font-size: 12px;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
+/* Header-3: always show get ticket button (theme CSS hides it below 1400px) */
+.header-1.header-3 .header-right .header-button {
+  display: block !important;
+}
+
+@media (max-width: 575px) {
+  .header-1.header-3 .header-right .header-button .gt-theme-btn {
+    padding: 10px 14px;
+    font-size: 12px;
   }
 }
 
-@layer utilities {
-  .gradient-primary {
-    @apply bg-gradient-to-r from-primary to-secondary;
-  }
-  .text-gradient {
-    @apply gradient-primary bg-clip-text text-transparent;
-  }
+/* Testimonial dual sliders — uniform card size, left + right marquee */
+.gt-testimonial-section-3 .gt-testimonial-box-wrapper .swiper-slide.brand-slide-element {
+  width: 660px;
+  max-width: calc(100vw - 48px);
+}
+.gt-testimonial-section-3 .gt-testimonial-box-wrapper .gt-testimonial-box-item {
+  min-height: 260px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.gt-testimonial-section-3 .gt-testimonial-box-wrapper .gt-testimonial-box-item p {
+  flex: 1;
 }
 
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+.gt-offcanvas-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.gt-offcanvas-nav > li {
+  border-bottom: 1px solid #eee;
+  padding: 8px 0;
+}
+.gt-offcanvas-nav > li > a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: block;
+  padding: 6px 0;
+}
+.gt-offcanvas-nav .submenu {
+  list-style: none;
+  padding-left: 16px;
+  margin: 0;
+}
+.gt-offcanvas-nav .submenu li a {
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  display: block;
+  padding: 4px 0;
 }
 
-@keyframes gradient-shift {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+/* Meanmenu nav inside offcanvas sidebar */
+.offcanvas__content .mobile-menus .mean-container,
+.offcanvas__content .mobile-menu .mean-container {
+  background: transparent;
+}
+.offcanvas__content .mobile-menus .mean-nav,
+.offcanvas__content .mobile-menu .mean-nav {
+  margin-top: 0;
+}
+.offcanvas__content .mobile-menus .mean-nav ul li a,
+.offcanvas__content .mobile-menu .mean-nav ul li a {
+  color: #1a1a2e;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+.offcanvas__content .mobile-menus .mean-nav ul li li a,
+.offcanvas__content .mobile-menu .mean-nav ul li li a {
+  text-transform: none;
+  font-weight: 500;
+  font-size: 14px;
+  color: #666;
+  padding: 8px 0 8px 12px;
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translateY(-20px) scale(1.05);
-    opacity: 0.8;
-  }
+.gt-mobile-menu {
+  position: fixed;
+  top: 0;
+  left: -320px;
+  width: 300px;
+  height: 100vh;
+  background: #fff;
+  z-index: 9999;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  padding: 20px;
 }
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.2);
-  }
+.gt-mobile-menu.open { left: 0; }
+.gt-mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
-
-@keyframes marquee-reverse {
-  0% {
-    transform: translateX(-50%);
-  }
-  100% {
-    transform: translateX(0);
-  }
+.gt-mobile-nav { list-style: none; padding: 0; margin: 0; }
+.gt-mobile-nav > li {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 8px 0;
 }
-
-@keyframes fade-in-up {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.gt-mobile-nav > li > a,
+.gt-mobile-link-with-toggle > a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: block;
+  padding: 8px 0;
 }
-
-.animate-marquee {
-  animation: marquee 40s linear infinite;
+.gt-mobile-link-with-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-.animate-marquee-reverse {
-  animation: marquee-reverse 40s linear infinite;
+.gt-sub-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #666;
 }
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 8s ease infinite;
+.gt-mobile-sub {
+  list-style: none;
+  padding-left: 16px;
+  display: none;
+  margin: 0;
 }
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+.gt-mobile-sub.open { display: block; }
+.gt-mobile-sub li {
+  padding: 6px 0;
 }
-
-.animate-float-delayed {
-  animation: float 6s ease-in-out 2s infinite;
+.gt-mobile-sub li a {
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  display: block;
 }
-
-.animate-pulse-glow {
-  animation: pulse-glow 4s ease-in-out infinite;
+.gt-mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 9998;
 }
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
-}
-
-.animate-fade-in-up-delayed {
-  animation: fade-in-up 0.6s ease-out 0.2s forwards;
-  opacity: 0;
-}
-
-@keyframes gradient-mesh {
-  0% {
-    background-position: 0% 0%, 100% 100%, 50% 0%;
-    opacity: 0.6;
-  }
-  25% {
-    background-position: 100% 0%, 0% 100%, 50% 100%;
-    opacity: 0.8;
-  }
-  50% {
-    background-position: 100% 100%, 0% 0%, 50% 50%;
-    opacity: 0.6;
-  }
-  75% {
-    background-position: 0% 100%, 100% 0%, 50% 50%;
-    opacity: 0.8;
-  }
-  100% {
-    background-position: 0% 0%, 100% 100%, 50% 0%;
-    opacity: 0.6;
-  }
-}
-
-@keyframes spin-slow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.animate-spin-slow {
-  animation: spin-slow 10s linear infinite;
-  transform-origin: center;
-}
-
-.animate-hero-mesh {
-  animation: gradient-mesh 12s ease-in-out infinite;
-  background:
-    radial-gradient(ellipse at top left, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom right, rgba(6, 182, 212, 0.2) 0%, transparent 50%),
-    radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
-  background-size: 100% 100%;
+@media (min-width: 1200px) {
+  /* Keep hamburger visible on header-3; hide only generic mobile menu panel on desktop */
+  .header-1:not(.header-3) .header__hamburger { display: none; }
+  .gt-mobile-menu { display: none; }
+  .gt-mobile-overlay { display: none; }
 }

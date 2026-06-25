@@ -4,29 +4,9 @@ export const revalidate = 0;
 import { unstable_noStore as noStore } from "next/cache";
 import { db } from "@/lib/db";
 import { defaultContent } from "@/lib/landing-defaults";
+import { mergeSiteContent } from "@/lib/site-content";
 import HomePageClient from "./_HomePageClient";
-
-function deepMerge(target: Record<string, unknown>, source: Record<string, unknown>) {
-  const result = { ...target };
-  for (const key of Object.keys(source)) {
-    if (
-      source[key] !== null &&
-      typeof source[key] === "object" &&
-      !Array.isArray(source[key]) &&
-      target[key] !== null &&
-      typeof target[key] === "object" &&
-      !Array.isArray(target[key])
-    ) {
-      result[key] = deepMerge(
-        target[key] as Record<string, unknown>,
-        source[key] as Record<string, unknown>
-      );
-    } else {
-      result[key] = source[key];
-    }
-  }
-  return result;
-}
+import { hyderabadColleges } from "@/lib/hyderabad-colleges";
 
 export default async function HomePage() {
   noStore();
@@ -34,15 +14,7 @@ export default async function HomePage() {
 
   try {
     const rows = await db.siteContent.findMany();
-    for (const row of rows) {
-      const sectionData = row.data as Record<string, unknown>;
-      const defaultSection = defaultContent[row.section] as Record<string, unknown> | undefined;
-      if (defaultSection && typeof defaultSection === "object" && !Array.isArray(defaultSection)) {
-        mergedContent[row.section] = deepMerge(defaultSection, sectionData);
-      } else {
-        mergedContent[row.section] = sectionData;
-      }
-    }
+    mergedContent = mergeSiteContent(rows);
 
     // Fetch real sponsors from DB
     const dbSponsors = await db.sponsor.findMany({
@@ -50,13 +22,35 @@ export default async function HomePage() {
       orderBy: { sortOrder: "asc" },
     });
     if (dbSponsors.length > 0) {
-      mergedContent["_dbSponsors"] = dbSponsors.map((s) => ({
-        name: s.name,
-        tier: s.tier,
-        logoUrl: s.logoUrl,
-        websiteUrl: s.websiteUrl,
-        initials: s.name.slice(0, 2).toUpperCase(),
-        color: s.logoUrl ? "#6C5CE7" : ["#7C3AED", "#06B6D4", "#F59E0B"][dbSponsors.indexOf(s) % 3],
+      const hasPlaceholderLogos = dbSponsors.some(
+        (s) => !s.logoUrl || s.logoUrl.includes("unsplash.com") || s.logoUrl.includes("placeholder")
+      );
+      const sponsorSource = hasPlaceholderLogos
+        ? hyderabadColleges.map((c) => ({
+            name: c.name,
+            tier: c.tier || "Gold",
+            logoUrl: c.logo,
+            websiteUrl: c.website,
+            initials: c.name.slice(0, 2).toUpperCase(),
+            color: "#6C5CE7",
+          }))
+        : dbSponsors.map((s) => ({
+            name: s.name,
+            tier: s.tier,
+            logoUrl: s.logoUrl,
+            websiteUrl: s.websiteUrl,
+            initials: s.name.slice(0, 2).toUpperCase(),
+            color: s.logoUrl ? "#6C5CE7" : ["#7C3AED", "#06B6D4", "#F59E0B"][dbSponsors.indexOf(s) % 3],
+          }));
+      mergedContent["_dbSponsors"] = sponsorSource;
+    } else {
+      mergedContent["_dbSponsors"] = hyderabadColleges.map((c) => ({
+        name: c.name,
+        tier: c.tier || "Gold",
+        logoUrl: c.logo,
+        websiteUrl: c.website,
+        initials: c.name.slice(0, 2).toUpperCase(),
+        color: "#6C5CE7",
       }));
     }
 
@@ -102,6 +96,40 @@ export default async function HomePage() {
           type: "Session",
         })),
       };
+    }
+
+    const blogPosts = await db.blogPost.findMany({
+      where: { published: true },
+      take: 3,
+      orderBy: { publishedAt: "desc" },
+    });
+    if (blogPosts.length > 0) {
+      mergedContent["_blogPosts"] = blogPosts.map((p) => ({
+        title: p.title,
+        slug: p.slug,
+        category: p.category || "Corporate",
+        date: p.publishedAt
+          ? p.publishedAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+          : "11 march 2025",
+        day: p.publishedAt ? String(p.publishedAt.getDate()) : "20",
+        month: p.publishedAt
+          ? p.publishedAt.toLocaleString("default", { month: "short" })
+          : "april",
+        excerpt: p.excerpt || "",
+        image: p.coverImage || null,
+      }));
+    }
+
+    const dbSpeakers = await db.speaker.findMany({ take: 5, orderBy: { createdAt: "asc" } });
+    if (dbSpeakers.length > 0) {
+      const speakersSection = mergedContent.speakers as Record<string, unknown> | undefined;
+      if (speakersSection) {
+        speakersSection.items = dbSpeakers.map((s) => ({
+          name: `${s.firstName} ${s.lastName}`,
+          role: s.title || "Speaker",
+          photoUrl: s.photoUrl,
+        }));
+      }
     }
   } catch (error) {
     console.error("Home page fetch error:", error);

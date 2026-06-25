@@ -1,0 +1,154 @@
+
+.gt-instagram-item {
+
+    .gt-insta-item {
+        text-align: center;
+        margin-bottom: 60px;
+
+        .gt-icon {
+            background: linear-gradient(90deg, rgba(255, 123, 107, 1), rgba(226, 0, 196, 1));
+			background-clip: text;
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        h4 {
+            font-weight: 400;
+
+            span {
+                background: linear-gradient(90deg, #2ADDC8 34.44%, #4D55CC 79.33%);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        }
+    }
+    .gt-instagram-image {
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            top: 0;
+            bottom: 0px;
+            right: 0;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(77, 85, 204, 0.70) 0%, rgba(42, 221, 200, 0.70) 100%);
+            transition: -webkit-transform 0.4s ease;
+            transition: transform 0.4s ease;
+            transition: transform 0.4s ease, -webkit-transform 0.4s ease;
+            // transform-origin: top right;
+            -webkit-transform: scale(1, 0);
+            transform: scale(1, 0);
+            z-index: 9;
+        }
+
+        img {
+            @include imgw;
+            transition: all 1.5s ease-out;
+            border-radius: 10px;
+        }
+
+        &.gt-style-2 {
+            position: relative;
+            overflow: hidden;
+
+            &::before {
+                border-radius: 100%;
+
+                img {
+                    border-radius: 100%;
+                }
+            }
+        }
+
+        .gt-icon {
+            display: inline-block;
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 30px;
+            color: $gt-white;
+            @include transition;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 99;
+        }
+
+        &:hover {
+            .gt-icon {
+                top: 50%;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            &::before {
+                -webkit-transform: scale(1, 1);
+                transform: scale(1, 1);
+                transform-origin: bottom center;
+         }
+     }
+}
+
+.gt-instagram-slider {
+    // margin-left: -7%;
+    // margin-right: -7%;
+
+    @include breakpoint (max-xl){
+        margin-left: 0;
+        margin-right: 0;
+    }
+  }
+}
+
+.gt-couinter-box-item-5 {
+    border-radius: 10px;
+    background: rgba(255, 26, 188, 0.10);
+    padding: 26px 0;
+    text-align: center;
+    position: relative;
+
+    &::before {
+        @include before;
+        background: linear-gradient(101deg, #FF1ABC 0.86%, #90F 100%);
+        border-radius: 10px;
+        opacity: 0;
+        visibility: hidden;
+        z-index: -1;
+    }
+
+    h2 {
+        color: #FF1ABC;
+        font-size: 75px;
+        font-weight: 700;
+
+        @include breakpoint (max-lg) {
+            font-size: 70px;
+        }
+
+        @include breakpoint (max-md) {
+            font-size: 50px;
+        }
+    }
+
+    &:hover {
+         &::before {
+            opacity: 1;
+            visibility: visible;
+         }
+
+         h2  {
+            color: $gt-white;
+         }
+
+         p {
+            color: $gt-white;
+         }
+    }
+}

@@ -1,661 +1,267 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 
-interface TicketTypeData {
-  id?: string;
-  name: string;
-  price: string;
-  quantityLimit: string;
-  perks: string;
-  color: string;
-  isActive: boolean;
-  sortOrder: number;
-}
+interface SessionData { id?: string; title: string; startTime: string; endTime: string; room: string; day: number; speakerId: string; }
 
-interface SessionData {
-  id?: string;
-  title: string;
-  startTime: string;
-  endTime: string;
-  room: string;
-  day: number;
-  speakerName: string;
-}
-
-interface FormData {
-  title: string;
-  slug: string;
-  description: string;
-  shortDescription: string;
-  startDate: string;
-  endDate: string;
-  timezone: string;
-  category: string;
-  status: string;
-  coverImage: string;
-  isFeatured: boolean;
-}
-
-const emptyForm: FormData = {
-  title: "",
-  slug: "",
-  description: "",
-  shortDescription: "",
-  startDate: "",
-  endDate: "",
-  timezone: "Asia/Kolkata",
-  category: "",
-  status: "DRAFT",
-  coverImage: "",
-  isFeatured: false,
-};
-
-const emptyTicket = (): TicketTypeData => ({
-  name: "",
-  price: "",
-  quantityLimit: "100",
-  perks: "",
-  color: "#6C5CE7",
-  isActive: true,
-  sortOrder: 0,
-});
-
-export default function EventFormPage() {
-  const router = useRouter();
+export default function AdminEventEditPage() {
   const params = useParams();
-  const id = params?.id as string;
-  const isNew = id === "new";
+  const router = useRouter();
+  const eventId = params.id as string;
+  const isNew = eventId === "new";
 
-  const [form, setForm] = useState<FormData>(emptyForm);
-  const [ticketTypes, setTicketTypes] = useState<TicketTypeData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [organizations, setOrganizations] = useState<{ id: string; name: string }[]>([]);
+  const [speakers, setSpeakers] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [form, setForm] = useState({ title: "", slug: "", description: "", shortDescription: "", category: "", coverImage: "", organizationId: "", venueName: "", venueAddress: "", venueCity: "", venueState: "", venueCountry: "", venueZip: "", startDate: "", endDate: "", status: "DRAFT" });
+  const [ticketTypes, setTicketTypes] = useState<{ name: string; price: string; quantityLimit: string }[]>([]);
   const [sessions, setSessions] = useState<SessionData[]>([]);
-  const [loading, setLoading] = useState(!isNew);
-  const [saving, setSaving] = useState(false);
-
-  const emptySession = (): SessionData => ({
-    title: "",
-    startTime: "",
-    endTime: "",
-    room: "",
-    day: 1,
-    speakerName: "",
-  });
+  const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([]);
 
   useEffect(() => {
-    if (!isNew && id) {
-      fetch(`/api/admin/events/${id}`)
-        .then((r) => r.json())
-        .then((json) => {
-          if (json.success) {
-            const e = json.data;
-            setForm({
-              title: e.title || "",
-              slug: e.slug || "",
-              description: e.description || "",
-              shortDescription: e.shortDescription || "",
-              startDate: e.startDate ? new Date(e.startDate).toISOString().slice(0, 16) : "",
-              endDate: e.endDate ? new Date(e.endDate).toISOString().slice(0, 16) : "",
-              timezone: e.timezone || "Asia/Kolkata",
-              category: e.category || "",
-              status: e.status || "DRAFT",
-              coverImage: e.coverImage || "",
-              isFeatured: e.isFeatured || false,
-            });
-            if (e.ticketTypes?.length > 0) {
-              setTicketTypes(
-                e.ticketTypes.map((tt: Record<string, unknown>) => ({
-                  id: tt.id as string,
-                  name: (tt.name as string) || "",
-                  price: String(tt.price || ""),
-                  quantityLimit: String(tt.quantityLimit || "100"),
-                  perks: Array.isArray(tt.perks) ? (tt.perks as string[]).join(", ") : "",
-                  color: (tt.color as string) || "#6C5CE7",
-                  isActive: tt.isActive !== false,
-                  sortOrder: (tt.sortOrder as number) || 0,
-                }))
-              );
-            }
-            if (e.sessions?.length > 0) {
-              setSessions(
-                e.sessions.map((s: Record<string, unknown>) => ({
-                  id: s.id as string,
-                  title: (s.title as string) || "",
-                  startTime: s.startTime
-                    ? new Date(s.startTime as string).toISOString().slice(0, 16)
-                    : "",
-                  endTime: s.endTime
-                    ? new Date(s.endTime as string).toISOString().slice(0, 16)
-                    : "",
-                  room: (s.room as string) || "",
-                  day: (s.day as number) || 1,
-                  speakerName: s.speaker
-                    ? `${(s.speaker as Record<string, string>).firstName || ""} ${(s.speaker as Record<string, string>).lastName || ""}`
-                    : "",
-                }))
-              );
-            }
-          } else {
-            toast.error(json.error || "Failed to load event");
-          }
-        })
-        .catch(() => toast.error("Network error loading event"))
-        .finally(() => setLoading(false));
-    }
-  }, [id, isNew]);
-
-  function generateSlug(title: string) {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
+    fetch("/api/admin/organizations?all=true").then((r) => r.json()).then((d) => setOrganizations(d.organizations || d || []));
+    fetch("/api/admin/speakers").then((r) => r.json()).then((d) => setSpeakers(d.speakers || d || []));
+    if (!isNew) fetch(`/api/events/${eventId}`).then((r) => r.json()).then((d) => {
+      const e = d.event || d;
+      setForm({
+        title: e.title || "", slug: e.slug || "", description: e.description || "", shortDescription: e.shortDescription || "",
+        category: e.category || "", coverImage: e.coverImage || "", organizationId: e.organizationId || "",
+        venueName: e.venue?.name || "", venueAddress: e.venue?.address || "", venueCity: e.venue?.city || "",
+        venueState: e.venue?.state || "", venueCountry: e.venue?.country || "", venueZip: e.venue?.zipCode || "",
+        startDate: e.startDate ? new Date(e.startDate).toISOString().slice(0, 16) : "", endDate: e.endDate ? new Date(e.endDate).toISOString().slice(0, 16) : "", status: e.status || "DRAFT"
+      });
+      if (e.ticketTypes) setTicketTypes(e.ticketTypes.map((t: { name: string; price: number; quantityLimit: number }) => ({ name: t.name, price: String(t.price), quantityLimit: String(t.quantityLimit) })));
+      if (e.sessions) setSessions(e.sessions.map((s: { id: string; title: string; startTime: string; endTime: string; room: string; day: number; speakerId: string }) => ({ id: s.id, title: s.title || "", startTime: s.startTime ? new Date(s.startTime).toISOString().slice(0, 16) : "", endTime: s.endTime ? new Date(s.endTime).toISOString().slice(0, 16) : "", room: s.room || "", day: s.day || 1, speakerId: s.speakerId || "" })));
+      if (e.faqs) setFaqs(e.faqs.map((f: { question: string; answer: string }) => ({ question: f.question, answer: f.answer })));
+    });
+  }, [eventId, isNew]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.title.trim()) {
-      toast.error("Title is required");
-      return;
-    }
-    if (form.description.length < 10) {
-      toast.error("Description must be at least 10 characters");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const slug = form.slug || generateSlug(form.title);
-      const payload = { ...form, slug };
-
-      const url = isNew ? "/api/admin/events" : `/api/admin/events/${id}`;
-      const method = isNew ? "POST" : "PUT";
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json();
-
-      if (json.success) {
-        const eventId = isNew ? json.data.id : id;
-
-        // Save ticket types
-        const ticketTypesToSave = ticketTypes.map((tt, i) => ({
-          ...(tt.id ? { id: tt.id } : {}),
-          name: tt.name || `Ticket ${i + 1}`,
-          price: parseFloat(tt.price) || 0,
-          quantityLimit: parseInt(tt.quantityLimit) || 100,
-          perks: tt.perks
-            ? tt.perks
-                .split(",")
-                .map((s: string) => s.trim())
-                .filter(Boolean)
-            : [],
-          color: tt.color,
-          isActive: tt.isActive,
-          sortOrder: i,
-        }));
-
-        await fetch(`/api/admin/events/${eventId}/ticket-types`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ticketTypes: ticketTypesToSave }),
-        });
-
-        // Save sessions
-        const sessionsToSave = sessions.map((s) => ({
-          ...(s.id ? { id: s.id } : {}),
-          title: s.title || "Untitled",
-          startTime: s.startTime ? new Date(s.startTime).toISOString() : new Date().toISOString(),
-          endTime: s.endTime ? new Date(s.endTime).toISOString() : new Date().toISOString(),
-          room: s.room || "",
-          day: s.day || 1,
-          speakerName: s.speakerName || "",
-        }));
-        await fetch(`/api/admin/events/${eventId}/sessions`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessions: sessionsToSave }),
-        });
-
-        toast.success(isNew ? "Event created" : "Event updated");
-        router.push("/admin/events");
-        router.refresh();
-      } else {
-        toast.error(json.error || "Failed to save event");
-      }
-    } catch {
-      toast.error("Network error saving event");
-    }
-    setSaving(false);
-  }
-
-  function updateTicket(index: number, field: keyof TicketTypeData, value: string | boolean) {
-    setTicketTypes((prev) => prev.map((tt, i) => (i === index ? { ...tt, [field]: value } : tt)));
-  }
-
-  function addTicketType() {
-    setTicketTypes((prev) => [...prev, { ...emptyTicket(), sortOrder: prev.length }]);
-  }
-
-  function removeTicketType(index: number) {
-    setTicketTypes((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
-      </div>
-    );
+    setLoading(true);
+    const body = { ...form, ticketTypes, sessions, faqs };
+    const method = isNew ? "POST" : "PUT";
+    const url = isNew ? "/api/admin/events" : `/api/admin/events/${eventId}`;
+    await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    router.push("/admin/events");
+    router.refresh();
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/admin/events">
-          <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
+    <div>
+      <div className="d-flex align-items-center justify-content-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">
-            {isNew ? "Create New Event" : "Edit Event"}
-          </h2>
-          <p className="text-gray-400">
-            {isNew
-              ? "Fill in event details and add ticket types below"
-              : `Editing: ${form.title || "Untitled"}`}
+          <h2 className="gt-admin-section-title">{isNew ? "Create Event" : "Edit Event"}</h2>
+          <p className="gt-admin-section-subtitle">
+            <Link href="/admin/events" style={{ color: "#8B5CF6", textDecoration: "none" }}>Events</Link> / {isNew ? "New" : form.title || "Edit"}
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Event Details */}
-        <Card className="border-white/10 bg-white/[0.03]">
-          <CardHeader>
-            <CardTitle className="text-white">Event Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1">
-              <Label className="text-gray-300">Event Title</Label>
-              <Input
-                placeholder="Enter event title"
-                value={form.title}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setForm((prev) => ({
-                    ...prev,
-                    title: v,
-                    slug: isNew ? generateSlug(v) : prev.slug,
-                  }));
-                }}
-                className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label className="text-gray-300">Slug</Label>
-                <Input
-                  value={form.slug}
-                  onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] font-mono text-xs text-white"
-                />
+      <form onSubmit={handleSubmit}>
+        <div className="row g-4">
+          <div className="col-lg-8">
+            <div className="gt-admin-card">
+              <h3 className="gt-admin-card-title mb-3">Event Details</h3>
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Title</label>
+                <input className="gt-admin-input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value, slug: form.slug || e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") })} required />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Category</Label>
-                <Input
-                  placeholder="Technology, Business..."
-                  value={form.category}
-                  onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-                />
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Slug</label>
+                <input className="gt-admin-input" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Start Date</Label>
-                <Input
-                  type="datetime-local"
-                  value={form.startDate}
-                  onChange={(e) => setForm((prev) => ({ ...prev, startDate: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white"
-                />
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Description</label>
+                <textarea className="gt-admin-textarea" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={5} required />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">End Date</Label>
-                <Input
-                  type="datetime-local"
-                  value={form.endDate}
-                  onChange={(e) => setForm((prev) => ({ ...prev, endDate: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white"
-                />
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Short Description</label>
+                <input className="gt-admin-input" value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Status</Label>
-                <Select
-                  value={form.status}
-                  onValueChange={(v) => setForm((prev) => ({ ...prev, status: v }))}
-                >
-                  <SelectTrigger className="border-white/10 bg-white/[0.03] text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="DRAFT">Draft</SelectItem>
-                    <SelectItem value="PUBLISHED">Published</SelectItem>
-                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                    <SelectItem value="COMPLETED">Completed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Timezone</Label>
-                <Input
-                  value={form.timezone}
-                  onChange={(e) => setForm((prev) => ({ ...prev, timezone: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white"
-                />
-              </div>
-              <div className="flex items-center gap-2 pt-6">
-                <input
-                  type="checkbox"
-                  id="isFeatured"
-                  checked={form.isFeatured}
-                  onChange={(e) => setForm((prev) => ({ ...prev, isFeatured: e.target.checked }))}
-                  className="h-4 w-4 rounded accent-purple-500"
-                />
-                <Label htmlFor="isFeatured" className="cursor-pointer text-gray-300">
-                  Featured Event (display on landing page)
-                </Label>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-gray-300">Short Description</Label>
-              <Input
-                placeholder="Brief description for cards"
-                value={form.shortDescription}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    shortDescription: e.target.value,
-                  }))
-                }
-                className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-gray-300">Full Description</Label>
-              <textarea
-                placeholder="Detailed event description..."
-                value={form.description}
-                onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                className="min-h-[100px] w-full resize-y rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-gray-600"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Ticket Types (Passes) */}
-        <Card className="border-white/10 bg-white/[0.03]">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-white">Ticket Types / Passes</CardTitle>
-              <p className="mt-1 text-sm text-gray-500">
-                Define pass categories with name, price, perks, and quantity limit
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addTicketType}
-              className="border-white/10 text-gray-300 hover:bg-white/10"
-            >
-              <Plus className="mr-1 h-4 w-4" /> Add Pass
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {ticketTypes.length === 0 ? (
-              <p className="py-4 text-center text-sm text-gray-500">
-                No ticket types yet. Click &ldquo;Add Pass&rdquo; to create one.
-              </p>
-            ) : (
-              ticketTypes.map((tt, i) => (
-                <div key={i} className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-400">Pass #{i + 1}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-red-400 hover:text-red-300"
-                      onClick={() => removeTicketType(i)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Name</Label>
-                      <Input
-                        placeholder="VIP, Standard..."
-                        value={tt.name}
-                        onChange={(e) => updateTicket(i, "name", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Price (₹)</Label>
-                      <Input
-                        type="number"
-                        placeholder="699"
-                        value={tt.price}
-                        onChange={(e) => updateTicket(i, "price", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Quantity</Label>
-                      <Input
-                        type="number"
-                        placeholder="100"
-                        value={tt.quantityLimit}
-                        onChange={(e) => updateTicket(i, "quantityLimit", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Color</Label>
-                      <Input
-                        type="color"
-                        value={tt.color}
-                        onChange={(e) => updateTicket(i, "color", e.target.value)}
-                        className="h-9 w-full cursor-pointer rounded-md border border-white/10 bg-white/[0.03]"
-                      />
-                    </div>
-                    <div className="col-span-full space-y-1">
-                      <Label className="text-xs text-gray-500">Perks (comma-separated)</Label>
-                      <Input
-                        placeholder="Keynote access, Exhibition entry, Networking..."
-                        value={tt.perks}
-                        onChange={(e) => updateTicket(i, "perks", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">Category</label>
+                    <input className="gt-admin-input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="Technology, Design, Music..." />
                   </div>
                 </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Schedule Sessions */}
-        <Card className="border-white/10 bg-white/[0.03]">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-white">Schedule Sessions</CardTitle>
-              <p className="mt-1 text-sm text-gray-500">
-                Add session timings, speakers, and rooms for this event
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setSessions((prev) => [...prev, emptySession()])}
-              className="border-white/10 text-gray-300 hover:bg-white/10"
-            >
-              <Plus className="mr-1 h-4 w-4" /> Add Session
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {sessions.length === 0 ? (
-              <p className="py-4 text-center text-sm text-gray-500">
-                No sessions yet. Click &ldquo;Add Session&rdquo; to create one.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {sessions.map((s, i) => (
-                  <div key={i} className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm text-gray-400">Session #{i + 1}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-red-400 hover:text-red-300"
-                        onClick={() => setSessions((prev) => prev.filter((_, j) => j !== i))}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">Title</Label>
-                        <Input
-                          value={s.title}
-                          onChange={(e) => {
-                            const updated = [...sessions];
-                            updated[i] = { ...s, title: e.target.value };
-                            setSessions(updated);
-                          }}
-                          placeholder="Opening Keynote"
-                          className="border-white/10 bg-white/[0.03] text-sm text-white"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">Day #</Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          value={s.day}
-                          onChange={(e) => {
-                            const updated = [...sessions];
-                            updated[i] = { ...s, day: parseInt(e.target.value) || 1 };
-                            setSessions(updated);
-                          }}
-                          className="border-white/10 bg-white/[0.03] text-sm text-white"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">Room</Label>
-                        <Input
-                          value={s.room}
-                          onChange={(e) => {
-                            const updated = [...sessions];
-                            updated[i] = { ...s, room: e.target.value };
-                            setSessions(updated);
-                          }}
-                          placeholder="Main Hall"
-                          className="border-white/10 bg-white/[0.03] text-sm text-white"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">Start Time</Label>
-                        <Input
-                          type="datetime-local"
-                          value={s.startTime}
-                          onChange={(e) => {
-                            const updated = [...sessions];
-                            updated[i] = { ...s, startTime: e.target.value };
-                            setSessions(updated);
-                          }}
-                          className="border-white/10 bg-white/[0.03] text-sm text-white"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">End Time</Label>
-                        <Input
-                          type="datetime-local"
-                          value={s.endTime}
-                          onChange={(e) => {
-                            const updated = [...sessions];
-                            updated[i] = { ...s, endTime: e.target.value };
-                            setSessions(updated);
-                          }}
-                          className="border-white/10 bg-white/[0.03] text-sm text-white"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">Speaker Name</Label>
-                        <Input
-                          value={s.speakerName}
-                          onChange={(e) => {
-                            const updated = [...sessions];
-                            updated[i] = { ...s, speakerName: e.target.value };
-                            setSessions(updated);
-                          }}
-                          placeholder="John Doe"
-                          className="border-white/10 bg-white/[0.03] text-sm text-white"
-                        />
-                      </div>
-                    </div>
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">Cover Image URL</label>
+                    <input className="gt-admin-input" value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} placeholder="https://images.unsplash.com/photo-..." />
                   </div>
-                ))}
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">Start Date & Time</label>
+                    <input type="datetime-local" className="gt-admin-input" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} required />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">End Date & Time</label>
+                    <input type="datetime-local" className="gt-admin-input" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} required />
+                  </div>
+                </div>
+              </div>
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Status</label>
+                <select className="gt-admin-select" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                  <option value="DRAFT">Draft</option>
+                  <option value="PUBLISHED">Published</option>
+                  <option value="CANCELLED">Cancelled</option>
+                  <option value="COMPLETED">Completed</option>
+                </select>
+              </div>
+            </div>
 
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
-            onClick={() => router.back()}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={saving}
-            className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : isNew ? (
-              "Create Event"
-            ) : (
-              "Update Event"
-            )}
-          </Button>
+            <div className="gt-admin-card mt-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h3 className="gt-admin-card-title" style={{ margin: 0 }}>Ticket Types</h3>
+                <button type="button" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" onClick={() => setTicketTypes([...ticketTypes, { name: "", price: "", quantityLimit: "" }])}>
+                  <i className="fa-regular fa-plus"></i> Add
+                </button>
+              </div>
+              {ticketTypes.map((t, i) => (
+                <div key={i} className="row g-2 mb-3 p-3" style={{ background: "#f8f9fe", borderRadius: "10px" }}>
+                  <div className="col-md-4">
+                    <input className="gt-admin-input" placeholder="Ticket name" value={t.name} onChange={(e) => { const list = [...ticketTypes]; list[i].name = e.target.value; setTicketTypes(list); }} />
+                  </div>
+                  <div className="col-md-3">
+                    <input className="gt-admin-input" type="number" placeholder="Price" value={t.price} onChange={(e) => { const list = [...ticketTypes]; list[i].price = e.target.value; setTicketTypes(list); }} />
+                  </div>
+                  <div className="col-md-3">
+                    <input className="gt-admin-input" type="number" placeholder="Quantity limit" value={t.quantityLimit} onChange={(e) => { const list = [...ticketTypes]; list[i].quantityLimit = e.target.value; setTicketTypes(list); }} />
+                  </div>
+                  <div className="col-md-2 d-flex align-items-center">
+                    <button type="button" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ borderColor: "#EF4444", color: "#EF4444" }} onClick={() => setTicketTypes(ticketTypes.filter((_, idx) => idx !== i))}>
+                      <i className="fa-regular fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="gt-admin-card mt-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h3 className="gt-admin-card-title" style={{ margin: 0 }}>Schedule Sessions</h3>
+                <button type="button" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" onClick={() => setSessions([...sessions, { title: "", startTime: "", endTime: "", room: "", day: 1, speakerId: "" }])}>
+                  <i className="fa-regular fa-plus"></i> Add
+                </button>
+              </div>
+              {sessions.map((s, i) => (
+                <div key={i} className="row g-2 mb-3 p-3" style={{ background: "#f8f9fe", borderRadius: "10px" }}>
+                  <div className="col-md-4">
+                    <input className="gt-admin-input" placeholder="Session title" value={s.title} onChange={(e) => { const list = [...sessions]; list[i].title = e.target.value; setSessions(list); }} />
+                  </div>
+                  <div className="col-md-2">
+                    <input type="datetime-local" className="gt-admin-input" value={s.startTime} onChange={(e) => { const list = [...sessions]; list[i].startTime = e.target.value; setSessions(list); }} />
+                  </div>
+                  <div className="col-md-2">
+                    <input type="datetime-local" className="gt-admin-input" value={s.endTime} onChange={(e) => { const list = [...sessions]; list[i].endTime = e.target.value; setSessions(list); }} />
+                  </div>
+                  <div className="col-md-2">
+                    <select className="gt-admin-select" value={s.speakerId} onChange={(e) => { const list = [...sessions]; list[i].speakerId = e.target.value; setSessions(list); }}>
+                      <option value="">No speaker</option>
+                      {speakers.map((sp) => <option key={sp.id} value={sp.id}>{sp.firstName} {sp.lastName}</option>)}
+                    </select>
+                  </div>
+                  <div className="col-md-1">
+                    <input className="gt-admin-input" type="number" min="1" placeholder="Day" value={s.day} onChange={(e) => { const list = [...sessions]; list[i].day = parseInt(e.target.value) || 1; setSessions(list); }} />
+                  </div>
+                  <div className="col-md-1 d-flex align-items-center">
+                    <button type="button" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ borderColor: "#EF4444", color: "#EF4444" }} onClick={() => setSessions(sessions.filter((_, idx) => idx !== i))}>
+                      <i className="fa-regular fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="gt-admin-card mt-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h3 className="gt-admin-card-title" style={{ margin: 0 }}>FAQs</h3>
+                <button type="button" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" onClick={() => setFaqs([...faqs, { question: "", answer: "" }])}>
+                  <i className="fa-regular fa-plus"></i> Add
+                </button>
+              </div>
+              {faqs.map((f, i) => (
+                <div key={i} className="row g-2 mb-3 p-3" style={{ background: "#f8f9fe", borderRadius: "10px" }}>
+                  <div className="col-md-5">
+                    <input className="gt-admin-input" placeholder="Question" value={f.question} onChange={(e) => { const list = [...faqs]; list[i].question = e.target.value; setFaqs(list); }} />
+                  </div>
+                  <div className="col-md-5">
+                    <input className="gt-admin-input" placeholder="Answer" value={f.answer} onChange={(e) => { const list = [...faqs]; list[i].answer = e.target.value; setFaqs(list); }} />
+                  </div>
+                  <div className="col-md-2 d-flex align-items-center">
+                    <button type="button" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm" style={{ borderColor: "#EF4444", color: "#EF4444" }} onClick={() => setFaqs(faqs.filter((_, idx) => idx !== i))}>
+                      <i className="fa-regular fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="col-lg-4">
+            <div className="gt-admin-card">
+              <h3 className="gt-admin-card-title mb-3">Event Settings</h3>
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Organization</label>
+                <select className="gt-admin-select" value={form.organizationId} onChange={(e) => setForm({ ...form, organizationId: e.target.value })}>
+                  <option value="">None</option>
+                  {organizations.map((org) => <option key={org.id} value={org.id}>{org.name}</option>)}
+                </select>
+              </div>
+
+              <h4 style={{ fontSize: "14px", fontWeight: 600, marginTop: "20px", marginBottom: "12px", color: "#555" }}>Venue</h4>
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Venue Name</label>
+                <input className="gt-admin-input" value={form.venueName} onChange={(e) => setForm({ ...form, venueName: e.target.value })} />
+              </div>
+              <div className="gt-admin-form-group">
+                <label className="gt-admin-label">Address</label>
+                <input className="gt-admin-input" value={form.venueAddress} onChange={(e) => setForm({ ...form, venueAddress: e.target.value })} />
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">City</label>
+                    <input className="gt-admin-input" value={form.venueCity} onChange={(e) => setForm({ ...form, venueCity: e.target.value })} />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">State</label>
+                    <input className="gt-admin-input" value={form.venueState} onChange={(e) => setForm({ ...form, venueState: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">Country</label>
+                    <input className="gt-admin-input" value={form.venueCountry} onChange={(e) => setForm({ ...form, venueCountry: e.target.value })} />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="gt-admin-form-group">
+                    <label className="gt-admin-label">Zip Code</label>
+                    <input className="gt-admin-input" value={form.venueZip} onChange={(e) => setForm({ ...form, venueZip: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" className="gt-admin-btn gt-admin-btn-primary w-100 mt-4" disabled={loading} style={{ fontSize: "16px", padding: "14px" }}>
+              {loading ? <><i className="fa-solid fa-spinner fa-spin me-2"></i> Saving...</> : <><i className="fa-regular fa-floppy-disk me-2"></i> {isNew ? "Create Event" : "Save Changes"}</>}
+            </button>
+          </div>
         </div>
       </form>
     </div>

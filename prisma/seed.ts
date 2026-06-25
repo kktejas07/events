@@ -1,6 +1,10 @@
 import { PrismaClient, Role, SponsorTier, OrderStatus, TicketStatus } from "@prisma/client";
+import type { Organization } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { hyderabadColleges } from "../src/lib/hyderabad-colleges";
+import { defaultContent } from "../src/lib/landing-defaults";
+import { landingSectionKeys } from "../src/lib/site-content";
 
 const prisma = new PrismaClient();
 
@@ -27,6 +31,9 @@ async function main() {
   await prisma.ticketType.deleteMany();
   await prisma.event.deleteMany();
   await prisma.venue.deleteMany();
+  await prisma.organizationMember.deleteMany();
+  await prisma.event.deleteMany();
+  await prisma.organization.deleteMany();
   await prisma.session.deleteMany();
   await prisma.account.deleteMany();
   await prisma.verificationToken.deleteMany();
@@ -46,6 +53,120 @@ async function main() {
     },
   });
   console.log("Created admin:", admin.email);
+
+  // Create organizations
+  const orgs = await Promise.all([
+    prisma.organization.create({
+      data: {
+        name: "MIT - Massachusetts Institute of Technology",
+        slug: "mit",
+        description: "World-renowned research university in Cambridge, Massachusetts",
+        email: "events@mit.edu",
+        website: "https://web.mit.edu",
+        city: "Cambridge",
+        state: "MA",
+        country: "USA",
+        brandColor: "#8B5CF6",
+        commissionRate: 5,
+        verified: true,
+      },
+    }),
+    prisma.organization.create({
+      data: {
+        name: "Stanford University",
+        slug: "stanford",
+        description: "Leading private research university in Silicon Valley",
+        email: "events@stanford.edu",
+        website: "https://www.stanford.edu",
+        city: "Stanford",
+        state: "CA",
+        country: "USA",
+        brandColor: "#8B5CF6",
+        commissionRate: 5,
+        verified: true,
+      },
+    }),
+    prisma.organization.create({
+      data: {
+        name: "IIT Bombay",
+        slug: "iit-bombay",
+        description: "Indian Institute of Technology Bombay — premier engineering institute",
+        email: "events@iitb.ac.in",
+        website: "https://www.iitb.ac.in",
+        city: "Mumbai",
+        state: "Maharashtra",
+        country: "India",
+        brandColor: "#8B5CF6",
+        commissionRate: 3,
+        verified: true,
+      },
+    }),
+    prisma.organization.create({
+      data: {
+        name: "Harvard University",
+        slug: "harvard",
+        description: "Ivy League research university in Cambridge, Massachusetts",
+        email: "events@harvard.edu",
+        website: "https://www.harvard.edu",
+        city: "Cambridge",
+        state: "MA",
+        country: "USA",
+        brandColor: "#8B5CF6",
+        commissionRate: 5,
+        verified: true,
+      },
+    }),
+    prisma.organization.create({
+      data: {
+        name: "Unverified College",
+        slug: "unverified-college",
+        description: "A college pending verification",
+        email: "contact@unverified.edu",
+        website: "https://unverified.edu",
+        city: "Somewhere",
+        state: "CA",
+        country: "USA",
+        brandColor: "#8B5CF6",
+        commissionRate: 0,
+        verified: false,
+      },
+    }),
+  ]);
+  console.log(`Created ${orgs.length} organizations`);
+
+  // Create organization admin users and assign them to orgs
+  type OrgSeed = { email: string; name: string; orgIdx: number };
+  const orgAdmins: OrgSeed[] = [
+    { email: "mit-admin@example.com", name: "MIT Events", orgIdx: 0 },
+    { email: "stanford-admin@example.com", name: "Stanford Events", orgIdx: 1 },
+    { email: "iitb-admin@example.com", name: "IITB Events", orgIdx: 2 },
+    { email: "harvard-admin@example.com", name: "Harvard Events", orgIdx: 3 },
+    { email: "unverified-admin@example.com", name: "Unverified Events", orgIdx: 4 },
+  ];
+
+  for (const oa of orgAdmins) {
+    const u = await prisma.user.upsert({
+      where: { email: oa.email },
+      update: {},
+      create: {
+        email: oa.email,
+        passwordHash: await bcrypt.hash("orgadmin123", 12),
+        firstName: oa.name.split(" ")[0],
+        lastName: oa.name.split(" ").slice(1).join(" "),
+        role: Role.ORGANIZATION_ADMIN,
+        organizationId: orgs[oa.orgIdx].id,
+      },
+    });
+    await prisma.organizationMember.create({
+      data: {
+        organizationId: orgs[oa.orgIdx].id,
+        userId: u.id,
+        role: Role.ORGANIZATION_ADMIN,
+        designation: "Event Coordinator",
+      },
+    });
+  }
+  console.log(`Created ${orgAdmins.length} organization admins`);
 
   // Create sample user
   const userHash = await bcrypt.hash("user1234", 12);
@@ -73,11 +194,12 @@ async function main() {
     },
   });
 
-  // Create event
+  // Create event (linked to MIT organization)
   const event = await prisma.event.create({
     data: {
       title: "AI Summit 2026",
       slug: "ai-summit-2026",
+      organizationId: orgs[0].id,
       description:
         "Join thought leaders, developers, researchers, and founders as we explore how artificial intelligence is reshaping industries, creativity, and the future of work. 5 days of keynotes, workshops, and networking with 50 world-class speakers.",
       shortDescription: "A global gathering of AI innovators",
@@ -86,13 +208,46 @@ async function main() {
       timezone: "America/Los_Angeles",
       venueId: venue.id,
       category: "Technology",
+      coverImage: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
       status: "PUBLISHED",
       isFeatured: true,
     },
   });
   console.log("Created event:", event.title);
 
-  // Create ticket types
+  // Create a second event for Stanford
+  const stanfordVenue = await prisma.venue.create({
+    data: {
+      name: "Stanford Memorial Auditorium",
+      address: "551 Serra Mall",
+      city: "Stanford",
+      state: "CA",
+      country: "USA",
+      zipCode: "94305",
+    },
+  });
+
+  const stanfordEvent = await prisma.event.create({
+    data: {
+      title: "Design Engineering Summit 2026",
+      slug: "design-engineering-summit-2026",
+      organizationId: orgs[1].id,
+      description:
+        "Explore the intersection of design thinking and engineering innovation at Stanford. Workshops, keynotes, and hands-on labs.",
+      shortDescription: "Design meets engineering at Stanford",
+      coverImage: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80",
+      startDate: new Date("2026-11-15T09:00:00Z"),
+      endDate: new Date("2026-11-17T17:00:00Z"),
+      timezone: "America/Los_Angeles",
+      venueId: stanfordVenue.id,
+      category: "Design",
+      status: "PUBLISHED",
+      isFeatured: true,
+    },
+  });
+  console.log("Created stanford event:", stanfordEvent.title);
+
+  // Create ticket types for AI Summit
   const ticketTypes = await Promise.all([
     prisma.ticketType.create({
       data: {
@@ -175,7 +330,44 @@ async function main() {
       },
     }),
   ]);
-  console.log(`Created ${ticketTypes.length} ticket types`);
+  console.log(`Created ${ticketTypes.length} ticket types for AI Summit`);
+
+  const stanfordTickets = await Promise.all([
+    prisma.ticketType.create({
+      data: {
+        eventId: stanfordEvent.id,
+        name: "Standard",
+        price: 249,
+        quantityLimit: 400,
+        perks: ["Keynotes & workshops", "Networking sessions", "Digital materials"],
+        color: "#6C5CE7",
+        sortOrder: 1,
+      },
+    }),
+    prisma.ticketType.create({
+      data: {
+        eventId: stanfordEvent.id,
+        name: "VIP",
+        price: 599,
+        quantityLimit: 150,
+        perks: ["All Standard benefits", "VIP lounge", "Front-row seating"],
+        color: "#00CEC9",
+        sortOrder: 2,
+      },
+    }),
+    prisma.ticketType.create({
+      data: {
+        eventId: stanfordEvent.id,
+        name: "Student",
+        price: 99,
+        quantityLimit: 200,
+        perks: ["Workshop access", "Student networking", "Certificate"],
+        color: "#00B894",
+        sortOrder: 3,
+      },
+    }),
+  ]);
+  console.log(`Created ${stanfordTickets.length} ticket types for Design Engineering Summit`);
 
   // Create speakers
   const speakers = await Promise.all([
@@ -186,6 +378,9 @@ async function main() {
         title: "Chief AI Scientist",
         company: "OpenAI",
         bio: "Leading AI researcher with over 15 years of experience in machine learning and deep neural networks.",
+        photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+        twitterUrl: "https://twitter.com",
+        linkedinUrl: "https://linkedin.com",
       },
     }),
     prisma.speaker.create({
@@ -195,6 +390,9 @@ async function main() {
         title: "VP of Machine Learning",
         company: "Google",
         bio: "Expert in building human-centered AI products and scalable ML infrastructure.",
+        photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+        twitterUrl: "https://twitter.com",
+        linkedinUrl: "https://linkedin.com",
       },
     }),
     prisma.speaker.create({
@@ -204,6 +402,45 @@ async function main() {
         title: "Founder & CEO",
         company: "NeuralCore",
         bio: "Serial entrepreneur focused on AI policy, regulation, and ethical deployment.",
+        photoUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+        twitterUrl: "https://twitter.com",
+        linkedinUrl: "https://linkedin.com",
+      },
+    }),
+    prisma.speaker.create({
+      data: {
+        firstName: "Aisha",
+        lastName: "Mensah",
+        title: "AI Ethics Researcher",
+        company: "DeepMind",
+        bio: "Leading voice in AI ethics, fairness, and responsible deployment of machine learning systems.",
+        photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80",
+        twitterUrl: "https://twitter.com",
+        linkedinUrl: "https://linkedin.com",
+      },
+    }),
+    prisma.speaker.create({
+      data: {
+        firstName: "Leo",
+        lastName: "Tanaka",
+        title: "Director of Engineering",
+        company: "NVIDIA",
+        bio: "Expert in GPU computing, deep learning infrastructure, and large-scale AI model training.",
+        photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80",
+        twitterUrl: "https://twitter.com",
+        linkedinUrl: "https://linkedin.com",
+      },
+    }),
+    prisma.speaker.create({
+      data: {
+        firstName: "Sophia",
+        lastName: "Romero",
+        title: "Head of AI Research",
+        company: "Meta AI",
+        bio: "Pioneer in transformer architectures, NLP, and multimodal AI systems.",
+        photoUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80",
+        twitterUrl: "https://twitter.com",
+        linkedinUrl: "https://linkedin.com",
       },
     }),
   ]);
@@ -252,36 +489,20 @@ async function main() {
   ]);
   console.log("Created schedule sessions");
 
-  // Create sponsors
-  const sponsors = await Promise.all([
-    prisma.sponsor.create({
-      data: {
-        name: "TechCorp",
-        logoUrl: "",
-        websiteUrl: "https://techcorp.com",
-        tier: SponsorTier.PLATINUM,
-        sortOrder: 1,
-      },
-    }),
-    prisma.sponsor.create({
-      data: {
-        name: "DataFlow",
-        logoUrl: "",
-        websiteUrl: "https://dataflow.com",
-        tier: SponsorTier.GOLD,
-        sortOrder: 2,
-      },
-    }),
-    prisma.sponsor.create({
-      data: {
-        name: "CloudNine",
-        logoUrl: "",
-        websiteUrl: "https://cloudnine.com",
-        tier: SponsorTier.SILVER,
-        sortOrder: 3,
-      },
-    }),
-  ]);
+  // Create sponsors — Hyderabad colleges & universities
+  const sponsors = await Promise.all(
+    hyderabadColleges.map((college, i) =>
+      prisma.sponsor.create({
+        data: {
+          name: college.name,
+          logoUrl: college.logo,
+          websiteUrl: college.website,
+          tier: (college.tier as SponsorTier) || SponsorTier.GOLD,
+          sortOrder: i + 1,
+        },
+      })
+    )
+  );
   console.log(`Created ${sponsors.length} sponsors`);
 
   // Link sponsors to event
@@ -437,6 +658,80 @@ async function main() {
     }
   }
   console.log(`Created ${demoOrders.length} orders with tickets`);
+
+  // Create blog posts
+  await Promise.all([
+    prisma.blogPost.create({
+      data: {
+        title: "The Future of Artificial Intelligence in 2026",
+        slug: "future-of-ai-2026",
+        excerpt: "Explore how AI is transforming industries from healthcare to finance, and what the next decade holds for machine learning and deep learning technologies.",
+        content: "<p>Artificial intelligence is rapidly evolving, reshaping industries and creating new opportunities across every sector. From healthcare diagnostics to autonomous vehicles, AI systems are becoming increasingly sophisticated and integrated into our daily lives.</p><p>In 2026, we're seeing unprecedented advances in large language models, computer vision, and reinforcement learning. These technologies are not just academic curiosities anymore — they're driving real business value and solving complex problems at scale.</p><p>The key trends to watch include multimodal AI systems that can understand text, images, and audio simultaneously; AI agents that can autonomously complete complex tasks; and the growing importance of AI safety and alignment research.</p>",
+        author: "Admin User",
+        category: "Technology",
+        tags: ["AI", "Machine Learning", "Technology"],
+        coverImage: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
+        published: true,
+        featured: true,
+        publishedAt: new Date("2025-11-15"),
+      },
+    }),
+    prisma.blogPost.create({
+      data: {
+        title: "How to Choose the Right Conference for Your Career",
+        slug: "choose-right-conference",
+        excerpt: "Not all conferences are created equal. Learn how to evaluate events based on your career goals, networking opportunities, and learning objectives.",
+        content: "<p>Attending the right conference can be a career-defining decision. Whether you're a developer looking to learn new skills, a founder seeking investors, or a researcher wanting to share your work, choosing the right event matters.</p><p>Consider factors like the speaker lineup, the attendee profile, workshop quality, and networking opportunities. Look for events that align with your specific interests and career stage.</p>",
+        author: "Sarah Johnson",
+        category: "Career",
+        tags: ["Career", "Events", "Networking"],
+        coverImage: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80",
+        published: true,
+        publishedAt: new Date("2025-12-01"),
+      },
+    }),
+    prisma.blogPost.create({
+      data: {
+        title: "5 Key Takeaways from the AI Summit 2025",
+        slug: "ai-summit-2025-takeaways",
+        excerpt: "Last year's AI Summit brought together over 5,000 attendees. Here are the most important insights and announcements that shaped the AI landscape.",
+        content: "<p>The AI Summit 2025 was a landmark event that brought together the brightest minds in artificial intelligence. From groundbreaking research presentations to product launches, the conference delivered insights that will shape the industry for years to come.</p>",
+        author: "Mike Chen",
+        category: "Technology",
+        tags: ["AI", "Conference", "Summary"],
+        coverImage: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80",
+        published: true,
+        publishedAt: new Date("2025-10-10"),
+      },
+    }),
+    prisma.blogPost.create({
+      data: {
+        title: "Networking Tips for Tech Conference Attendees",
+        slug: "tech-conference-networking",
+        excerpt: "Make the most of your conference experience with these proven networking strategies that will help you build meaningful professional connections.",
+        content: "<p>Networking at tech conferences can be intimidating, but it's one of the most valuable aspects of attending. Here are strategies to help you connect authentically with fellow attendees, speakers, and sponsors.</p>",
+        author: "Priya Sharma",
+        category: "Career",
+        tags: ["Networking", "Career", "Events"],
+        coverImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+        published: true,
+        publishedAt: new Date("2025-12-20"),
+      },
+    }),
+  ]);
+  console.log("Created blog posts");
+
+  // Seed landing page CMS content (matches index-3 defaults)
+  await prisma.siteContent.deleteMany();
+  for (const section of landingSectionKeys) {
+    const data = defaultContent[section];
+    if (data !== undefined) {
+      await prisma.siteContent.create({
+        data: { section, data: data as object },
+      });
+    }
+  }
+  console.log("Seeded site content sections:", landingSectionKeys.length);
 
   console.log("Seed completed successfully!");
 }

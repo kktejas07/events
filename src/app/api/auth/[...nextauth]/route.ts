@@ -98,9 +98,18 @@ const { handlers } = NextAuth({
       if (user || account) {
         const dbUser = await db.user.findUnique({
           where: { email: token.email! },
+          include: {
+            organization: {
+              select: { id: true, name: true, slug: true, logo: true, brandColor: true },
+            },
+          },
         });
         if (dbUser) {
           token.role = dbUser.role;
+          token.organizationId = dbUser.organizationId;
+          if (dbUser.organization) {
+            token.org = dbUser.organization;
+          }
         }
       }
       return token;
@@ -109,6 +118,12 @@ const { handlers } = NextAuth({
       if (session.user) {
         (session.user as unknown as Record<string, string>).id = token.id as string;
         (session.user as unknown as Record<string, string>).role = (token.role as string) || "USER";
+        (session.user as unknown as Record<string, string>).organizationId =
+          token.organizationId as string;
+        (session.user as unknown as Record<string, unknown>).org = token.org as Record<
+          string,
+          unknown
+        >;
       }
       return session;
     },

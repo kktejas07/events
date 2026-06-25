@@ -1,0 +1,965 @@
+.gt-speaker-wrapper {
+
+    .gt-left-image {
+
+        @include breakpoint (max-sm) {
+            margin-top: 30px;
+        }
+
+        .gt-text {
+            max-width: 690px;
+            color: $gt-text-color-2;
+        }
+
+        .gt-speaker-image {
+          max-width: 690px;
+          margin-top: 60px;
+
+          @include breakpoint (max-xl) {
+              margin-top: 30px;
+          } 
+
+            img {
+                @include imgw;
+            }
+        }
+    }
+
+    .gt-speaker-item {
+
+        .gt-speaker-image {
+            position: relative;
+            overflow: hidden;
+
+            &::before {
+                @include before;
+                border-radius: 20px;
+                background: linear-gradient(180deg, rgba(42, 221, 200, 0.75) 0%, rgba(21, 57, 238, 0.75) 100%);
+                @include transition;
+                opacity: 0;
+                visibility: hidden;
+                transform: scale(1, 0);
+                transition: transform 500ms ease;
+                transform-origin: top center;
+            }
+
+            &.gt-style-2 {
+                height: 865px;
+
+                 @include breakpoint (max-xl) {
+                    height: 575px;
+                }
+
+                @include breakpoint (max-lg) {
+                    height: 420px;
+                }
+
+                img {
+                    object-fit: cover
+                }
+            }
+
+            img {
+                @include imgw;
+                border-radius: 20px;
+            }
+
+            .gt-button-text {
+                position: absolute;
+                left: -20px;
+                top: 20px;
+                z-index: 999;
+                opacity: 0;
+                visibility: hidden;
+                @include transition;
+
+                .video-btn {
+                    background-color: rgba(255, 255, 255, 0.25);
+                    color: $gt-white;
+                    display: inline-block;
+                    font-size: 12px;
+                    height:42px;
+                    width: 42px;
+                    line-height:42px;
+                    border-radius: 100%;
+                    text-align: center;
+                    position: relative;
+               }
+
+                span {
+                    font-size: 14px;
+                    color: $gt-white;
+                    font-weight: 600;
+                }
+            }
+
+            .gt-speaker-content {
+                position: absolute;
+                left: 30px;
+                right: 30px;
+                bottom: -30px;
+                text-align: center;
+                opacity: 0;
+                visibility: hidden;
+                @include transition;
+
+                @include breakpoint (max-xl) {
+                    left: 20px;
+                    right: 20px;
+                }
+                
+                h3 {
+                    font-size: 30px;
+
+                    @include breakpoint (max-xl) {
+                       font-size: 20px;
+                   }
+
+                    a {
+                        color: $gt-white;
+                    }
+                }
+
+                 p {
+                    color: $gt-white;
+
+                    span {
+                        color: #2ADDC8;
+                    }
+                 }
+
+                 .gt-social-icon {
+                    gap: 15px;
+                    justify-content: center;
+                    margin-top: 15px;
+
+                    @include breakpoint (max-xl) {
+                       gap: 10px;
+                   }
+
+                    a {
+                        display: inline-block;
+                        width: 40px;
+                        height: 40px;
+                        line-height: 40px;
+                        text-align: center;
+                        border-radius: 6px;
+                        border: 1px solid rgba(255, 255, 255, 0.25);
+                        color: $gt-white;
+                        @include transition;
+                          
+                        &:hover {
+                            background: linear-gradient(180deg, #1539EE 0%, #2ADDC8 100%);
+                            border: 1px solid rgba(255, 255, 255, .25);
+                        }
+                    }
+                }
+            }
+        }
+
+        &:hover {
+            .gt-speaker-image {
+                &::before {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: scale(1, 1);
+                    transform-origin: bottom center;
+                    z-index: 1;
+                }
+
+                .gt-button-text {
+                    opacity: 1;
+                    visibility: visible;
+                    left: 20px;
+                }
+
+                .gt-speaker-content {
+                    opacity: 1;
+                    visibility: visible;
+                    bottom: 30px;
+                    z-index: 999;
+                }
+            }
+        }
+    }
+}
+
+.gt-speaker-section {
+    position: relative;
+    z-index: 9;
+
+     @include breakpoint (max-lg) {
+           overflow: hidden;
+     }
+
+    .gt-blur-shape {
+        position: absolute;
+        left: -10%;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+
+    .gt-blur-shape-2 {
+        position: absolute;
+        top: -10%;
+        right: 0;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+        
+        img {
+            @include imgw;
+        }
+    }
+}
+
+.gt-speaker-details-wrapper {
+
+    .gt-speaker-details-item {
+
+        .gt-speaker-image {
+            position: relative;
+            overflow: hidden;
+            max-width: 567px;
+            border-radius: 20px;
+
+            @include breakpoint (max-xl) {
+                max-width: initial;
+            }
+
+            &::before {
+               position: absolute;
+                top: 69%;
+                left: -19px;
+                right: 0px;
+                width: 100%;
+                height: 100%;
+                content: "";
+                border-radius: 700px !important;
+                background: linear-gradient(270deg, #1539EE 0%, #2ADDC8 100%);
+                width: 600px;
+                height: 550px;
+                transition: all 0.4s ease-in-out;
+                opacity: 0;
+                visibility: hidden;
+                overflow: hidden !important;
+                transform: scale(1, 0);
+                transition: transform 500ms ease;
+                transform-origin: top center;
+
+                @include breakpoint (max-xl) {
+                   display: none;
+              }
+            }
+
+            img {
+                @include imgw;
+                border-radius: 20px;
+            }
+
+            .gt-button-text {
+                position: absolute;
+                left: -20px;
+                top: 20px;
+                z-index: 999;
+                opacity: 0;
+                visibility: hidden;
+                @include transition;
+
+                .video-btn {
+                    background-color: rgba(255, 255, 255, 0.25);
+                    color: $gt-white;
+                    display: inline-block;
+                    font-size: 12px;
+                    height:42px;
+                    width: 42px;
+                    line-height:42px;
+                    border-radius: 100%;
+                    text-align: center;
+                    position: relative;
+               }
+
+                span {
+                    font-size: 14px;
+                    color: $gt-white;
+                    font-weight: 600;
+                }
+            }
+
+            .gt-speaker-content {
+                position: absolute;
+                left: 30px;
+                right: 30px;
+                bottom: -30px;
+                text-align: center;
+                opacity: 0;
+                visibility: hidden;
+                @include transition;
+
+                @include breakpoint (max-xl) {
+                    left: 20px;
+                    right: 20px;
+                }
+
+                 .gt-social-icon {
+                    gap: 15px;
+                    justify-content: center;
+                    margin-bottom: 40px;
+
+                    @include breakpoint (max-xl) {
+                       gap: 10px;
+                       margin-bottom: 30px;
+                   }
+
+                    a {
+                        display: inline-block;
+                        width: 40px;
+                        height: 40px;
+                        line-height: 40px;
+                        text-align: center;
+                        border-radius: 12px;
+                        color: $gt-header-color;
+                        @include transition;
+                        background-color: $gt-white;
+                          
+                        &:hover {
+                            background-color: $gt-theme-color;
+                            color: $gt-white;
+                        }
+                    }
+                }
+                
+                h3 {
+                    font-size: 30px;
+
+                    @include breakpoint (max-xl) {
+                       font-size: 20px;
+                   }
+
+                    a {
+                        color: $gt-white;
+                    }
+                }
+
+                 p {
+                    color: $gt-white;
+
+                    span {
+                        color: #2ADDC8;
+                    }
+                 }
+            }
+        }
+
+        &:hover {
+            .gt-speaker-image {
+                &::before {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: scale(1, 1);
+                    transform-origin: bottom center;
+                    z-index: 1;
+                }
+
+                .gt-button-text {
+                    opacity: 1;
+                    visibility: visible;
+                    left: 20px;
+                }
+
+                .gt-speaker-content {
+                    opacity: 1;
+                    visibility: visible;
+                    bottom: 30px;
+                    z-index: 999;
+                }
+            }
+        }
+    }
+
+    .gt-details-content {
+        margin-left: 30px;
+
+        @include breakpoint (max-xl){
+            margin-left: 0;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 48px;
+            font-weight: 700;
+
+            @include breakpoint (max-xl) {
+                font-size: 45px;
+            }
+
+            @include breakpoint (max-lg) {
+                font-size: 40px;
+            }
+
+            @include breakpoint (max-md) {
+               font-size: 35px;
+            }
+
+            @include breakpoint (max-sm) {
+                font-size: 30px;
+            }
+        }
+
+        h3 {
+           font-weight: 400;
+            margin-bottom: 20px;
+
+            span {
+                color: #2ADDC8;
+            }
+        }
+
+        p {
+            color: $gt-header-color;
+        }
+
+        .gt-list {
+           border-top: 1px solid rgba(0, 0, 0, 0.08);
+           padding-top: 30px;
+           margin-top: 30px;
+
+            li {
+                color: $gt-header-color;
+                font-weight: 400;
+
+                &:not(:last-child) {
+                    margin-bottom: 10px;
+                }
+
+                span {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: $gt-header-color;
+                    margin-right: 5px;
+                }
+            }
+        }
+    }
+
+    .gt-speaker-skill-wrapper {
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        padding-top: 50px;
+        margin-top: 100px;
+        @include flex;
+        gap: 50px;
+
+        @include breakpoint (max-xl) {
+            margin-top: 30px;
+            padding-top: 30px;
+        }
+
+        @include breakpoint (max-xl) {
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .gt-speaker-skill-content {
+            max-width: 670px;
+            h2 {
+                font-size: 40px;
+                font-weight: 700;
+                margin-bottom: 10px;
+
+                @include breakpoint (max-xl) {
+                 font-size: 35px;
+              }
+            }
+
+            p {
+                color: $gt-header-color;
+            }
+        }
+
+        .gt-progress-wrap {
+            width: 100%;
+            .pro-items {
+                width: 100%;
+        
+                &:not(:last-child){
+                    margin-bottom: 25px;
+                }
+                .pro-head {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 15px;
+                    
+                    .point {
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: $gt-header-color;
+                    }
+                }
+        
+                .progress {
+                    background: rgba(77, 85, 204, 0.07);
+                    justify-content: flex-start;
+                    align-items: center;
+                    position: relative;
+                    display: flex;
+                    height: 10px;
+                    width: 100%;
+                }
+                
+                .progress-value {
+                    animation: load 3s normal forwards;
+                    border-radius: 0;
+                    border-radius: 16px 0px 0px 16px;
+                    background: linear-gradient(270deg, #1539EE 0%, #2ADDC8 100%);
+                    height: 10px;
+                    width: 0;
+                }
+        
+                .style-two{
+                    animation: load2 3s normal forwards;
+                }
+        
+                .style-three{
+                    animation: load3 3s normal forwards;
+                }
+        
+                @keyframes load {
+                    0% { width: 0; }
+                    100% { width: 90%; }
+                }
+                @keyframes load2 {
+                    0% { width: 0; }
+                    100% { width: 70%; }
+                }
+                @keyframes load3 {
+                    0% { width: 0; }
+                    100% { width: 55%; }
+                }
+            }
+        }
+    }
+
+    .gt-text {
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    p {
+        color: $gt-header-color;
+    }
+}
+
+.gt-speaker-wrapper-3 {
+    background-color: $gt-theme-color-3;
+    border-radius: 40px;
+    padding: 70px;
+    position: relative;
+    z-index: 9;
+
+    @include breakpoint (max-xl) {
+        padding: 60px;
+    }
+
+    @include breakpoint (max-lg) {
+        padding: 50px;
+    }
+
+    @include breakpoint (max-md) {
+        padding: 40px;
+    }
+
+    @include breakpoint (max-sm) {
+        padding: 30px;
+    }
+
+
+    .gt-speaker-items-3 {
+
+        .gt-speaker-image {
+            position: relative;
+            overflow: hidden;
+
+            img {
+                @include imgw;
+                border-radius: 1000px 1000px 0px 1000px;
+            }
+
+            &::before {
+                @include before;
+                border-radius: 1000px 1000px 0px 1000px;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #1539EE 100%);
+                opacity: 0;
+                visibility: hidden;
+                @include transition;
+            }
+
+            .gt-social-icon {
+                position: absolute;
+                left: -30px;
+                top: 0;
+                transform: translateY(-50%);
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                transform: rotate(30deg);
+                transition: 0.4s ease;
+                opacity: 0;
+                visibility: hidden;
+
+                a {
+                    display: inline-block;
+                    background-color: $gt-white;
+                    color: $gt-theme-color;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    font-size: 14px;
+                    line-height: 30px;
+                    text-align: center;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    transition: 0.3s;
+
+                    &:hover {
+                        background-color: $gt-theme-color;
+                        color: $gt-white;
+                    }
+                }
+            }
+
+            .gt-speaker-content {
+                position: absolute;
+                left: 40px;
+                right: 40px;
+                bottom: -30px;
+                text-align: center;
+                opacity: 0;
+                visibility: hidden;
+                @include transition;
+
+                .video-btn {
+                    color: $gt-white;
+                    font-size: 16px;
+                }
+
+                h4 {
+                    margin-top: 10px;
+                    font-weight: 700;
+
+                    a {
+                        color: $gt-white;
+                    }
+                }
+
+                p {
+                    font-size: 14px;
+                    font-weight: 400;
+                    color: $gt-white;
+                }
+            }
+        }
+
+        &:hover {
+            .gt-speaker-image {
+                &::before {
+                    opacity: 1;
+                    visibility: visible;
+                }
+
+                .gt-social-icon {
+                    opacity: 1;
+                    visibility: visible;
+                    left: 30px;
+                }
+
+                .gt-speaker-content {
+                    opacity: 1;
+                    visibility: visible;
+                    bottom: 30px;
+                }
+            }
+        }
+    }
+}
+
+.gt-speaker-section-3 {
+    position: relative;
+
+    @include breakpoint (max-xl) {
+        overflow: hidden;
+    }
+
+    .gt-left-shape {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: -1;
+
+        img {
+            @include imgw;
+        }
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}
+
+
+.gt-meet-speaker-items {
+    text-align: center;
+    margin-bottom: 200px;
+    overflow: visible; 
+    position: relative; 
+    z-index: 1;
+
+     @include breakpoint (max-xxxl) {
+        margin-bottom: 250px;
+    }
+
+    @include breakpoint (max-xl) {
+        margin-bottom: 0;
+        margin-top: 30px;
+    }
+
+  .swiper {
+    &.gt-speaker-slider {
+      overflow: hidden; 
+      position: relative;
+      z-index: 999;
+
+      .swiper-slide {
+        position: relative;
+        overflow: visible; 
+
+        &.gt-style-2 {
+            padding-top: 30px;
+
+          .speaker-image {
+                display: flex;
+                justify-content: center;
+                align-items: center; 
+                overflow: visible !important;
+
+            img {
+                @include imgw;
+                width: 100%;
+                max-width: 250px;
+                transition: transform 0.5s ease;
+                transform: scale(1);
+                transform-origin: center center;
+                display: block;
+            }
+          }
+
+          .content {
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.4s ease;
+                margin-top: 50px;
+          }
+
+          &.swiper-slide-active {
+              z-index: 10;
+              padding-top: 30px;
+            .speaker-image {
+              img {
+                transform: scale(1.2); 
+              }
+            }
+
+            .content {
+              opacity: 1;
+              visibility: visible;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+.gt-meet-speaker-section {
+    position: relative;
+
+    .gt-left-image {
+        position: absolute;
+        bottom: 120px;
+        left: 0;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+
+        .array-buttons-3 {
+
+            .array-prev {
+                position: absolute;
+                top: 50%;
+                right: 40px;
+                transform: translateY(-50%);
+                width: 80px;
+                height: 80px;
+                line-height: 80px;
+                border-radius: 100%;
+                text-align: center;
+                background-color: $gt-white;
+                color: #4D55CC;
+                font-size: 24px;
+                @include transition;
+
+                &:hover {
+                    background-color: #4D55CC;
+                    color: $gt-white;
+                }
+            }
+        }
+
+        img {
+            @include imgw;
+            border-radius: 0px 1000px 1000px 0px;
+        }
+    }
+
+    .gt-right-image {
+        position: absolute;
+        bottom: 120px;
+        right: 0;
+
+         @include breakpoint (max-xl) {
+            display: none;
+        }
+
+        .array-buttons-3 {
+
+            .array-next {
+                position: absolute;
+                top: 50%;
+                left: 40px;
+                transform: translateY(-50%);
+                width: 80px;
+                height: 80px;
+                line-height: 80px;
+                border-radius: 100%;
+                text-align: center;
+                background-color: #4D55CC;
+                color: $gt-white;
+                font-size: 24px;
+                @include transition;
+
+                &:hover {
+                    background-color: $gt-white;
+                    color: #4D55CC;
+                }
+            }
+        }
+
+        img {
+            @include imgw;
+            border-radius: 1000px 0px 0px 1000px;
+        }
+    }
+}
+
+
+.gt-speaker-items-5 {
+    margin-top: 30px;
+    
+    .gt-speaker-image {
+        overflow: hidden;
+        position: relative;
+
+        &::before {
+            @include before;
+            border-radius: 100%;
+            background: linear-gradient(180deg, rgba(153, 0, 255, 0.00) 35%, #90F 85%);
+            @include transition;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        img {
+            @include imgw;
+        }
+
+        .gt-speaker-content {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            bottom: -30px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            @include transition;
+            
+                h4 {
+                    font-weight: 700;
+
+                    a {
+                        color: $gt-white;
+                    }
+                }
+
+                .gt-social-icon {
+                    gap: 15px;
+                    justify-content: center;
+                    margin-top: 10px;
+
+                    @include breakpoint (max-xl) {
+                        gap: 10px;
+                    }
+
+                a {
+                    display: inline-block;
+                    color: $gt-white;
+                    @include transition;
+                        
+                    &:hover {
+                        background: linear-gradient(180deg, #1539EE 0%, #2ADDC8 100%);
+                        border: 1px solid rgba(255, 255, 255, .25);
+                    }
+                }
+            }
+        }
+    }
+
+    &:hover {
+
+        .gt-speaker-image {
+             &::before {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .gt-speaker-content {
+                opacity: 1;
+                visibility: visible;
+                bottom: 30px;
+                z-index: 999;
+            }
+        }
+    }
+}
+
+.gt-speaker-section-5 {
+    position: relative;
+
+    .gt-blur-shape {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+}

@@ -4,14 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  ScanLine,
-  TicketCheck,
-  ShieldCheck,
-  CheckCircle2,
-  XCircle,
-  Calendar,
-} from "lucide-react";
+import { ScanLine, TicketCheck, ShieldCheck, CheckCircle2, XCircle, Calendar } from "lucide-react";
 import CameraScanner from "@/components/scanner/camera-scanner";
 
 interface Event {
@@ -50,39 +43,44 @@ export default function ScannerPageClient({
       .catch(() => {});
   }, []);
 
-  const verifyBarcode = useCallback(async (code: string): Promise<boolean> => {
-    try {
-      const body: Record<string, string> = { barcode: code };
-      if (selectedEventId !== "all") body.eventId = selectedEventId;
+  const verifyBarcode = useCallback(
+    async (code: string): Promise<boolean> => {
+      try {
+        const body: Record<string, string> = { barcode: code };
+        if (selectedEventId !== "all") body.eventId = selectedEventId;
 
-      const res = await fetch("/api/admin/tickets/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const json = await res.json();
+        const res = await fetch("/api/admin/tickets/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const json = await res.json();
 
-      const entry: ScanLogEntry = {
-        barcode: code,
-        timestamp: Date.now(),
-        valid: !!json.success,
-        attendeeName: json.data?.attendeeName,
-        ticketType: json.data?.ticketTypeName,
-        eventName: json.data?.eventName,
-        message: json.success
-          ? `${json.data.attendeeName} — ${json.data.ticketTypeName}`
-          : json.error || "Invalid ticket",
-      };
-      setScanLog((prev) => [entry, ...prev].slice(0, 50));
-      return !!json.success;
-    } catch {
-      setScanLog((prev) => [
-        { barcode: code, timestamp: Date.now(), valid: false, message: "Network error" },
-        ...prev,
-      ].slice(0, 50));
-      return false;
-    }
-  }, [selectedEventId]);
+        const entry: ScanLogEntry = {
+          barcode: code,
+          timestamp: Date.now(),
+          valid: !!json.success,
+          attendeeName: json.data?.attendeeName,
+          ticketType: json.data?.ticketTypeName,
+          eventName: json.data?.eventName,
+          message: json.success
+            ? `${json.data.attendeeName} — ${json.data.ticketTypeName}`
+            : json.error || "Invalid ticket",
+        };
+        setScanLog((prev) => [entry, ...prev].slice(0, 50));
+        return !!json.success;
+      } catch {
+        setScanLog((prev) =>
+          [
+            { barcode: code, timestamp: Date.now(), valid: false, message: "Network error" },
+            ...prev,
+          ].slice(0, 50)
+        );
+        return false;
+      }
+    },
+    [selectedEventId]
+  );
 
   async function handleManualVerify() {
     if (!barcode.trim()) return;
@@ -95,9 +93,7 @@ export default function ScannerPageClient({
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-bold text-white">Ticket Scanner</h2>
-        <p className="text-sm text-gray-400">
-          Logged in as {user.name || user.email}
-        </p>
+        <p className="text-sm text-gray-400">Logged in as {user.name || user.email}</p>
       </div>
 
       {events.length > 0 && (
@@ -109,7 +105,9 @@ export default function ScannerPageClient({
               onChange={(e) => setSelectedEventId(e.target.value)}
               className="flex-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
             >
-              <option value="all" className="bg-[#0a0a1a]">All Events</option>
+              <option value="all" className="bg-[#0a0a1a]">
+                All Events
+              </option>
               {events.map((ev) => (
                 <option key={ev.id} value={ev.id} className="bg-[#0a0a1a]">
                   {ev.title}
@@ -150,7 +148,7 @@ export default function ScannerPageClient({
             />
             <Button
               onClick={handleManualVerify}
-              className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
             >
               Verify
             </Button>
@@ -168,7 +166,9 @@ export default function ScannerPageClient({
                 <TicketCheck
                   className={`h-5 w-5 ${scanResult.valid ? "text-green-400" : "text-red-400"}`}
                 />
-                <span className={`font-medium ${scanResult.valid ? "text-green-400" : "text-red-400"}`}>
+                <span
+                  className={`font-medium ${scanResult.valid ? "text-green-400" : "text-red-400"}`}
+                >
                   {scanResult.valid ? "Valid Ticket" : "Invalid"}
                 </span>
               </div>

@@ -1,0 +1,2920 @@
+.gt-event-wrapper {
+    padding: 130px 0 440px;
+    position: relative;
+
+     @include breakpoint (max-lg) {
+        padding: 150px 0;
+    }
+
+
+    @include breakpoint (max-sm) {
+        padding: 100px 0;
+    }
+
+    .video-btn {
+        width: 138px;
+        height: 138px;
+        line-height: 138px;
+        text-align: center;
+        border-radius: 100px;
+        background-color: transparent;
+        color: $gt-white;
+        display: inline-block;
+        text-align: center;
+        font-size: 30px;
+        border: 1px solid rgba(255, 255, 255, .3);
+        text-align: center;
+        position: absolute;
+        top: 49%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+
+        @include breakpoint (max-lg) {
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+        }
+
+        @include breakpoint (max-md) {
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+        }
+    }
+}
+
+.gt-event-bg-section {
+
+    &.bg-cover {
+        background-position: bottom center;
+    }
+}
+
+.gt-event-card-item {
+    background-color: $gt-white;
+    padding: 25px;
+    border-radius: 20px;
+    position: relative;
+    z-index: 999;
+    box-shadow: 0px 4px 60px 0px rgba(21, 57, 238, 0.08);
+
+    &::before {
+        @include before;
+        transform: scale(1, 0);
+        transition: transform 500ms ease;
+        transform-origin: bottom center;
+        border-radius: 20px;
+        background: linear-gradient(180deg, #1539EE 0%, #2ADDC8 100%);
+        z-index: 9;
+    }
+
+    .gt-line-shape {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: -1;
+
+        img {
+            @include imgw;
+        }
+    }
+
+    .gt-event-content {
+
+        h2 {
+            font-size: 60px;
+            font-weight: 400;
+            background: linear-gradient(180deg, #1539EE 0%, #2ADDC8 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h3 {
+            margin-bottom: 15px;
+        }
+
+        p {
+            max-width: 370px;
+            color: $gt-text-color-2;
+        }
+    }
+
+    &:hover {
+
+        .gt-event-content {
+            position: relative;
+            z-index: 999;
+
+            h2 {
+                background: linear-gradient(180deg, #fff 0%, #fff 100%);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                z-index: 1;
+            }
+    
+            h3 {
+               a {
+                  color: $gt-white;
+               }
+            }
+    
+            p {
+                color: $gt-white;
+            }
+        }
+
+        &::before {
+            transform: scale(1, 1);
+            transform-origin: top center;
+        }
+    }
+}
+
+.gt-event-top-section {
+    margin-top: -120px;
+
+    @include breakpoint (max-xl) {
+        margin-top: 100px;
+    }
+
+    @include breakpoint (max-lg) {
+        margin-top: 80px;
+    }
+}
+
+.gt-event-schedule-wrapper {
+    border-top: 1px solid rgba(17, 17, 44, 0.20);
+    padding-top: 30px;
+
+    @include breakpoint (max-xl) {
+        margin-bottom: 30px;
+    }
+
+    @include breakpoint (max-sm) {
+       margin-top: 30px;
+    }
+
+    .nav {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        gap: 10px;
+        justify-content: center;
+        position: relative;
+
+        @include breakpoint (max-lg) {
+            flex-wrap: wrap;
+            gap: 20px;
+            border: 1px none;
+        }
+    
+        li{
+          
+           .nav-link{
+            @include transition;
+            padding: 12px 15px;
+            border-radius: 100px;
+            background: rgba(77, 85, 204, 0.20);
+            line-height: 1;
+            color: $gt-header-color;
+            font-weight: 600;
+
+            &.active {
+                position: relative;
+                border-radius: 100px;
+                background: linear-gradient(90deg, #1539EE 0%, #2ADDC8 100%);
+                color: $gt-white;
+             }
+           }
+        }
+      }
+
+    .gt-event-schedule-item {
+        @include flex;
+        justify-content: space-between;
+        border-radius: 20px;
+        position: relative;
+        box-shadow: 0px 4px 60px 0px rgba(21, 57, 238, 0.08);
+        padding: 0px 60px 0 0px;
+        z-index: 9;
+        margin-top: 30px;
+
+        @include breakpoint (max-xl) {
+           flex-wrap: wrap;
+           gap: 30px;
+           padding: 60px;
+        }
+
+        @include breakpoint (max-lg) {
+            padding: 50px;
+        }
+
+        @include breakpoint (max-md) {
+            padding: 40px;
+        }
+
+        @include breakpoint (max-sm) {
+            padding: 30px;
+        }
+
+        @include breakpoint (max-xxs) {
+            padding: 25px;
+        }
+
+        .gt-dot-shape {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: -1;
+
+            @include breakpoint (max-xl) {
+               display: none;
+           }
+
+            img {
+                @include imgw;
+            }
+        }
+
+        .gt-event-image {
+           
+            @include breakpoint (max-xl) {
+                flex-basis: 100%;
+           }
+
+            img {
+                @include imgw;
+            }
+        }
+
+        .gt-event-schedule-content {
+            max-width: 482px;
+            border-right: 1px solid rgba(0, 0, 0, 0.15);
+
+            @include breakpoint (max-xl) {
+                 border-right: none
+            }
+
+            .gt-event-list {
+                @include flex;
+                gap: 30px;
+                margin-bottom: 30px;
+
+                @include breakpoint (max-xl) {
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+
+                li {
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: $gt-theme-color;
+                    padding: 8px 16px;
+                    background-color: $gt-white;
+                    border-radius: 40px;
+                    line-height: 1;
+                    border: 1px solid $gt-theme-color;
+                    @include transition;
+
+                    &:hover {
+                        background-color: $gt-theme-color;
+                        color: $gt-white;
+                    }
+
+                    i {
+                        margin-right: 5px;
+                    }
+                }
+            }
+
+            h3 {
+                margin-bottom: 15px;
+
+                a {
+
+                    &:hover {
+                        color: $gt-theme-color;
+                    }
+                }
+            }
+
+            .gt-list {
+                li {
+                    color: $gt-header-color;
+
+                    i {
+                        margin-right: 10px;
+                        color: $gt-theme-color
+                    }
+                }
+            }
+
+            .gt-client-info {
+                @include flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+        }
+
+        .gt-event-button {
+
+            .gt-theme-btn {
+                background-image: none;
+                border: 1px solid rgba(21, 57, 238, 0.20);
+                color: $gt-theme-color;
+                @include transition;
+
+                i {
+                    color: $gt-theme-color;
+                }
+
+                &:hover {
+                    background-image: linear-gradient(to right, #2ADDC8 0%, #1539EE 50%, #2ADDC8 100%);
+                    color: $gt-white;
+
+                    i {
+                        color: $gt-white;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.gt-events-schedule-section {
+    position: relative;
+
+    @include breakpoint (max-xxxl) {
+        overflow: hidden;
+    }
+
+     @include breakpoint (max-xl) {
+       margin-bottom: -30px;
+    }
+
+    .gt-middle-shape {
+        position: absolute;
+        left: 22%;
+        top: -71%;
+        z-index: -1;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+
+    .gt-left-shape {
+        position: absolute;
+        left: -29%;
+        top: -62%;
+        z-index: -1;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+
+    .gt-right-shape {
+        position: absolute;
+        right: 0;
+        top: -60%;
+        z-index: -1;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+}
+
+.gt-attended-item {
+    position: relative;
+
+    .gt-attended-iamge {
+        position: relative;
+        z-index: 9;
+        overflow: hidden;
+
+        img {
+            @include imgw;
+        }
+
+        .icon {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            opacity: 0;
+            visibility: hidden;    
+            @include transition;
+            color: $gt-white;
+            z-index: 999;
+            font-size: 32px;
+        }
+
+        &:before, &:after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 50%;
+            top:0;
+            left: 0;
+            background: rgba(21, 57, 238, 0.70);
+            transform: translateX(-100%) rotate(15deg);
+            @include transition;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        &:after {
+            left: auto;
+            right: 0;
+            transform: translateX(100%) rotate(-15deg);
+        }
+    }
+
+      .gt-attended-iamge-2 {
+            position: relative;
+
+            img {
+                @include imgw;
+            }
+
+            &::before {
+                @include before;
+                background: linear-gradient(180deg, rgba(21, 57, 238, 0.90) 0%, rgba(42, 221, 200, 0.90) 100%);
+            }
+
+            .gt-attended-content {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+                text-align: center;
+
+            h6 {
+                font-size: 16px;
+                font-weight: 600;
+                color: $gt-white;
+                font-family: $gt-body-font;
+                margin-bottom: 25px;
+                text-transform: capitalize;
+                border-radius: 100px;
+                background: rgba(255, 255, 255, 0.10);
+                padding: 10px 24px;
+                line-height: 1;
+                display: inline-block;
+
+                @include breakpoint (max-xl) {
+                    padding: 10px 15px;
+                }
+            }
+
+            h2 {
+                color: $gt-white;
+                line-height: 100%;
+
+                 @include breakpoint (max-xl) {
+                    font-size: 35px;
+                }
+
+                 @include breakpoint (max-md) {
+                    font-size: 30px;
+                }
+
+                 @include breakpoint (max-sm) {
+                    font-size: 25px;
+                }
+             }
+           }
+        }
+
+    &:hover {
+        
+        .gt-attended-iamge {
+
+            .icon {
+                top: 50%;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            &:before, &:after {
+                transform: none;
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+}
+
+.gt-event-ticket-section {
+    position: relative;
+
+    &.bg-cover {
+        background-position: bottom center;
+    }
+
+    .gt-blur-shape {
+        position: absolute;
+        left: 25%;
+        top: -6%;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}
+
+.gt-main-card-item {
+    padding: 12px;
+    background-color: $gt-theme-color;
+    border-radius: 10px;
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transform: translateY(0);
+
+    &.gt-bg {
+        background: rgba(122, 115, 209, 0.30);
+    }
+
+     @include breakpoint (max-xl) {
+          margin-bottom: 0;
+     }
+
+    &.gt-style-2 {
+        background: linear-gradient(180deg, #2ADDC8 0%, #4D55CC 100%);
+
+        .gt-event-ticket-card-item {
+            background: rgba(255, 255, 255, 0.80);
+
+        }
+    }
+
+    &.gt-bg-color {
+        background: linear-gradient(180deg, #1539EE 0%, #90F 100%);
+    }
+
+    .gt-event-ticket-card-item {
+        border-radius: 10px;
+        background-color: $gt-white;
+        position: relative;
+        padding: 30px 35px;
+        position: relative;
+
+        @include breakpoint (max-sm) {
+             padding: 30px;
+         }
+
+        @include breakpoint (max-xxs) {
+             padding: 25px;
+         }
+
+        h3 {
+            border-bottom: 1.5px solid rgba(191, 191, 191, 0.32);
+            padding-bottom: 16px;
+            margin-bottom: 40px;
+            font-weight: 800;
+        }
+
+        .gt-event-box-item {
+            padding: 24px 20px;
+            background-color: $gt-bg-color;
+            position: relative;
+            margin-bottom: 16px;
+
+            &::before {
+                position: absolute;
+                content: "";
+                left: -13px;
+                top: 41px;
+                width: 32px;
+                height: 32px;
+                border-radius: 100%;
+                background: $gt-bg-color-2;
+
+                @include breakpoint (max-sm) {
+                    display: none;
+                }
+            }
+            
+            &::after {
+                position: absolute;
+                content: "";
+                right: -13px;
+                top: 41px;
+                width: 32px;
+                height: 32px;
+                border-radius: 100%;
+                background: $gt-bg-color-2;
+
+                 @include breakpoint (max-sm) {
+                    display: none;
+                }
+            }
+
+            h6 {
+                border-bottom: 1px dashed rgba(191, 191, 191, 1);
+                margin-bottom: 16px;
+                padding-bottom: 16px;
+                font-weight: 700;
+
+                span {
+                    color: #595959;
+                    font-size: 14px;
+                    font-weight: 400;
+                }
+            }
+
+            .gt-box-item {
+                @include flex;
+                justify-content: space-between;
+
+                @include breakpoint (max-xl) {
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+                
+                .gt-item {
+                    text-align: center;
+
+                    span {
+                        font-size: 12px;
+                        font-weight: 700;
+                        display: inline-block;
+                        margin-bottom: 10px;
+                        color: #595959;
+                    }
+
+                    p {
+                        text-align: center;
+                        color: #595959;
+
+                        @include breakpoint (max-xl) {
+                            text-align: left;
+                        }
+                    }
+
+                    .qty {
+                        display: flex;
+                        align-items: center;
+                        background-color: $gt-bg-color-2;
+                        padding: 5px 12px;
+                        line-height: 1;
+                        justify-content: space-between;
+                        margin-top: 0;
+                        width: 100px;
+        
+                        button,
+                        input{
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: $gt-header-color;
+                            font-weight: 400;
+                            font-size: 16px;
+                            width: 45px;
+                        }
+                        
+                        input{
+                            background-color: transparent;
+                            text-align: center;
+                            border-radius: 0;
+                            border: unset;
+                            outline: none;
+                        }
+                    }
+                }
+            }
+        }
+
+        .gt-list-item {
+            background-color: $gt-bg-color;
+            padding: 24px;
+
+            li {
+                @include flex;
+                justify-content: space-between;
+                font-weight: 700;
+                color: $gt-header-color;
+
+                @include breakpoint (max-xl) {
+                    font-size: 14px;
+                }
+
+                @include breakpoint (max-lg) {
+                    font-size: 16px;
+                }
+
+                &:not(:last-child) {
+                    border-bottom: 1px solid rgba(191, 191, 191, 0.32);
+                    padding-bottom: 16px;
+                    margin-bottom: 16px;
+                }
+
+                span {
+                font-weight: 400;
+                color: #595959;
+                }
+            }
+        }
+
+        .gt-card-button {
+            margin-top: 30px;
+
+            .gt-theme-btn {
+
+                &.gt-style-2 {
+                    border: 1px solid $gt-theme-color;
+                    width: 100%;
+
+                    &:hover {
+                        border: 1px solid transparent;
+                        border-image: linear-gradient(90deg, rgba(21, 57, 238, 0.6), rgba(42, 221, 200, 0.6));
+                    }
+                }
+
+                &.gt-theme-btn-2 {
+                    background-image: none;
+                    width: 100%;
+                    border: 1.5px solid #4D55CC;
+                    color: $gt-header-color;
+
+                    &:hover {
+                        background: #4D55CC;
+                        color: $gt-white;
+                    }
+                }
+            }
+
+            &.gt-cart-button-2 {
+                .gt-theme-btn {
+
+                &.gt-theme-btn-2 {
+                    background-image: none;
+                    width: 100%;
+                    border: 1.5px solid #4D55CC;
+                    color: $gt-header-color;
+                    border-radius: 100px;
+
+                    &:hover {
+                       background-image: linear-gradient(to right, #1539EE 0%, #90F 50%, #1539EE 100%);
+                       border: 1.5px solid transparent;
+                       color: $gt-white;
+                    }
+                 }
+              }
+            }
+        }
+    }
+
+    &:hover {
+        transform: translateY(-10px);
+    }
+}
+
+
+.gt-event-ticket-section-2 {
+    position: relative;
+
+    .gt-left-shape {
+        position: absolute;
+        left: 50px;
+        bottom: 270px;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+
+    .gt-top-shape {
+        position: absolute;
+        right: 37%;
+        top: 120px;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+
+    .gt-right-shape {
+        position: absolute;
+        right: 50px;
+        bottom: 230px;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+
+    .gt-right-shape-2 {
+        position: absolute;
+        right: 0;
+        top: -20%;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}
+
+
+.tab-content {
+    border-top: 1px solid rgba(255, 255, 255, 0.20);
+    padding-top: 40px;
+    margin-top: 30px;
+
+    .gt-event-box-item {
+        background-color: $gt-white;
+        padding: 25px;
+        border-radius: 20px;
+        position: relative;
+
+        .gt-event-image {
+            position: relative;
+
+            .gt-link-btn-3 {
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                transform: translateX(-50%);
+
+                @include breakpoint (max-xl) {
+                        padding: 9px 15px;
+                }
+            }
+
+            img {
+                @include imgw;
+                border-radius: 20px;
+            }
+        }
+
+        .gt-event-content {
+            margin-top: 30px;
+
+            .gt-event-list {
+                @include flex;
+                gap: 30px;
+                margin-bottom: 15px;
+
+                @include breakpoint (max-xl) {
+                    flex-wrap: wrap;
+                    gap: 20px;
+                }
+
+                    li {
+                        font-size: 16px;
+                        font-weight: 400;
+                        color: #4D55CC;
+                        padding: 8px 16px;
+                        background-color: $gt-white;
+                        line-height: 1;
+                        border-radius: 4px;
+                        border: 1px solid #4D55CC;
+                        @include transition;
+
+                        &:hover {
+                            background-color: $gt-theme-color-2;
+                            border: 1px solid $gt-theme-color-2;
+                            color: $gt-white;
+                        }
+
+                        i {
+                            margin-right: 5px;
+                        }
+                    }
+                }
+
+                h3 {
+                    margin-bottom: 10px;
+
+                a {
+                    &:hover {
+                        color: $gt-theme-color;
+                    }
+                }
+            }
+
+            p {
+                color: $gt-text-color-2;
+                max-width: 390px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+                font-size: 16px;
+                font-weight: 400;
+            }
+
+            .gt-client-info {
+                @include flex;
+                gap: 10px;
+
+                .gt-text {
+                    h6 {
+                        color: $gt-theme-color-2;
+                    }
+                }
+            }
+        }
+    }
+
+    .gt-event-main-box-item {
+        border-radius: 20px;
+        background-color: $gt-white;
+        padding: 25px;
+
+    .gt-event-box-item-2 {
+        @include flex;
+        gap: 25px;
+
+        @include breakpoint (max-xl) {
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .gt-event-image {
+            position: relative;
+
+            @include breakpoint (max-xl) {
+                flex-basis: 100%;
+            }
+
+            .gt-link-btn-3 {
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                transform: translateX(-50%);
+
+                @include breakpoint (max-xl) {
+                    padding: 9px 15px;
+                }
+            }
+
+            img {
+                border-radius: 20px;
+            }
+
+            @include breakpoint (max-xl) {
+                img {
+                    @include imgw;
+                }
+            }
+        }
+
+        .gt-event-content {
+
+            .gt-event-list {
+                @include flex;
+                gap: 30px;
+                margin-bottom: 15px;
+
+                @include breakpoint (max-xl) {
+                    flex-wrap: wrap;
+                    gap: 20px;
+                }
+
+                    li {
+                        font-size: 16px;
+                        font-weight: 400;
+                        color: #4D55CC;
+                        padding: 8px 16px;
+                        background-color: $gt-white;
+                        line-height: 1;
+                        border-radius: 4px;
+                        border: 1px solid #4D55CC;
+                        @include transition;
+
+                        &:hover {
+                            background-color: $gt-theme-color-2;
+                            border: 1px solid $gt-theme-color-2;
+                            color: $gt-white;
+                        }
+
+                        i {
+                            margin-right: 5px;
+                        }
+                    }
+                }
+
+                h3 {
+                    margin-bottom: 10px;
+
+                a {
+                    &:hover {
+                        color: $gt-theme-color;
+                    }
+                }
+            }
+
+            p {
+                color: $gt-text-color-2;
+                max-width: 390px;
+                margin-bottom: 20px;
+                font-size: 16px;
+                font-weight: 400;
+            }
+
+            .gt-client-info {
+                @include flex;
+                gap: 10px;
+
+                .gt-text {
+                    h6 {
+                        color: $gt-theme-color-2;
+                    }
+                }
+            }
+        }
+
+        &.gt-style-2 {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+    }
+  }
+}
+
+
+.gt-our-event-section {
+    position: relative;
+    z-index: 9;
+
+    &::before {
+        @include before;
+        background: linear-gradient(180deg, rgba(33, 28, 132, 0.90) 0%, rgba(9, 0, 255, 0.90) 52.88%, rgba(122, 115, 209, 0.90) 100%);
+        z-index: -1;
+    }
+
+    .gt-circle-shape {
+        position: absolute;
+        bottom: 40px;
+        left: 60px;
+
+         @include breakpoint (max-xl) {
+            display: none;
+        }
+
+        img {
+            @include imgw;
+        }
+    }
+
+    .nav {
+        display: grid;
+        gap: 20px;
+        justify-content: center;
+        position: absolute;
+        right: 150px;
+        bottom: 300px;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+
+        .nav-item {
+            list-style: none;
+
+                .nav-link {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 70px;
+                    height: 70px;
+                    border-radius: 100px;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+
+                .day-text,
+                .day-number {
+                        font-weight: 700;
+                        font-size: 14px;
+                        color: #B5A8D5;
+                        text-transform: uppercase;
+                }
+
+                .day-number {
+                    font-size: 16px;
+                }
+
+                &.active {
+                    background: linear-gradient(180deg, #00E5FF 0%, #90F 100%);
+                    border: 1px none;
+
+                    .day-text,
+                    .day-number {
+                    color: $gt-white;
+                    }
+                }
+             }
+         }
+     }
+}
+
+.gt-event-intro-items {
+
+    .gt-intro-video {
+        @include flex;
+        gap: 50px;
+        margin-left: -200px;
+
+        @include breakpoint (max-xxxl) {
+            margin-left: 0;
+        }
+
+        @include breakpoint (max-xl) {
+            gap: 30px;
+        }
+
+        .gt-intro-image {
+            img  {
+                @include imgw;
+            }
+        }
+
+        .video-icon {
+
+            .video-btn {
+                background: linear-gradient(180deg, #1539EE 0%, #90F 100%);
+                color: $gt-white;
+                display: inline-block;
+                font-size: 16px;
+                height: 156px;
+                width: 156px;
+                line-height: 156px;
+                border-radius: 50%;
+                text-align: center;
+                position: relative;
+                font-size: 30px;
+
+                @include breakpoint (max-xxxl) {
+                    &.ripple {
+                         &::before,&::after {
+                            box-shadow: initial;
+                        }
+                    }
+                }
+
+                @include breakpoint (max-xl) {
+                    width: 140px;
+                    height: 140px;
+                    line-height: 140px;
+                }
+
+                 @include breakpoint (max-lg) {
+                    width: 110px;
+                    height: 110px;
+                    line-height: 110px;
+                }
+
+               @include breakpoint (max-md) {
+                    width: 70px;
+                    height: 70px;
+                    line-height: 70px;
+                }
+
+                &::before {
+                    position: absolute;
+                    content: "";
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%,-50%);
+                    width: 196px;
+                    height: 196px;
+                    border-radius: 100%;
+                    border: 1px solid rgba(255, 255, 255, 0.40);
+
+                    @include breakpoint (max-xl) {
+                        width: 160px;
+                        height: 160px;
+                    }
+
+                    @include breakpoint (max-lg) {
+                        width: 130px;
+                        height: 130px;
+                    }
+
+                    @include breakpoint (max-md) {
+                        width: 90px;
+                        height: 90px;
+                    }
+                }
+            }
+       }
+   }
+
+   .gt-intro-content {
+        margin-left: 150px;
+
+        @include breakpoint (max-xl) {
+            margin-left: 0;
+        }
+        
+        h2 {
+            font-size: 200px;
+            font-weight: 800;
+            -webkit-text-stroke-width: 3px;
+            -webkit-text-stroke-color: $gt-header-color;
+            text-transform: uppercase;
+
+             @include breakpoint (max-xxxl) {
+                font-size: 170px;
+            }
+
+             @include breakpoint (max-xl) {
+                font-size: 120px;
+            }
+
+             @include breakpoint (max-lg) {
+                font-size: 70px;
+            }
+
+             @include breakpoint (max-md) {
+                font-size: 45px;
+            }
+
+            @include breakpoint (max-sm) {
+                font-size: 35px;
+                -webkit-text-stroke-width: 1px;
+            }
+        }
+    }
+}
+
+.gt-event-intro-section {
+    position: relative;
+
+    .gt-blur-shape {
+        position: absolute;
+        right: 0;
+        top: -45%;
+        z-index: -1;
+
+        img {
+            @include imgw;
+        }
+    }
+}
+
+.gt-event-ticket-section-3 {
+    position: relative;
+    z-index: 9;
+
+    @include breakpoint (max-xl) {
+         overflow: hidden;
+         margin-top: -100px;
+     }
+
+     @include breakpoint (max-lg) {
+        margin-top: -80px;
+     }
+
+     .gt-right-shape {
+        position: absolute;
+        right: 0;
+        top: -115px;
+
+         @include breakpoint (max-xl) {
+            display: none;
+        }
+     }
+
+    .gt-dark-shape {
+        position: absolute;
+        top: -26%;
+        left: 0;
+        z-index: -1;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}
+
+.tab-content {
+    margin-top: 60px;
+    border-top: 1px none;
+    padding-top: 0;
+
+    @include breakpoint (max-xl) {
+        margin-top: 30px;
+    }
+
+    .event-schedule-box-items-3 {
+        border-radius: 165px;
+        background: #F5F0FF;
+        text-align: center;
+
+        @include breakpoint (max-xl) {
+           border-radius: 60px;
+        }
+
+        @include breakpoint (max-lg) {
+           border-radius: 50px;
+        }
+
+        @include breakpoint (max-md) {
+           border-radius: 40px;
+        }
+
+        @include breakpoint (max-sm) {
+           border-radius: 30px;
+        }
+
+        .event-schedule-image {
+            position: relative;
+
+            img {
+                @include imgw;
+                border-top-left-radius: 165px;
+                border-top-right-radius: 165px;
+
+                 @include breakpoint (max-xl) {
+                     border-top-left-radius: 60px;
+                     border-top-right-radius: 60px;
+                }
+                 @include breakpoint (max-lg) {
+                     border-top-left-radius: 50px;
+                     border-top-right-radius: 50px;
+                }
+
+                 @include breakpoint (max-md) {
+                     border-top-left-radius: 40px;
+                     border-top-right-radius: 40px;
+                }
+
+                 @include breakpoint (max-sm) {
+                     border-top-left-radius: 30px;
+                     border-top-right-radius: 30px;
+                }
+            }
+
+            .gt-event-post {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: 0;
+
+                li {
+                    font-size: 16px;
+                    font-weight: 400;
+                    color: $gt-white;
+                    padding: 8px 13px;
+                    line-height: 1;
+                    border-radius: 4px 4px 0px 0px;
+                    background: linear-gradient(90deg, #1539EE 0%, #90F 100%);
+
+                    i {
+                        margin-right: 5px;
+                    }
+                }
+            }
+        }
+
+        .gt-event-schedule-content {
+            padding: 30px;
+
+            h3 {
+                margin-bottom: 15px;
+
+                a {
+                    &:hover {
+                        color: $gt-theme-color
+                    }
+                }
+            }
+
+            .gt-list {
+                margin-bottom: 30px;
+
+                li {
+                    font-size: 16px;
+                    font-weight: 400;
+                    color: #4D55CC;
+                    padding: 8px 13px;
+                    line-height: 1;
+                    border-radius: 4px;
+                    border: 1px solid #4D55CC;
+                    background-color: $gt-white;
+                    display: inline-block;
+
+                    i {
+                        margin-right: 5px;
+                        color: #4D55CC
+                    }
+                }
+            }
+
+            .gt-group-image {
+                margin-bottom: 40px;
+            }
+
+            .gt-icon {
+                width: 80px;
+                height: 80px;
+                line-height: 80px;
+                text-align: center;
+                border-radius: 100%;
+                background-color: $gt-white;
+                color: $gt-theme-color;
+                @include transition;
+                display: inline-block;
+                font-size: 24px;
+
+                &:hover {
+                    background: linear-gradient(180deg, #FF0 0%, #90F 100%);
+                    color: $gt-white;
+                }
+            }
+        }
+    }
+}
+
+.gt-event-schedule-section-3 {
+    position: relative;
+    margin-top: -40px;
+
+    @include breakpoint (max-xl) {
+        margin-top: 0;
+    }
+
+    .gt-section-title-area {
+        .gt-section-title {
+            margin-left: 140px;
+
+            @include breakpoint (max-xl) {
+                margin-left: 0;
+            }
+        }
+    }
+
+    .gt-top-shape {
+        position: absolute;
+        left: 260px;
+        top: 0;
+
+        @include breakpoint (max-xxxl) {
+            display: none;
+        }
+    }
+}
+
+.gt-event-video-item {
+    .tab-content {
+
+        .gt-event-video-image {
+            height: 557px;
+            border-radius: 40px;
+            overflow: hidden;
+
+            video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 40px;
+        }
+      }
+    }
+  
+  .gt-gallery-items {
+      @include flex;
+      justify-content: space-between;
+      margin-top: 20px;
+
+        @include breakpoint (max-xl) {
+           flex-wrap: wrap;
+           gap: 30px;
+        }
+
+      .gt-nav {
+         display: flex;
+         justify-content: space-between;
+         gap: 70px;
+         position: relative;
+
+        @include breakpoint (max-lg) {
+            flex-wrap: wrap;
+            gap: 20px;
+            border: 1px none;
+        }
+    
+        li {
+          
+           .nav-link{
+				@include transition;
+				line-height: 1;
+				color: #B5A8D5;
+				font-weight: 600;
+                font-size: 24px;
+                position: relative;
+
+                &::before {
+                    position: absolute;
+                    content: "";
+                    left: 100px;
+                    top: 10px;
+                    width: 6px;
+                    height: 6px;
+                    line-height: 6px;
+                    border-radius: 30px;
+                    background-color: #D8CEF0;
+                }
+
+                &.gt-style-2 {
+                    &::before {
+                        display: none;
+                    }
+                }
+
+				&.active {
+					position: relative;
+					background: linear-gradient(90deg, #1539EE 0%, #90F 100%);
+                    background-clip: text;
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+
+                    &::after {
+                        position: absolute;
+                        content: "";
+                        width: 32px;
+                        height: 15px;
+                        background-color: $gt-theme-color;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        top: -75%;
+                        clip-path: polygon(50% 0%, 0% 131%, 85% 100%);
+                        @include transition;
+                    }
+				}
+		    }
+		}
+	 }
+  }
+}
+
+.gt-event-video-section {
+    position: relative;
+
+    @include breakpoint (max-xl) {
+        overflow: hidden;
+    }
+
+    .gt-left-shape {
+        position: absolute;
+        left: 0;
+        top: 5%;
+
+         img {
+            @include imgw;
+        }
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}
+
+.gt-event-artist-item {
+     border-radius: 20.179px 20.179px 0px 0px;
+     margin-top: 30px;
+
+    .gt-artist-image {
+        img {
+            @include imgw;
+            border-radius: 20.179px 20.179px 0px 0px;
+        }
+    }
+
+    .gt-artist-content {
+        padding: 20px 40px;
+        border-radius: 0px 0px 40.358px 40.358px;
+        border: 1.261px solid rgba(255, 255, 255, 0.30);
+        background: linear-gradient(180deg, rgba(250, 250, 250, 0.08) 0%, rgba(250, 250, 250, 0.08) 100%);
+        @include flex;
+        justify-content: space-between;
+
+        @include breakpoint (max-xl) {
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+         @include breakpoint (max-sm) {
+            padding: 20px 30px;
+        }
+
+        h3 {
+            font-weight: 600;
+            
+            a {
+                color: $gt-white
+            }
+        }
+
+        .play-btn {
+            i {
+                color: $gt-white;
+            }
+        }
+    } 
+ }
+
+ .gt-event-artist-section {
+    position: relative;
+
+    @include breakpoint (max-xl) {
+        overflow: hidden;
+     }
+
+    .gt-shape {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+       
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+ }
+
+   
+.gt-event-gallery-item {
+    position: relative;
+    margin-top: 30px;
+
+    .gt-event-gallery-iamge {
+        position: relative;
+        z-index: 9;
+        overflow: hidden;
+         border-radius: 10px;
+
+         @include breakpoint (max-xl) {
+            height: 426px;
+         }
+
+        img {
+            @include imgw;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .icon {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            opacity: 0;
+            visibility: hidden;    
+            @include transition;
+            color: $gt-white;
+            z-index: 999;
+            font-size: 32px;
+        }
+
+        &:before, &:after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 50%;
+            top:0;
+            left: 0;
+
+            background: rgba(24, 24, 24, 0.80);
+            transform: translateX(-100%) rotate(15deg);
+            @include transition;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        &:after {
+            left: auto;
+            right: 0;
+            transform: translateX(100%) rotate(-15deg);
+        }
+    }
+
+    &:hover {
+        
+        .gt-event-gallery-iamge {
+
+            .icon {
+                top: 50%;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            &:before, &:after {
+                transform: none;
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+}
+
+.gt-event-schedule-wrapper-4 {
+   
+  
+    .nav {
+        
+         &.gt-style-4 {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 10px;
+            justify-content: center;
+            position: relative;
+
+            @include breakpoint (max-lg) {
+                flex-wrap: wrap;
+                gap: 20px;
+                border: 1px none;
+            }
+
+            @include breakpoint (max-sm) {
+                margin-top: 30px;
+            }
+        
+        li{
+          
+           .nav-link{
+                @include transition;
+                padding: 12px 15px;
+                border-radius: 100px;
+                background: rgba(255, 255, 255, 0.20);
+                line-height: 1;
+                color: $gt-white;
+                font-weight: 600;
+
+                &.active {
+                    position: relative;
+                    border-radius: 100px;
+                    background: $gt-white;
+                    color: rgba(153, 0, 255, 1);
+                }
+             }
+            }
+         }
+      }
+
+   .tab-content {
+
+    &.gt-style-4 {
+
+        @include breakpoint (max-xl) {
+           margin-top: 30px;
+        }
+        
+         .gt-event-schedule-item-4 {
+            @include flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 999;
+            margin-top: 30px;
+            border-bottom: 1px solid rgba(65, 65, 65, 1);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+
+            @include breakpoint (max-xl) {
+                flex-wrap: wrap;
+                gap: 30px;
+            }
+
+            .gt-event-schedule-content-4 {
+        
+                .gt-event-list-4 {
+                    @include flex;
+                    gap: 30px;
+                    margin-bottom: 20px;
+
+                    @include breakpoint (max-xl) {
+                        flex-wrap: wrap;
+                        gap: 10px;
+                    }
+
+                    li {
+                        font-size: 14px;
+                        font-weight: 500;
+                        color: $gt-theme-color;
+                        padding: 8px 16px;
+                        background-color: rgba(153, 0, 255, 1);
+                        border-radius: 100px;
+                        line-height: 1;
+                        @include transition;
+                        color: $gt-white;
+
+                        &.gt-bg {
+                            background-color: $gt-white;
+                            color: rgba(153, 0, 255, 1);
+                        }
+
+                        i {
+                            margin-right: 5px;
+                        }
+                    }
+                }
+
+                h3 {
+                    margin-bottom: 10px;
+                    font-size: 30px;
+
+                    @include breakpoint (max-xl) {
+                        font-size: 20px;
+                    }
+
+                    a {
+                        color: $gt-white;
+                        opacity: 0.25;
+                    }
+                }
+
+                .gt-list {
+                    li {
+                        color: $gt-white;
+                        opacity: 0.25;
+                        @include transition;
+
+                        i {
+                            margin-right: 10px;
+                            color: rgba(255, 255, 0, 1);
+                        }
+                    }
+                }
+            }
+
+            .image-hover {
+                width: 182px;
+                height: 182px;
+                position: absolute;
+                top: 50%;
+                transform: rotate(15deg);
+                inset-inline-start: 0;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position-x: 75%;
+                opacity: 0;
+                transition: opacity 0.3s, transform 0.4s ease-out;
+                margin: -200px 0 0 -50px;
+                overflow: hidden;
+                pointer-events: none;
+                z-index: 2;
+                visibility: hidden;
+                border-radius: 10px;
+            }
+
+            .gt-client-info {
+                @include flex;
+                gap: 10px;
+
+                .gt-client-image {
+                    img {
+                        opacity: 0.25;
+                        @include transition;
+                    }
+                }
+
+                .gt-text {
+                    h6 {
+                        color: $gt-theme-color-4;
+                        opacity: 0.25;
+                    }
+                }
+            }
+
+            .gt-icon {
+                width: 82px;
+                height: 82px;
+                line-height: 82px;
+                text-align: center;
+                border-radius: 100%;
+                border: 1px solid rgba(65, 65, 65, 1);
+                display: inline-block;
+                color: $gt-white;
+                font-size: 30px;
+                @include transition;
+
+                @include breakpoint (max-md) {
+                   width: 60px;
+                   height: 60px;
+                   line-height: 60px;
+                }
+            }
+
+            &:hover {
+                .image-hover {
+                    opacity: 1;
+                    visibility: visible;
+                }
+
+                .gt-event-schedule-content-4 {
+                    h3 {
+                        a {
+                            color: $gt-white;
+                            opacity: initial;
+                        }
+                    }
+
+                    .gt-list {
+                        li {
+                            color: $gt-white;
+                             opacity: initial;
+
+                            i {
+                                margin-right: 10px;
+                                color: rgba(255, 255, 0, 1);
+                            }
+                        }
+                    }
+                }
+
+                .gt-client-info {
+                    @include flex;
+                    gap: 10px;
+
+                    .gt-client-image {
+                        img {
+                            opacity: initial;
+                        }
+                    }
+
+                    .gt-text {
+                        h6 {
+                            opacity: initial;
+                        }
+                    }
+                }
+
+                .gt-icon {
+                    background: linear-gradient(90deg, rgba(153, 0, 255, 1) 0%, rgba(255, 255, 0, 1) 100%);
+                    color: $gt-white;
+                }
+            }
+         }
+      }
+   }
+}
+ 
+.gt-events-schedule-section-4 {
+    position: relative;
+
+    &::before {
+        @include before;
+        background: linear-gradient(90deg, #90F 0%, #FF0 100%);
+        height: 96px;
+        top: 21%;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+
+    }
+
+    .gt-line-shape {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 21%;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}
+
+.gt-music-box {
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 1);
+
+    .gt-top-box {
+        background: linear-gradient(90deg, #181818 0%, #90F 100%);
+        padding: 20px 0;
+        border-radius: 10px 10px 0px 0px;
+        position: relative;
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            background-color: $gt-white;
+            border-radius: 100px;
+            position: absolute;
+            right: 25px;
+            bottom: -20px;
+            @include transition;
+
+            i {
+                color: rgba(21, 57, 238, 1);
+            }
+
+            &:hover {
+              background: linear-gradient(to bottom, rgba(255, 255, 0, 1), rgba(153, 0, 255, 1));
+             
+                i {
+                    color: $gt-white;
+                }
+            }
+        }
+
+        .gt-music-shape {
+            img {
+                @include imgw;
+            }
+        }
+    }
+
+    .gt-music-content {
+        padding: 30px;
+
+        h4 {
+            color: $gt-white;
+        }
+
+        h6 {
+            font-weight: 700;
+            color: #7A73D1;
+        }
+
+        .music-list {
+            @include flex;
+            gap: 10px;
+            margin-top: 20px;
+
+            li {
+                a {
+                    border-radius: 100px;
+                    border: 1px solid rgba(255, 255, 255, 0.20);
+                    padding: 8px;
+                    color: #C4C4C4;
+                    display: inline-block;
+                    line-height: 1;
+                    font-size: 12px;
+                    font-weight: 400;
+                }
+            }
+        }
+
+        .gt-music-button {
+            margin-top: 40px;
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            @include breakpoint (max-xl) {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .gt-button {
+
+                  .gt-theme-btn {
+                    background-image: none;
+                    background-color: $gt-white;
+                    color: rgba(21, 57, 238, 1);
+
+                    i {
+                        transform: rotate(0);
+                        margin-left: 10px;
+                    }
+
+                    &:hover {
+                        background-image: linear-gradient(to right, #90F 0%, #FFF600 50%, #90F 100%);
+                        color: $gt-white;
+
+                        i {
+                            color: $gt-white;
+                        }
+                    }
+                }
+            }
+          
+            .gt-right-text {
+                h4 {
+                    color: rgba(255, 255, 0, 1);
+                    line-height: 1;
+                }
+
+                span {
+                    color: #C4C4C4;
+                    font-size: 14px;
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+}
+
+.gt-music-section {
+    position: relative;
+    z-index: 9;
+
+    @include breakpoint (max-xl) {
+        overflow: hidden;
+     }
+
+    .gt-top-blur {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: -1;
+        top: -120%;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+}
+
+.gt-event-details-wrapper {
+
+    .gt-details-post {
+
+        .gt-event-list {
+            @include flex;
+            gap: 40px;
+            margin-bottom: 30px;
+            margin-left: 220px;
+
+            @include breakpoint (max-xl) {
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-left: 0;
+            }
+
+            li {
+                font-size: 14px;
+                font-weight: 500;
+                color: $gt-theme-color;
+                padding: 8px 16px;
+                background-color: $gt-white;
+                border-radius: 40px;
+                line-height: 1;
+                border: 1px solid $gt-theme-color;
+                @include transition;
+
+                &:hover {
+                    background-color: $gt-theme-color;
+                    color: $gt-white;
+                }
+
+                i {
+                    margin-right: 5px;
+                }
+            }
+        }
+    }
+
+    .gt-details-image {
+        position: relative;
+        margin-bottom: 20px;
+
+        @include breakpoint (max-sm) {
+            height: 300px;
+        }
+
+        img {
+            @include imgw;
+            border-radius: 24px;
+        }
+
+        .gt-client-image {
+            position: absolute;
+            top: -50px;
+            left: 50px;
+
+            @include breakpoint (max-xl) {
+                top: 0;
+                left: 0;
+            }
+
+            img {
+                border-radius: 100%;
+            }
+        }
+    }
+
+    .gt-event-details-content {
+
+        h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 12px;
+
+            @include breakpoint (max-xl) {
+                font-size: 40px;
+            }
+
+            @include breakpoint (max-lg) {
+                font-size: 35px;
+            }
+
+            @include breakpoint (max-md) {
+                font-size: 30px;
+            }
+
+            @include breakpoint (max-sm) {
+                font-size: 25px;
+            }
+        }
+
+        .gt-details-list-item {
+            h3 {
+                font-size: 32px;
+                margin-bottom: 20px;
+
+                @include breakpoint (max-xl) {
+                  font-size: 25px;
+                }
+            }
+
+            .gt-list {
+
+                li {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $gt-header-color;
+
+                    &:not(:last-child) {
+                        margin-bottom: 12px;
+                    }
+
+                    i {
+                        margin-right: 10px;
+                        color: $gt-theme-color-2;
+                    }
+                }
+            }
+        }
+
+        .gt-thumb {
+            img {
+                @include imgw;
+                border-radius: 16px;
+            }
+        }
+
+        h3 {
+            font-size: 32px;
+
+
+            @include breakpoint (max-xl) {
+                font-size: 25px;
+            }
+        }
+
+        .gt-Registration-Fees-item {
+            margin-bottom: 30px;
+
+            h3  {
+                font-size: 32px;
+
+                @include breakpoint (max-xl) {
+                    font-size: 25px;
+                }
+            }
+
+            .gt-Registration-Fees-title {
+                @include flex;
+                justify-content: space-between;
+                padding: 24px 70px 12px;
+
+                 @include breakpoint (max-xl) {
+                    flex-wrap: wrap;
+                    gap: 30px;
+                    padding: 12px 0;
+                }
+            }
+
+            .gt-list {
+                @include flex;
+                justify-content: space-between;
+                padding: 12px 70px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+                @include breakpoint (max-xl) {
+                    flex-wrap: wrap;
+                    gap: 30px;
+                    padding: 12px 0;
+                }
+
+                li {
+                    font-weight: 400;
+                    color: $gt-header-color;
+                }
+            }
+        }
+
+        .gt-map-items {
+            h3 {
+                font-size: 24px;
+            }
+
+            .googpemap {
+
+                iframe {
+                    width: 100%;
+                    height: 420px;
+                    position: initial;
+                    border-radius: 16px;
+
+                    @include breakpoint (max-sm){
+                        height: 300px;
+                    }
+                }
+            }
+        }
+    }
+
+    .gt-event-main-sideber {
+        margin-top: 15px;
+
+        .gt-event-sideber-widget {
+            padding: 30px;
+            background-color: $gt-white;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            box-shadow: 0px 4px 60px 0px rgba(21, 57, 238, 0.10);
+
+            .gt-widget-title {
+                border-bottom: 1.5px solid rgba(0, 0, 0, 0.08);
+                margin-bottom: 20px;
+                padding-bottom: 16px;
+            }
+
+            .gt-sideber-list {
+                li {
+                    @include flex;
+                    justify-content: space-between;
+                    font-weight: 700;
+                    font-size: 16px;
+                    font-family: $gt-heading-font;
+                    color: $gt-header-color;
+
+                    @include breakpoint (max-xl) {
+                        font-size: 14px;
+                    }
+
+                    @include breakpoint (max-lg) {
+                        font-size: 16px;
+                    }
+
+                    &:not(:last-child) {
+                        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                        padding-bottom: 16px;
+                        margin-bottom: 16px;
+                    }
+
+                    span {
+                        font-weight: 400;
+                        color: $gt-text-color;
+                    }
+                }
+
+                &.gt-box {
+                    background: #F6F6F6;
+                    padding: 24px;
+                }
+            }
+
+            .gt-theme-btn {
+                width: 100%;
+                margin-top: 30px;
+                display: inline-block;
+            }
+
+            .gt-social-icon {
+                gap: 12px;
+        
+                a {
+                    display: inline-block;
+                    width: 48px;
+                    height: 48px;
+                    line-height: 48px;
+                    text-align: center;
+                    background: #F6F6F6;
+                    color: $gt-header-color;
+                    border-radius: 8px;
+        
+                    &:hover {
+                        background: linear-gradient(90deg, #1539EE 0%, #2ADDC8 100%);
+                        color: $gt-white;
+                    }
+                }
+            }
+
+            .gt-event-box-item {
+                padding: 24px 20px;
+                background: #F6F6F6;
+                position: relative;
+                margin-bottom: 16px;
+                border-radius: 12px;
+
+                &::before {
+                    position: absolute;
+                    content: "";
+                    left: -18px;
+                    top: 41px;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 100%;
+                    background: $gt-white;
+                }
+        
+                &::after {
+                    position: absolute;
+                    content: "";
+                    right: -18px;
+                    top: 41px;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 100%;
+                    background: $gt-white;
+                }
+
+                h6 {
+                    border-bottom: 1px dashed rgba(191, 191, 191, 1);
+                    margin-bottom: 16px;
+                    padding-bottom: 16px;
+
+                    span {
+                        color: $gt-text-color;
+                        font-size: 14px;
+                        font-weight: 400;
+                    }
+                }
+
+                .gt-box-item {
+                    @include flex;
+                    justify-content: space-between;
+
+                    @include breakpoint (max-xl) {
+                        flex-wrap: wrap;
+                        gap: 10px;
+                    }
+                   
+                    .gt-item {
+                        span {
+                            font-size: 12px;
+                            font-weight: 400;
+                            display: inline-block;
+                            margin-bottom: 10px;
+                        }
+
+                        p {
+                            text-align: center;
+
+                            @include breakpoint (max-xl) {
+                                text-align: left;
+                            }
+                        }
+
+                        .qty {
+                            display: flex;
+                            align-items: center;
+                            background-color: #F2F2F2;
+                            padding: 5px 12px;
+                            line-height: 1;
+                            justify-content: space-between;
+                            margin-top: 0;
+                            width: 100px;
+            
+                            button,
+                            input{
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: $gt-header-color;
+                                font-weight: 400;
+                                font-size: 16px;
+                                width: 45px;
+                            }
+                            
+                            input{
+                                background-color: transparent;
+                                text-align: center;
+                                border-radius: 0;
+                                border: unset;
+                                outline: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.gt-concert-image {
+  video {
+    width: 100%;
+    height: 609px;
+    border-radius: 40px;
+    object-fit: cover;
+
+    @include breakpoint (max-sm) {
+        height: 400px;
+    }
+  }
+}
+
+.gt-event-concert-section {
+    margin-top: 60px;
+    position: relative;
+}
+
+.gt-event-ticket-box-5 {
+    border-radius: 10px;
+    background-color: $gt-white;
+    border-radius: 10px 10px 0px 0px;
+    margin-top: 30px;
+    box-shadow: 0px 4px 60px 0px rgba(0, 0, 0, 0.10);
+
+    .gt-event-image {
+
+        img {
+            @include imgw;
+            border-radius: 10px 10px 0px 0px;
+        }
+    }
+
+    .gt-event-content {
+        padding: 30px;
+
+        h4 {
+            margin-bottom: 5px;
+
+           a {
+             &:hover {
+                color: #FF1ABC;
+             }
+           }
+        }
+
+        h6 {
+            font-weight: 700;
+            color: $gt-theme-color-3;
+        }
+
+        .event-list {
+            @include flex;
+            gap: 10px;
+            margin-top: 20px;
+
+            li {
+                a {
+                    border-radius: 100px;
+                    border: 1px solid #C4C4C4;
+                    padding: 8px;
+                    border: 1px solid #C4C4C4;
+                    display: inline-block;
+                    line-height: 1;
+                    font-size: 12px;
+                    font-weight: 400;
+                }
+            }
+        }
+
+        .gt-event-button {
+            margin-top: 40px;
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            @include breakpoint (max-xl) {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .gt-button {
+
+                  .gt-theme-btn {
+                    background-image: none;
+                    background-image: linear-gradient(to right, #90C 0%, #FF1ABC 50%, #90C 100%);
+                    color: $gt-white;
+
+                    i {
+                        transform: rotate(0);
+                        margin-left: 10px;
+                        color: $gt-white;
+                    }
+
+                    &:hover {
+                        color: $gt-white;
+
+                        i {
+                            color: $gt-white;
+                        }
+                    }
+                }
+            }
+          
+            .gt-right-text {
+                h4 {
+                    color: #FF1ABC;
+                    line-height: 1;
+                }
+
+                span {
+                    color: #C4C4C4;
+                    font-size: 14px;
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+}
+
+.gt-event-ticket-section-5 {
+    position: relative;
+    z-index: 9;
+
+    .shape {
+        position: absolute;
+        left: 0;
+        top: -50%;
+        z-index: -1;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+
+    .shape-2 {
+        position: absolute;
+        right: 0;
+        top: 0;
+         z-index: -1;
+    }
+}
+
+.gt-fashion-image {
+    position: relative;
+
+    .video-btn {
+        background: $gt-white;
+        color: #FF1ABC;
+        display: inline-block;
+        font-size: 16px;
+        height: 68px;
+        width: 68px;
+        line-height: 68px;
+        border-radius: 50%;
+        text-align: center;
+        position: relative;
+        font-size: 24px;
+        position: absolute;
+        right: 40px;
+        bottom: 40px;
+
+        &::before {
+            position: absolute;
+            content: "";
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            width: 96px;
+            height: 96px;
+            border-radius: 100%;
+            border: 1px solid $gt-white;
+        }
+    }
+
+    video {
+    width: 100%;
+    height: 630px;
+    border-radius: 10px;
+    object-fit: cover;
+
+    @include breakpoint (max-sm) {
+        height: 400px;
+    }
+  }
+}
+
+.gt-event-fashion-section {
+    position: relative;
+
+    .left-shape {
+        position: absolute;
+        left: 0;
+        top: -12%;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+
+    .right-shape {
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        @include breakpoint (max-xl) {
+            display: none;
+        }
+    }
+
+    .gt-section-title-area {
+
+        .gt-section-title-5 {
+
+            .gt-theme-btn {
+                background-color: $gt-white;
+                color: #FF1ABC;
+                margin-top: 30px;
+                background-image: initial;
+
+                i {
+                    color: #FF1ABC;
+                    transform: rotate(0);
+                }
+
+                @include breakpoint (max-xl) {
+                    background-image: linear-gradient(to right, #90C 0%, #FF1ABC 50%, #90C 100%);
+                    background-position: right center;
+                    color: $gt-white;
+
+                    i {
+                        color: $gt-white;
+                    }
+                }
+
+                &:hover {
+                    background-image: linear-gradient(to right, #90C 0%, #FF1ABC 50%, #90C 100%);
+                    background-position: right center;
+                    color: $gt-white;
+
+                    i {
+                        color: $gt-white;
+                    }
+                }
+            }
+        }
+
+        .content {
+            p {
+                max-width: 570px;
+                margin-bottom: 15px;
+            }
+
+            .counter-item {
+                @include flex;
+                gap: 50px;
+
+                @include breakpoint (max-xl) {
+                    flex-wrap: wrap;
+                    gap: 15px;
+                }
+
+                .counter-content {
+                    h2 {
+                        color: $gt-theme-color-3;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.gt-event-schedule-wrapper-5 {
+    padding: 60px;
+    border-radius: 10px;
+    position: relative;
+
+     @include breakpoint(max-xl) {
+       padding: 30px;
+    }
+
+    .array-buttons-4 {
+        display: grid;
+        position: absolute;
+        right: 100px;
+        bottom: 296px;
+
+        @include breakpoint(max-xl) {
+            display: none;
+        }
+
+        .array-prev {
+           background: linear-gradient(90deg, #9900FF 0%, #FF1ABC 100%);
+           width: 75px;
+           height: 75px;
+           line-height: 75px;
+           color: $gt-white;
+
+           &:hover {
+              background: $gt-white;
+              color: $gt-theme-color-3;
+           }
+        }
+
+        .array-next {
+           background: $gt-white;
+           width: 75px;
+           height: 75px;
+           line-height: 75px;
+           color: $gt-theme-color-3;
+           border: 1px none;
+
+           &:hover {
+              background: linear-gradient(90deg, #9900FF 0%, #FF1ABC 100%);
+           }
+        }
+    }
+
+    .gt-event-schedule-item-5 {
+
+        .gt-event-list {
+            @include flex;
+            gap: 30px;
+            margin-bottom: 30px;
+
+            @include breakpoint (max-xl) {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            li {
+                font-size: 14px;
+                font-weight: 500;
+                color: $gt-theme-color;
+                padding: 8px 16px;
+                background-color: $gt-white;
+                border-radius: 40px;
+                line-height: 1;
+                border: 1px solid $gt-theme-color;
+                @include transition;
+
+                &:hover {
+                    background-color: $gt-theme-color;
+                    color: $gt-white;
+                }
+
+                i {
+                    margin-right: 5px;
+                }
+            }
+        }
+
+         h3 {
+                margin-bottom: 15px;
+
+                a {
+
+                    &:hover {
+                        color: $gt-theme-color;
+                    }
+                }
+         }
+
+         .gt-list {
+            margin-bottom: 30px;
+
+                li {
+                    color: $gt-header-color;
+
+                    i {
+                        margin-right: 10px;
+                        color: $gt-theme-color
+                    }
+                }
+            }
+
+        .gt-event-schedule-image {
+            img {
+                @include imgw;
+                border-radius: 10px;
+            }
+
+            
+        }
+
+
+
+
+
+
+    }
+}

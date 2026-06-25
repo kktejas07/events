@@ -1,0 +1,575 @@
+.scrolling-wrap-2 {
+	overflow: hidden;
+	white-space: nowrap;
+	display: flex;
+	gap: 20px;
+    padding: 15px 0;
+
+	.comm {
+		display: flex;
+		align-items: center;
+		animation: scroll 60s linear infinite;
+		gap: 15px;
+		cursor: pointer;
+
+		.cmn-textslide {
+			font-size: 16px;
+			font-weight: 500;
+			line-height: 32px;
+			text-transform: capitalize;
+            color: $gt-white;
+            font-family: $gt-heading-font;
+            @include flex;
+            gap: 15px;
+
+            i {
+                font-size: 21px;
+            }
+
+            &.text-color-2 {
+                color: $gt-header-color;
+            }
+		}
+	}
+
+	&:hover {
+		.comm {
+			animation-play-state: paused;
+		}
+	}
+
+	@include breakpoint (max-xxl) {
+		.comm {
+			gap: 20px;
+		}
+	}
+
+	@include breakpoint (max-lg) {
+		gap: 14px;
+		.comm {
+			gap: 14px;
+		}
+	}
+
+	@include breakpoint (max-sm) {
+		.comm {
+			gap: 12px;
+		}
+	}
+}
+
+.mycustom-marque {
+	&.style-2 {
+        transform: rotate(-2.579deg);
+        position: relative;
+        z-index: -1;
+		margin-bottom: 120px;
+
+		@include breakpoint (max-xl) {
+			margin-bottom: 100px;
+		}
+
+		@include breakpoint (max-lg) {
+			margin-bottom: 80px;
+		}
+    }
+	&.theme-green-bg {
+		background-color: $gt-theme-color-2;
+	}
+
+	&.theme-pink-bg {
+		background: #D8CEF0;
+
+		.scrolling-wrap-2 {
+			.comm {
+				 animation: scrollRight 60s linear infinite;
+				 display: flex;
+				 align-items: center;
+				 gap: 15px;
+				 cursor: pointer;
+			}
+
+			.cmn-textslide {
+				color: $gt-header-color;
+	
+				i {
+					color: $gt-header-color;
+				}
+			}
+		}
+	}
+
+	&.header-marque {
+		.scrolling-wrap {
+			padding: 5px 0;
+		}
+	}
+}
+
+@keyframes scroll {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-100%);
+	}
+}
+
+@keyframes scrolly {
+	0% {
+		transform: translateY(0);
+	}
+	100% {
+		transform: translateY(-60%);
+	}
+}
+
+@keyframes scrollRight {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+
+.gt-feature-bg-wrapper {
+	padding: 75px;
+	position: relative;
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	border-radius: 20px;
+
+	@include breakpoint (max-xl) {
+		flex-wrap: wrap;
+		gap: 30px;
+		padding: 60px;
+	}
+
+	@include breakpoint (max-lg) {
+		padding: 50px;
+	}
+
+	@include breakpoint (max-md) {
+		padding: 40px;
+	}
+
+	@include breakpoint (max-sm) {
+		padding: 30px;
+	}
+
+	.gt-ai-image {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+
+		@include breakpoint (max-xl) {
+		  display: none;
+	   }
+
+		img {
+			@include imgw;
+		}
+	}
+
+	.gt-feature-content {
+
+		h2 {
+			color: $gt-white;
+			margin-bottom: 10px;
+		}
+
+		h4 {
+			color: $gt-white;
+			margin-bottom: 20px;
+		}
+
+		p {
+			color: $gt-white;
+			font-weight: 400;
+			font-size: 16px;
+			padding-bottom: 35px;
+		}
+
+		.gt-theme-btn {
+			&.gt-theme-btn-2 {
+
+				&.gt-border-btn {
+					border: 1px solid $gt-white;
+					color: $gt-white;
+
+					i {
+						color: $gt-white;
+					}
+
+					&:hover {
+						border: 1px solid #4D55CC;
+					}
+				}
+			}
+		}
+	}
+
+	 .gt-coming-soon-time {
+		@include flex;
+		gap: 20px;
+		position: relative;
+		
+		@include breakpoint (max-xl) {
+			flex-wrap: wrap;
+		}
+
+		.gt-timer-content {
+			text-align: center;
+			width: 70px;
+			height: 70px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			background-color: $gt-white;
+			border-radius: 100%;
+			
+			h3 {
+				font-size: 14px;
+				font-weight: 700;
+				color: $gt-header-color;
+				line-height: 1;
+			}
+
+			p {
+				font-size: 14px;
+				font-weight: 300;
+				color: $gt-header-color;
+				text-transform: uppercase;
+			}
+		}
+     }
+}
+
+.gt-coming-soon-items {
+	text-align: center;
+	position: relative;
+
+	.gt-coming-soon-image {
+		position: relative;
+		max-width: 600px;
+		text-align: center;
+        margin: 0 auto;
+		margin-top: 50px;
+		margin-bottom: 50px;
+
+		img {
+			@include imgw;
+		}
+
+		.gt-coming-soon-time {
+			@include flex;
+			gap: 20px;
+			position: relative;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			
+			@include breakpoint (max-lg) {
+				flex-wrap: wrap;
+				position: static;
+				transform: translate(0);
+				margin-top: 30px;
+				justify-content: center;
+			}
+
+			.gt-timer-content {
+				text-align: center;
+				width: 210px;
+				height: 210px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				background-color: $gt-white;
+				box-shadow: 0px 4px 60px 0px rgba(21, 57, 238, 0.10);
+				border-radius: 100%;
+
+				@include breakpoint (max-md) {
+				   width: 100px;
+				   height: 100px;
+				}
+				
+				h3 {
+					font-size: 64px;
+					font-weight: 800;
+					color: $gt-header-color;
+					line-height: 1;
+
+					@include breakpoint (max-xl) {
+						font-size: 45px;
+					}
+
+					@include breakpoint (max-lg) {
+						font-size: 40px;
+					}
+
+					@include breakpoint (max-md) {
+						font-size: 34px;
+					}
+
+					@include breakpoint (max-sm) {
+						font-size: 28px;
+					}
+				}
+
+				p {
+					font-size: 20px;
+					font-weight: 400;
+					color: $gt-header-color;
+					text-transform: uppercase;
+
+					@include breakpoint (max-xl) {
+						font-size: 16px;
+					}
+
+					@include breakpoint (max-sm) {
+						font-size: 14px;
+					}
+				}
+			}
+        }
+	}
+
+	.gt-coming-soon-content {
+		h2 {
+			font-size: 45px;
+			margin-bottom: 20px;
+
+			@include breakpoint (max-xl) {
+				font-size: 40px;
+			}
+
+			@include breakpoint (max-lg) {
+				font-size: 36px;
+			}
+
+			@include breakpoint (max-md) {
+				font-size: 32px;
+			}
+
+			@include breakpoint (max-sm) {
+				font-size: 28px;
+			}
+		}
+
+		p {
+			margin-bottom: 50px;
+
+			@include breakpoint (max-xl) {
+				margin-bottom: 30px;;
+			}
+		}
+
+		 form {
+			max-width: 752px;
+			width: 100%;
+			text-align: center;
+			margin: 0 auto;
+
+			@include breakpoint (max-sm) {
+			text-align: left;
+			}
+		}
+
+		.form-clt {
+			position: relative;
+
+			input {
+				width: 100%;
+				outline: none;
+				border: none;
+				border-radius: 100px;
+				background: rgba(77, 85, 204, 0.07);
+				line-height: 1;
+				padding: 20px;
+				max-width: 664px;
+				color: $gt-header-color;
+
+				@include breakpoint (max-xxs) {
+					font-size: 14px;
+					margin-bottom: 10px;
+				}
+			}
+
+			.gt-theme-btn {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				text-align: center;
+
+				@include breakpoint (max-xxs) {
+					position: static;
+				}
+			}
+		}
+	}
+}
+
+
+.gt-feature-bg-section {
+	position: relative;
+
+	.gt-top-shape {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+
+		img {
+			@include imgw;
+		}
+	}
+}
+
+.gt-counter-wrapper-4 {
+	@include flex;
+	justify-content: space-between;
+
+	@include breakpoint (max-xl) {
+		flex-wrap: wrap;
+		gap: 30px;
+		justify-content: center;
+	}
+
+	.gt-counter-item {
+		width: 100%;
+		height: 388.462px;
+		width: 388.462px;
+		border-radius: 388.462px;
+		border: 1px solid rgba(255, 255, 255, 0.20);
+		text-align: center;
+		position: relative;
+		overflow: hidden;
+
+
+		&.gt-style-2 {
+			margin-left: -35px;
+
+			@include breakpoint (max-lg) {
+			  margin-left: 0;
+		  }
+
+		}
+
+		@include breakpoint (max-lg) {
+			height: 330.462px;
+		    width: 330.462px;
+		}
+
+		@include breakpoint (max-md) {
+			height: 300.462px;
+		    width: 300.462px;
+		}
+
+		&::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background-image: url('../../assets/img/home-4/counter/bg.png');
+			background-size: cover;
+			background-position: center;
+			opacity: 0;
+			@include transition;
+			z-index: -1;
+		}
+
+		.gt-content {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 9;
+
+			.gt-icon {
+				margin-bottom: 10px;
+			}
+
+			h3 {
+				font-weight: 600;
+				color: #686868;
+			}
+
+			h2 {
+				font-size: 75px;
+				color: $gt-white;
+			}
+		}
+
+		&:hover {
+
+			.gt-content {
+				h3 {
+					color: $gt-white;
+				}
+			}
+			
+			&::before {
+				opacity: 1;
+				z-index: 9;
+			}
+		}
+	}
+}
+
+.gt-why-attend-item {
+	margin-top: 30px;
+
+	.gt-why-attend-content {
+		border-bottom: 1px solid rgba(17, 17, 44, 0.20);
+		padding-bottom: 30px;
+		margin-bottom: 30px;
+
+		span {
+			font-weight: 600;
+			color: #FF1ABC;
+			margin-bottom: 5px;
+			display: inline-block;
+		}
+
+		p {
+			max-width: 450px;
+		}
+	}
+
+	.gt-why-attend-image {
+
+		video {
+			width: 100%;
+			height: 683px;
+			border-radius: 225px;
+			object-fit: cover;
+
+			@include breakpoint (max-sm) {
+				height: 400px;
+			}
+		}
+	}
+}
+
+.gt-why-attend-section {
+	position: relative;
+	z-index: 9;
+
+	.shape {
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		top: 55%;
+		z-index: -1;
+
+		@include breakpoint (max-xl) {
+			display: none;
+		}
+		
+	}
+}
