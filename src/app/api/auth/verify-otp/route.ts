@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
       NotificationType.WELCOME,
       { email: user.email, phone: user.phone || undefined },
       "Welcome to echo",
-      html
+      html,
+      { firstName: user.firstName || "User", email: user.email }
     );
 
     return NextResponse.json({ success: true });

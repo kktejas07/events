@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { NotificationChannel, NotificationType } from "../types";
+import { formatWhatsAppMessage } from "./whatsapp-formatter";
 
 export const WHATSAPP_CHANNEL_NAME = NotificationChannel.WHATSAPP;
 
@@ -32,7 +33,8 @@ async function getConfig(): Promise<{ apiUrl: string; apiKey: string }> {
 export async function sendWhatsAppNotification(
   type: NotificationType,
   to: string,
-  htmlContent: string
+  htmlContent: string,
+  waData?: Record<string, unknown>
 ): Promise<void> {
   const { apiUrl, apiKey } = await getConfig();
 
@@ -41,7 +43,10 @@ export async function sendWhatsAppNotification(
     return;
   }
 
-  const plainText = stripHtml(htmlContent);
+  const plainText = waData
+    ? formatWhatsAppMessage(type, waData)
+    : stripHtml(htmlContent);
+
   const chatId = to.includes("@") ? to : `${to}@c.us`;
 
   await fetch(apiUrl, {

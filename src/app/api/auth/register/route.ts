@@ -72,7 +72,8 @@ export async function POST(req: NextRequest) {
       NotificationType.OTP,
       { email: user.email, phone: user.phone || undefined },
       "Your Verification Code",
-      html
+      html,
+      { firstName: firstName || "User", otp }
     );
 
     return NextResponse.json({

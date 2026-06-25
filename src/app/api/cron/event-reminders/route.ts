@@ -82,7 +82,15 @@ export async function GET(request: Request) {
           NotificationType.EVENT_REMINDER,
           { email, phone: phone || undefined },
           `Reminder: ${event.title} ${daysAway <= 1 ? "Tomorrow!" : `in ${daysAway} days`}`,
-          html
+          html,
+          {
+            firstName: name,
+            eventName: event.title,
+            eventDate,
+            eventTime,
+            eventVenue: event.venue?.name || "TBD",
+            daysAway,
+          }
         );
         sent++;
       } catch {

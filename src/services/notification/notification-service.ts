@@ -59,7 +59,8 @@ export async function notify(
   type: NotificationType,
   recipient: { email?: string; phone?: string },
   subject: string,
-  html: string
+  html: string,
+  waData?: Record<string, unknown>
 ): Promise<void> {
   const channels = await getEnabledChannels(type);
 
@@ -69,7 +70,7 @@ export async function notify(
         if (channel === NotificationChannel.EMAIL && recipient.email) {
           await sendEmailNotification(type, recipient.email, subject, html);
         } else if (channel === NotificationChannel.WHATSAPP && recipient.phone) {
-          await sendWhatsAppNotification(type, recipient.phone, html);
+          await sendWhatsAppNotification(type, recipient.phone, html, waData);
         }
       } catch (err) {
         console.error(`[Notification] ${channel} failed for ${type}:`, err);

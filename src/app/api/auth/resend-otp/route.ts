@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
       NotificationType.OTP,
       { email: user.email, phone: user.phone || undefined },
       subject,
-      html
+      html,
+      { firstName: user.firstName || "User", otp }
     );
 
     return NextResponse.json({ success: true });

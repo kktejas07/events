@@ -101,7 +101,22 @@ export async function POST(req: NextRequest) {
         NotificationType.TICKET_CONFIRMATION,
         { email: attendeeEmail, phone: order.user.phone || undefined },
         `Your tickets for ${order.event.title}`,
-        ticketHtml
+        ticketHtml,
+        {
+          firstName: attendeeName,
+          orderId: order.id,
+          eventName: order.event.title,
+          eventDate: order.event.startDate
+            ? new Date(order.event.startDate).toLocaleDateString()
+            : "TBA",
+          eventVenue: (order.event as any).venue?.name || "TBA",
+          tickets: order.items.map((i) => ({
+            name: i.ticketType?.name || "Ticket",
+            quantity: i.quantity,
+            price: Number(i.unitPrice),
+          })),
+          total: Number(order.total),
+        }
       );
 
       // Send order receipt notification
@@ -124,7 +139,21 @@ export async function POST(req: NextRequest) {
         NotificationType.ORDER_RECEIPT,
         { email: order.user.email, phone: order.user.phone || undefined },
         `Receipt for ${order.event.title}`,
-        receiptHtml
+        receiptHtml,
+        {
+          firstName: attendeeName,
+          orderId: order.id,
+          eventName: order.event.title,
+          paymentMethod: "Razorpay",
+          paidAt: new Date().toLocaleString(),
+          items: order.items.map((i) => ({
+            description: `${i.ticketType?.name || "Ticket"} x ${i.quantity}`,
+            amount: Number(i.totalPrice),
+          })),
+          subtotal: Number(order.subtotal),
+          tax: Number(order.tax),
+          total: Number(order.total),
+        }
       );
     }
 

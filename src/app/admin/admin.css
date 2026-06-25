@@ -462,6 +462,7 @@
 
 .gt-admin-input:focus {
   border-color: #1539EE;
+  color: #333;
 }
 
 .gt-admin-input::placeholder {
