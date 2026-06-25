@@ -376,7 +376,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                         </li>
                       )}
                       <li>
-                        <span>Organizer</span>: Events Platform
+                        <span>Organizer</span>: echo
                       </li>
                       <li>
                         <span>Category</span>: {event.category || "Conference"}

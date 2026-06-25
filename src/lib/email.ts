@@ -10,8 +10,8 @@ function buildProvider() {
     return new BrevoProvider({
       apiKey: process.env.BREVO_API_KEY || "",
       defaultSender: {
-        name: process.env.MAIL_FROM_NAME || "Events Platform",
-        email: process.env.MAIL_FROM_EMAIL || "noreply@events.forgetechno.com",
+        name: process.env.MAIL_FROM_NAME || "echo",
+        email: process.env.MAIL_FROM_EMAIL || "noreply@echo-platform.com",
       },
     });
   }

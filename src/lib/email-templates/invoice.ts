@@ -81,6 +81,6 @@ export function renderInvoiceEmail(data: InvoiceData) {
   );
   return baseEmailLayout(body, {
     title: `Invoice #${data.invoiceNumber}`,
-    previewText: `Invoice from Events Platform`,
+    previewText: `Invoice from echo`,
   });
 }

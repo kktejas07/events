@@ -35,7 +35,7 @@ interface Settings {
 }
 
 const defaults: Settings = {
-  NEXT_PUBLIC_APP_NAME: "Events Platform",
+  NEXT_PUBLIC_APP_NAME: "echo",
   LOGO_URL: "",
   FAVICON_URL: "",
   RAZORPAY_KEY_ID: "",

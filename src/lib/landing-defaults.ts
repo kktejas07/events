@@ -128,7 +128,7 @@ export const defaultContent: Record<string, unknown> = {
   "contact-page": {
     phones: [{ label: "+880 123 427 00" }, { label: "+000 938 809 12" }],
     address: "4233 w. 65th st. chicago il 60629",
-    emails: [{ label: "supportinfo@gmail.com" }, { label: "info@events.com" }],
+    emails: [{ label: "supportinfo@gmail.com" }, { label: "info@echo-platform.com" }],
     mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2970.122654!2d-87.771!3d41.775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2c3cd0f4c659%3A0x6f5!2sChicago%2C%20IL!5e0!3m2!1sen!2sus!4v1",
   },
 };

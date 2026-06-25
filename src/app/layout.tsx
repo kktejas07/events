@@ -4,8 +4,8 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pixvent - Conference and Event HTML Template",
-  description: "Conference and Event HTML Template",
+  title: "echo — Voices Across Generations",
+  description: "echo — Voices Across Generations",
   icons: [{ rel: "icon", url: "/assets/img/favicon.svg", type: "image/svg+xml" }],
 };
 

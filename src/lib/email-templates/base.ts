@@ -10,7 +10,7 @@ export const baseEmailLayout = (
   <meta name="color-scheme" content="dark" />
   <meta name="supported-color-schemes" content="dark" />
   ${options.previewText ? `<meta name="description" content="${options.previewText}" />` : ""}
-  <title>${options.title || "Events Platform"}</title>
+  <title>${options.title || "echo"}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#0a0a1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a1a;">
@@ -23,10 +23,10 @@ export const baseEmailLayout = (
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="width:40px;height:40px;background:linear-gradient(135deg,#7c3aed,#06b6d4);border-radius:10px;text-align:center;vertical-align:middle;">
-                    <span style="color:#fff;font-size:20px;font-weight:800;line-height:40px;">E</span>
+                    <span style="color:#fff;font-size:20px;font-weight:800;line-height:40px;">e</span>
                   </td>
                   <td style="padding-left:12px;">
-                    <span style="color:#fff;font-size:22px;font-weight:700;">Events</span>
+                    <span style="color:#fff;font-size:22px;font-weight:700;">echo</span>
                   </td>
                 </tr>
               </table>
@@ -42,7 +42,7 @@ export const baseEmailLayout = (
           <tr>
             <td align="center" style="padding-top:30px;">
               <p style="margin:0;color:#6b7280;font-size:13px;line-height:1.6;">
-                Events Platform &mdash; All rights reserved.<br/>
+                echo &mdash; All rights reserved.<br/>
                 If you didn't request this email, you can safely ignore it.
               </p>
             </td>

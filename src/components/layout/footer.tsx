@@ -45,7 +45,7 @@ export function Footer() {
               </div>
               <div className="gt-footer-wrapper-3">
                 <p className="wow fadeInLeft" data-wow-delay=".3s">
-                  &copy; {new Date().getFullYear()} Events. All Rights Reserved.
+                  &copy; {new Date().getFullYear()} echo. All Rights Reserved.
                 </p>
                 <div
                   className="gt-social-icon d-flex align-items-center wow fadeInRight"

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     try {
       await sendEmail({
-        to: process.env.CONTACT_EMAIL || "admin@events.forgetechno.com",
+        to: process.env.CONTACT_EMAIL || "admin@echo-platform.com",
         subject: `New Contact Form Submission from ${name}`,
         html: `<h2>Contact Form Submission</h2>
 <p><strong>Name:</strong> ${name}</p>

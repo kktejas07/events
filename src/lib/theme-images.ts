@@ -1,4 +1,4 @@
-/** Pixvent index-3 theme asset paths (matches original template) */
+/** Theme asset paths */
 
 export const themeAssets = {
   hero: {
