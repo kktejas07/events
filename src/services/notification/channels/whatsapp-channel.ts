@@ -3,7 +3,8 @@ import { NotificationChannel, NotificationType } from "../types";
 import { formatWhatsAppMessage } from "./whatsapp-formatter";
 import { generateTicketPdf } from "@/lib/pdf/ticket-pdf";
 import { generateInvoicePdf } from "@/lib/pdf/invoice-pdf";
-import { generateIdCardImage } from "@/lib/image/id-card-image";
+import { generateIdCardPdf } from "@/lib/pdf/id-card-pdf";
+
 
 export const WHATSAPP_CHANNEL_NAME = NotificationChannel.WHATSAPP;
 
@@ -39,10 +40,6 @@ async function getConfig(): Promise<{ apiUrl: string; apiKey: string }> {
 
 function docUrl(apiUrl: string): string {
   return apiUrl.replace(/\/messages\/send-text$/, "/messages/send-document");
-}
-
-function imgUrl(apiUrl: string): string {
-  return apiUrl.replace(/\/messages\/send-text$/, "/messages/send-image");
 }
 
 function toBase64(bytes: Uint8Array): string {
@@ -166,7 +163,7 @@ export async function sendWhatsAppNotification(
     return;
   }
 
-  // For ID card on registration — send as image (shows inline in chat)
+  // For ID card on registration — send as PDF document
   if (type === NotificationType.ID_CARD && waData) {
     try {
       const d = waData as {
@@ -176,28 +173,28 @@ export async function sendWhatsAppNotification(
         memberSince: string;
         phone?: string;
       };
-      const pngBuffer = await generateIdCardImage({
+      const pdfBytes = await generateIdCardPdf({
         userId: d.userId,
         name: d.name,
         email: d.email,
         memberSince: d.memberSince,
         appUrl: baseUrl(),
       });
-      const b64 = `data:image/png;base64,${toBase64(pngBuffer)}`;
+      const b64 = `data:application/pdf;base64,${toBase64(pdfBytes)}`;
       const caption = formatWhatsAppMessage(type, waData);
-      await fetch(imgUrl(apiUrl), {
+      await fetch(docUrl(apiUrl), {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
         body: JSON.stringify({
           chatId,
           base64: b64,
-          mimetype: "image/png",
-          filename: `id-card-${d.userId}.png`,
+          mimetype: "application/pdf",
+          filename: `id-card-${d.userId}.pdf`,
           caption,
         }),
       });
     } catch (err) {
-      console.error("[WhatsApp] Failed to send ID card image, falling back to text:", err);
+      console.error("[WhatsApp] Failed to send ID card PDF, falling back to text:", err);
       const plainText = formatWhatsAppMessage(type, waData);
       await fetch(apiUrl, {
         method: "POST",

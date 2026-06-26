@@ -61,6 +61,22 @@ enum DiscountType {
   FIXED_AMOUNT
 }
 
+enum InvoiceStatus {
+  DRAFT
+  UNPAID
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+enum IdCardType {
+  EMPLOYEE
+  VISITOR
+  VOLUNTEER
+  CONTRACTOR
+}
+
 model Organization {
   id            String   @id @default(cuid())
   name          String
@@ -129,6 +145,10 @@ model User {
   teamsLed             Team[]              @relation("TeamLead")
   organizationMembers  OrganizationMember[]
   createdEvents        Event[]             @relation("EventCreator")
+  idCards              IdCard[]
+  attendance           Attendance[]
+  purchases            Purchase[]
+  invoices             Invoice[]
 
   resetToken        String?   @unique
   resetTokenExpiry  DateTime?
@@ -204,6 +224,7 @@ model Event {
   teams          Team[]
   tickets        Ticket[]
   discountCodes  DiscountCode[]
+  attendance     Attendance[]
 
   organization Organization? @relation(fields: [organizationId], references: [id])
   createdBy    User?         @relation("EventCreator", fields: [createdById], references: [id])
@@ -278,6 +299,7 @@ model Order {
   event   Event       @relation(fields: [eventId], references: [id])
   items   OrderItem[]
   tickets Ticket[]
+  invoice Invoice?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -341,6 +363,105 @@ model ScanLog {
   ticket Ticket @relation(fields: [ticketId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+model IdCard {
+  id          String     @id @default(cuid())
+  userId      String
+  type        IdCardType @default(EMPLOYEE)
+  idNumber    String     @unique
+  designation String?
+  department  String?
+  photoUrl    String?
+  qrToken     String     @unique
+  isActive    Boolean    @default(true)
+  issuedAt    DateTime   @default(now())
+  expiresAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([qrToken])
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String?
+  checkIn   DateTime
+  checkOut  DateTime?
+  method    String   @default("QR_SCAN")
+  scannedBy String?
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event? @relation(fields: [eventId], references: [id])
+
+  @@index([userId])
+  @@index([eventId])
+}
+
+model Purchase {
+  id       String  @id @default(cuid())
+  userId   String
+  product  String
+  price    Decimal @db.Decimal(10, 2)
+  currency String  @default("INR")
+  quantity Int     @default(1)
+  category String?
+  date     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([date])
+}
+
+model Invoice {
+  id        String        @id @default(cuid())
+  invoiceNo String        @unique
+  orderId   String?       @unique
+  userId    String
+  amount    Decimal       @db.Decimal(10, 2)
+  tax       Decimal       @default(0) @db.Decimal(10, 2)
+  gst       Decimal       @default(0) @db.Decimal(10, 2)
+  currency  String        @default("INR")
+  status    InvoiceStatus @default(UNPAID)
+  dueDate   DateTime?
+  paidAt    DateTime?
+  notes     String?
+
+  user     User      @relation(fields: [userId], references: [id])
+  order    Order?    @relation(fields: [orderId], references: [id])
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceNo])
+  @@index([userId])
+  @@index([status])
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  invoiceId     String
+  amount        Decimal  @db.Decimal(10, 2)
+  method        String?
+  transactionId String?
+  notes         String?
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model InvoiceCounter {
+  id   String @id @default("global")
+  year Int    @default(2024)
+  seq  Int    @default(0)
 }
 
 model Team {

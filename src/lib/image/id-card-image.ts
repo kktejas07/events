@@ -1,7 +1,6 @@
 import { createCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
 import QRCode from "qrcode";
 
-// Register system fonts
 GlobalFonts.registerFromPath("/System/Library/Fonts/Helvetica.ttc", "Helvetica");
 GlobalFonts.registerFromPath("/System/Library/Fonts/HelveticaNeue.ttc", "HelveticaNeue");
 GlobalFonts.registerFromPath("/System/Library/Fonts/ArialHB.ttc", "Arial");
@@ -14,13 +13,20 @@ interface IdCardImageData {
   appUrl: string;
 }
 
-const W = 400;
-const H = 640;
+const CARD_W = 460;
+const CARD_H = 300;
+const GAP = 30;
+const W = CARD_W;
+const H = CARD_H * 2 + GAP;
+const R = 14;
+
 const BRAND = "#1539ee";
-const DARK = "#141414";
-const GRAY = "#6b7280";
+const DARK = "#1a1a2e";
+const GRAY = "#64748b";
+const LIGHT_GRAY = "#e2e8f0";
 const WHITE = "#ffffff";
-const LIGHT_BG = "#f8f9ff";
+const BG = "#f1f5f9";
+const GOLD = "#f59e0b";
 
 function getInitials(name: string): string {
   return name
@@ -32,14 +38,7 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-function drawRoundedRect(
-  ctx: any,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number
-) {
+function roundRect(ctx: any, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.lineTo(x + w - r, y);
@@ -57,124 +56,228 @@ export async function generateIdCardImage(data: IdCardImageData): Promise<Buffer
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext("2d");
 
-  const ml = 28;
-  const mr = W - 28;
+  const font = (s: number, bold = false) =>
+    `${bold ? "bold " : ""}${s}px Helvetica, HelveticaNeue, Arial, sans-serif`;
 
   // ── Background ──
-  ctx.fillStyle = WHITE;
-  drawRoundedRect(ctx, 0, 0, W, H, 16);
-  ctx.fill();
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
 
-  // ── Branded top bar ──
+  function drawCard(yOff: number) {
+    // Card shadow
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    roundRect(ctx, 6, yOff + 6, CARD_W - 12, CARD_H - 12, R);
+    ctx.fill();
+
+    // Card body
+    ctx.fillStyle = WHITE;
+    roundRect(ctx, 2, yOff + 2, CARD_W - 4, CARD_H - 4, R);
+    ctx.fill();
+    roundRect(ctx, 0, yOff, CARD_W, CARD_H, R);
+    ctx.fill();
+  }
+
+  // ════════════════════════════════════════════
+  //  FRONT
+  // ════════════════════════════════════════════
+  drawCard(0);
+
+  const ml = 24;
+  const mr = CARD_W - 24;
+
+  // Branded top strip
   ctx.fillStyle = BRAND;
-  drawRoundedRect(ctx, 0, 0, W, 72, 16);
+  ctx.beginPath();
+  ctx.moveTo(0, R);
+  ctx.quadraticCurveTo(0, 0, R, 0);
+  ctx.lineTo(CARD_W - R, 0);
+  ctx.quadraticCurveTo(CARD_W, 0, CARD_W, R);
+  ctx.lineTo(CARD_W, 80);
+  ctx.lineTo(0, 80);
+  ctx.closePath();
   ctx.fill();
-  // Square off bottom corners of top bar
-  ctx.fillRect(0, 56, W, 16);
 
+  // Brand name
   ctx.fillStyle = WHITE;
-  ctx.font = "bold 26px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText("Echo", ml, 44);
+  ctx.font = font(22, true);
+  ctx.fillText("Echo", ml, 36);
 
-  ctx.font = "14px Helvetica, HelveticaNeue, Arial, sans-serif";
   ctx.fillStyle = "#b3c5ff";
-  ctx.fillText("Voices Across Generations", ml + 90, 44);
+  ctx.font = font(11);
+  ctx.fillText("Voices Across Generations", ml + 82, 36);
 
-  // ── ID Label ──
+  // Member badge
+  ctx.fillStyle = "rgba(255,255,255,0.15)";
+  roundRect(ctx, mr - 120, 14, 108, 30, 6);
+  ctx.fill();
+
+  ctx.fillStyle = WHITE;
+  ctx.font = font(8);
+  ctx.fillText("MEMBER ID", mr - 110, 24);
+  ctx.font = font(11, true);
+  ctx.fillText("#" + data.userId.slice(-8).toUpperCase(), mr - 110, 39);
+
+  // ── Photo / Initials ──
+  const cx = ml + 44;
+  const cy = 140;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 40, 0, Math.PI * 2);
+  ctx.clip();
   ctx.fillStyle = BRAND;
-  ctx.font = "bold 18px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText("IDENTITY CARD", ml, 108);
+  ctx.fillRect(cx - 40, cy - 40, 80, 80);
+  ctx.fillStyle = WHITE;
+  ctx.font = font(28, true);
+  ctx.textAlign = "center";
+  ctx.fillText(getInitials(data.name), cx, cy + 10);
+  ctx.textAlign = "left";
+  ctx.restore();
+
+  // Photo ring
+  ctx.strokeStyle = WHITE;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 40, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // ── Name & Role ──
+  ctx.fillStyle = DARK;
+  ctx.font = font(18, true);
+  ctx.fillText(data.name, ml + 100, 130);
 
   ctx.fillStyle = GRAY;
-  ctx.font = "12px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText("#" + data.userId.slice(-8).toUpperCase(), mr - 120, 108);
+  ctx.font = font(12);
+  ctx.fillText(data.email, ml + 100, 150);
+
+  ctx.fillStyle = BRAND;
+  ctx.font = font(10);
+  ctx.fillText("Member", ml + 100, 168);
 
   // ── Divider ──
-  ctx.fillStyle = "#e5e7eb";
-  ctx.fillRect(ml, 120, mr - ml, 1);
-
-  // ── Avatar circle (initials) ──
-  const cx = ml + 34;
-  const cy = 176;
+  ctx.strokeStyle = LIGHT_GRAY;
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(cx, cy, 32, 0, Math.PI * 2);
-  ctx.fillStyle = BRAND;
+  ctx.moveTo(ml, 192);
+  ctx.lineTo(mr, 192);
+  ctx.stroke();
+
+  // ── Info rows ──
+  const rows = [
+    { label: "Member Since", value: data.memberSince },
+    { label: "Member ID", value: data.userId },
+    { label: "Website", value: data.appUrl.replace(/^https?:\/\//, "") },
+  ];
+
+  rows.forEach((r, i) => {
+    const y = 210 + i * 24;
+    ctx.fillStyle = GRAY;
+    ctx.font = font(8, true);
+    ctx.fillText(r.label, ml, y);
+    ctx.fillStyle = DARK;
+    ctx.font = font(11, true);
+    ctx.fillText(r.value, ml + 100, y);
+  });
+
+  // ── Footer strip ──
+  ctx.fillStyle = "#f8fafc";
+  ctx.beginPath();
+  ctx.moveTo(0, CARD_H - R);
+  ctx.quadraticCurveTo(0, CARD_H, R, CARD_H);
+  ctx.lineTo(CARD_W - R, CARD_H);
+  ctx.quadraticCurveTo(CARD_W, CARD_H, CARD_W, CARD_H - R);
+  ctx.lineTo(CARD_W, CARD_H - 40);
+  ctx.lineTo(0, CARD_H - 40);
+  ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = WHITE;
-  ctx.font = "bold 20px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText(getInitials(data.name), cx, cy + 7);
+  ctx.fillStyle = GRAY;
+  ctx.font = font(9);
+  ctx.fillText("Echo — Voices Across Generations", ml, CARD_H - 14);
+
+  ctx.fillStyle = BRAND;
+  ctx.font = font(10, true);
+  ctx.textAlign = "right";
+  ctx.fillText("events.forgetechno.com", mr, CARD_H - 14);
   ctx.textAlign = "left";
 
-  // ── Name & Email ──
-  ctx.fillStyle = DARK;
-  ctx.font = "bold 18px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText(data.name, ml + 78, 168);
+  // ════════════════════════════════════════════
+  //  BACK
+  // ════════════════════════════════════════════
+  const backY = CARD_H + GAP;
+  drawCard(backY);
 
-  ctx.fillStyle = GRAY;
-  ctx.font = "13px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText(data.email, ml + 78, 190);
-
-  // ── Info section ──
-  ctx.fillStyle = "#e5e7eb";
-  ctx.fillRect(ml, 218, mr - ml, 1);
-
-  // Info card background
-  ctx.fillStyle = LIGHT_BG;
-  drawRoundedRect(ctx, ml, 232, mr - ml, 80, 8);
+  // Brand bar at top of back
+  ctx.fillStyle = BRAND;
+  ctx.beginPath();
+  ctx.moveTo(0, backY + R);
+  ctx.quadraticCurveTo(0, backY, R, backY);
+  ctx.lineTo(CARD_W - R, backY);
+  ctx.quadraticCurveTo(CARD_W, backY, CARD_W, backY + R);
+  ctx.lineTo(CARD_W, backY + 50);
+  ctx.lineTo(0, backY + 50);
+  ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = GRAY;
-  ctx.font = "bold 9px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText("MEMBER SINCE", ml + 14, 256);
-  ctx.fillText("MEMBER ID", ml + 14, 280);
-  ctx.fillText("PLATFORM", ml + 14, 304);
+  ctx.fillStyle = WHITE;
+  ctx.font = font(16, true);
+  ctx.fillText("Scan to Access", ml, backY + 32);
 
-  ctx.fillStyle = DARK;
-  ctx.font = "12px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText(data.memberSince, ml + 120, 256);
-  ctx.font = "bold 12px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText(data.userId, ml + 120, 280);
-  ctx.font = "11px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillStyle = BRAND;
-  ctx.fillText(data.appUrl.replace(/^https?:\/\//, ""), ml + 120, 304);
-
-  // ── Divider ──
-  ctx.fillStyle = "#e5e7eb";
-  ctx.fillRect(ml, 330, mr - ml, 1);
+  ctx.fillStyle = "#b3c5ff";
+  ctx.font = font(10);
+  ctx.fillText("Your digital profile & tickets", ml + 130, backY + 32);
 
   // ── QR Code ──
   const profileUrl = `${data.appUrl}/id/${data.userId}`;
   const qrDataUrl = await QRCode.toDataURL(profileUrl, {
-    width: 300,
-    margin: 1,
+    width: 400,
+    margin: 2,
     color: { dark: BRAND, light: "#ffffff" },
   });
   const qrImg = await loadImage(qrDataUrl);
-  const qrSize = 130;
-  const qrX = (W - qrSize) / 2;
-  const qrY = 352;
+  const qrSize = 160;
+  const qrX = (CARD_W - qrSize) / 2;
+  const qrY = backY + 70;
+
+  // White background for QR
+  ctx.fillStyle = WHITE;
+  roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 8);
+  ctx.fill();
+
   ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-  ctx.fillStyle = GRAY;
-  ctx.font = "11px Helvetica, HelveticaNeue, Arial, sans-serif";
+  // Scan text
+  ctx.fillStyle = DARK;
+  ctx.font = font(11);
   ctx.textAlign = "center";
-  ctx.fillText("Scan to view profile & tickets", W / 2, qrY + qrSize + 22);
+  ctx.fillText("Scan with your phone camera", CARD_W / 2, qrY + qrSize + 22);
+  ctx.fillStyle = GRAY;
+  ctx.font = font(9);
+  ctx.fillText("or visit link below", CARD_W / 2, qrY + qrSize + 36);
   ctx.textAlign = "left";
 
-  // ── Footer ──
-  ctx.fillStyle = "#e5e7eb";
-  ctx.fillRect(ml, H - 44, mr - ml, 1);
+  // URL
+  ctx.fillStyle = BRAND;
+  ctx.font = font(9);
+  ctx.textAlign = "center";
+  ctx.fillText(profileUrl, CARD_W / 2, qrY + qrSize + 54);
+  ctx.textAlign = "left";
+
+  // ── Footer strip on back ──
+  ctx.fillStyle = "#f8fafc";
+  ctx.beginPath();
+  ctx.moveTo(0, backY + CARD_H - R);
+  ctx.quadraticCurveTo(0, backY + CARD_H, R, backY + CARD_H);
+  ctx.lineTo(CARD_W - R, backY + CARD_H);
+  ctx.quadraticCurveTo(CARD_W, backY + CARD_H, CARD_W, backY + CARD_H - R);
+  ctx.lineTo(CARD_W, backY + CARD_H - 36);
+  ctx.lineTo(0, backY + CARD_H - 36);
+  ctx.closePath();
+  ctx.fill();
 
   ctx.fillStyle = GRAY;
-  ctx.font = "10px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.fillText("Echo — Voices Across Generations", ml, H - 22);
-
-  ctx.fillStyle = BRAND;
-  ctx.font = "10px Helvetica, HelveticaNeue, Arial, sans-serif";
-  ctx.textAlign = "right";
-  ctx.fillText("events.forgetechno.com", mr, H - 22);
+  ctx.font = font(8);
+  ctx.textAlign = "center";
+  ctx.fillText("This is a digital identity card issued by Echo. Scan QR to verify.", CARD_W / 2, backY + CARD_H - 12);
   ctx.textAlign = "left";
 
   return canvas.toBuffer("image/png");

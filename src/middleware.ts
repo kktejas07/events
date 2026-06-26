@@ -37,7 +37,7 @@ export default auth((req) => {
 
   if (
     pathname.startsWith("/my-tickets") ||
-    pathname.startsWith("/profile") ||
+    pathname === "/profile" ||
     pathname.startsWith("/checkout")
   ) {
     if (!req.auth) {
@@ -45,7 +45,7 @@ export default auth((req) => {
     }
   }
 
-  if (pathname.startsWith("/my-tickets") || pathname.startsWith("/profile")) {
+  if (pathname.startsWith("/my-tickets") || pathname === "/profile") {
     if (
       ["ADMIN", "SUPER_ADMIN", "SCANNER", "ORGANIZATION_ADMIN", "ORGANIZATION_SCANNER"].includes(
         role || ""

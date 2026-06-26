@@ -22,120 +22,124 @@ export async function generateIdCardPdf(data: IdCardData): Promise<Uint8Array> {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  const pw = 330;
-  const ph = 510;
-  const page = pdfDoc.addPage([pw, ph]);
-  const { width } = page.getSize();
+  const pw = 510;
+  const ph = 340;
   const ml = 24;
-  const mr = width - 24;
+  const mr = pw - 24;
+  const dark = rgb(0.1, 0.1, 0.1);
+  const gray = rgb(0.4, 0.4, 0.4);
   const brand = rgb(0.08, 0.22, 0.93);
-  const gray = rgb(0.5, 0.5, 0.5);
-  const dark = rgb(0.08, 0.08, 0.08);
   const white = rgb(1, 1, 1);
+  const border = rgb(0.9, 0.9, 0.9);
 
-  let y = 0;
+  function initials(name: string): string {
+    return name
+      .split(" ")
+      .map((s) => s[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }
 
-  // ── Branded top bar ──
-  page.drawRectangle({ x: 0, y: ph - 60, width, height: 60, color: brand });
-  page.drawText("Echo", { x: ml, y: ph - 34, size: 16, font: bold, color: white });
-  page.drawText("Voices Across Generations", { x: ml + 58, y: ph - 32, size: 8, font, color: rgb(0.85, 0.88, 1) });
+  // ════════════════════════ FRONT ════════════════════════
+  const p1 = pdfDoc.addPage([pw, ph]);
 
-  // ── ID label ──
-  y = ph - 90;
-  page.drawText("IDENTITY CARD", { x: ml, y, size: 13, font: bold, color: brand });
-  page.drawText(`#${data.userId.slice(-8).toUpperCase()}`, { x: mr - 90, y, size: 9, font, color: gray });
+  // Brand bar
+  p1.drawRectangle({ x: 0, y: ph - 55, width: pw, height: 55, color: brand });
+  p1.drawText("Echo", { x: ml, y: ph - 32, size: 20, font: bold, color: white });
+  p1.drawText("Voices Across Generations", {
+    x: ml + 76, y: ph - 30, size: 10, font, color: rgb(0.85, 0.88, 1),
+  });
+  p1.drawText("MEMBER ID", {
+    x: mr - 110, y: ph - 28, size: 7, font: bold, color: white,
+  });
+  p1.drawText("#" + data.userId.slice(-8).toUpperCase(), {
+    x: mr - 110, y: ph - 42, size: 11, font: bold, color: white,
+  });
 
-  // ── Divider ──
-  y -= 6;
-  page.drawLine({ start: { x: ml, y }, end: { x: mr, y }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) });
+  // Avatar
+  const cx = ml + 38;
+  const cy = ph - 105;
+  p1.drawCircle({ x: cx, y: cy, size: 36, color: brand });
+  const init = initials(data.name);
+  p1.drawText(init, {
+    x: cx - init.length * 5, y: cy - 9, size: 20, font: bold, color: white,
+  });
 
-  // ── Avatar circle (initials) ──
-  y = ph - 130;
-  const avatarY = y - 28;
-  const cx = ml + 28;
-  page.drawCircle({ x: cx, y: avatarY, size: 28, color: brand });
-  const initials = data.name
-    .split(" ")
-    .map((s) => s[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-  page.drawText(initials, { x: cx - 8, y: avatarY - 7, size: 16, font: bold, color: white });
+  // Name & email
+  p1.drawText(data.name, { x: ml + 90, y: ph - 108, size: 16, font: bold, color: dark });
+  p1.drawText(data.email, { x: ml + 90, y: ph - 126, size: 10, font, color: gray });
+  p1.drawText("Member", { x: ml + 90, y: ph - 142, size: 9, font: bold, color: brand });
 
-  // ── Name & Email ──
-  page.drawText(data.name, { x: ml + 64, y: y - 4, size: 13, font: bold, color: dark });
-  page.drawText(data.email, { x: ml + 64, y: y - 24, size: 9, font, color: gray });
+  // Divider
+  p1.drawLine({
+    start: { x: ml, y: ph - 165 }, end: { x: mr, y: ph - 165 },
+    thickness: 0.5, color: border,
+  });
 
-  // ── Info rows ──
-  y = ph - 180;
-  page.drawLine({ start: { x: ml, y }, end: { x: mr, y }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) });
+  // Info rows
+  const infoRows = [
+    { label: "Member Since", value: data.memberSince },
+    { label: "Member ID", value: data.userId },
+    { label: "Website", value: data.appUrl.replace(/^https?:\/\//, "") },
+  ];
+  infoRows.forEach((r, i) => {
+    const y = ph - 182 - i * 20;
+    p1.drawText(r.label, { x: ml, y, size: 7, font: bold, color: gray });
+    p1.drawText(r.value, { x: ml + 90, y, size: 10, font: bold, color: dark });
+  });
 
-  y -= 16;
-  page.drawText("MEMBER SINCE", { x: ml, y, size: 7, font: bold, color: gray });
-  page.drawText(data.memberSince, { x: ml + 100, y, size: 9, font, color: dark });
+  // Footer
+  p1.drawLine({
+    start: { x: ml, y: 36 }, end: { x: mr, y: 36 },
+    thickness: 0.5, color: border,
+  });
+  p1.drawText("Echo — Voices Across Generations", {
+    x: ml, y: 20, size: 8, font, color: gray,
+  });
+  p1.drawText("events.forgetechno.com", {
+    x: mr - 100, y: 20, size: 8, font: bold, color: brand,
+  });
 
-  y -= 16;
-  page.drawText("MEMBER ID", { x: ml, y, size: 7, font: bold, color: gray });
-  page.drawText(data.userId, { x: ml + 100, y, size: 9, font: bold, color: dark });
+  // ════════════════════════ BACK ════════════════════════
+  const p2 = pdfDoc.addPage([pw, ph]);
 
-  y -= 16;
-  page.drawText("PLATFORM", { x: ml, y, size: 7, font: bold, color: gray });
-  const displayUrl = data.appUrl.replace(/^https?:\/\//, "");
-  page.drawText(displayUrl, { x: ml + 100, y, size: 8, font, color: brand });
+  // Brand bar
+  p2.drawRectangle({ x: 0, y: ph - 55, width: pw, height: 55, color: brand });
+  p2.drawText("Scan to Access", { x: ml, y: ph - 32, size: 16, font: bold, color: white });
+  p2.drawText("Your digital profile & tickets", {
+    x: ml + 122, y: ph - 30, size: 10, font, color: rgb(0.85, 0.88, 1),
+  });
 
-  // ── QR Code ──
-  y -= 28;
-  page.drawLine({ start: { x: ml, y }, end: { x: mr, y }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) });
-
+  // QR Code
   const profileUrl = `${data.appUrl}/id/${data.userId}`;
   const qrDataUrl = await QRCode.toDataURL(profileUrl, {
-    width: 200,
-    margin: 1,
-    color: { dark: "#1539ee", light: "#ffffff" },
+    width: 400, margin: 2, color: { dark: "#1539ee", light: "#ffffff" },
   });
   const qrImage = await pdfDoc.embedPng(toBuffer(qrDataUrl));
-  const qrSize = 90;
+  const qrSize = 140;
+  const qrX = (pw - qrSize) / 2;
 
-  y -= 8;
-  page.drawImage(qrImage, {
-    x: ml + 10,
-    y: y - qrSize,
-    width: qrSize,
-    height: qrSize,
-  });
+  p2.drawImage(qrImage, { x: qrX, y: ph - 190, width: qrSize, height: qrSize });
 
-  page.drawText("Scan to view profile & tickets", {
-    x: ml + qrSize + 20,
-    y: y - 10,
-    size: 8,
-    font,
-    color: gray,
+  p2.drawText("Scan with your phone camera", {
+    x: ml, y: ph - 210, size: 11, font, color: dark,
   });
-  page.drawText(profileUrl, {
-    x: ml + qrSize + 20,
-    y: y - 26,
-    size: 6,
-    font,
-    color: brand,
+  p2.drawText(profileUrl, {
+    x: ml, y: ph - 228, size: 8, font, color: brand,
   });
 
-  // ── Footer ──
-  y = 32;
-  page.drawLine({ start: { x: ml, y: y + 6 }, end: { x: mr, y: y + 6 }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) });
-  page.drawText("Echo — Voices Across Generations", {
-    x: ml,
-    y,
-    size: 7,
-    font,
-    color: gray,
+  // Footer
+  p2.drawLine({
+    start: { x: ml, y: 36 }, end: { x: mr, y: 36 },
+    thickness: 0.5, color: border,
   });
-  page.drawText("events.forgetechno.com", {
-    x: mr - 90,
-    y,
-    size: 7,
-    font,
-    color: gray,
+  p2.drawText("This is a digital identity card issued by Echo.", {
+    x: ml, y: 20, size: 8, font, color: gray,
+  });
+  p2.drawText("Scan the QR code to verify.", {
+    x: mr - 100, y: 20, size: 8, font, color: gray,
   });
 
   return pdfDoc.save();
