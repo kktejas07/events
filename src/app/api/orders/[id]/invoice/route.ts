@@ -42,7 +42,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       customerName,
     });
 
-    return new NextResponse(pdfBytes, {
+    return new NextResponse(pdfBytes as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="invoice-${order.id}.pdf"`,

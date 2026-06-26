@@ -4,8 +4,8 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "echo — Voices Across Generations",
-  description: "echo — Voices Across Generations",
+  title: "Echo — Voices Across Generations",
+  description: "Echo — Voices Across Generations",
   icons: [{ rel: "icon", url: "/assets/img/favicon.svg", type: "image/svg+xml" }],
 };
 

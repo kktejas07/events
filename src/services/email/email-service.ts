@@ -134,7 +134,7 @@ export class EmailService {
   }
 
   private getDefaultFrom(): string {
-    const name = process.env.MAIL_FROM_NAME || "echo";
+    const name = process.env.MAIL_FROM_NAME || "Echo";
     const email = process.env.MAIL_FROM_EMAIL || process.env.EMAIL_FROM || "noreply@yourdomain.com";
     if (email.includes("<")) return email;
     return `${name} <${email}>`;

@@ -10,7 +10,7 @@ export const baseEmailLayout = (
   <meta name="color-scheme" content="dark" />
   <meta name="supported-color-schemes" content="dark" />
   ${options.previewText ? `<meta name="description" content="${options.previewText}" />` : ""}
-  <title>${options.title || "echo"}</title>
+  <title>${options.title || "Echo"}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#0a0a1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a1a;">

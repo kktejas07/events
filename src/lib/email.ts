@@ -10,7 +10,7 @@ function buildProvider() {
     return new BrevoProvider({
       apiKey: process.env.BREVO_API_KEY || "",
       defaultSender: {
-        name: process.env.MAIL_FROM_NAME || "echo",
+        name: process.env.MAIL_FROM_NAME || "Echo",
         email: process.env.MAIL_FROM_EMAIL || "noreply@echo-platform.com",
       },
     });

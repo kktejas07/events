@@ -36,7 +36,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       barcode: ticket.barcode,
     });
 
-    return new NextResponse(pdfBytes, {
+    return new NextResponse(pdfBytes as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="ticket-${ticket.barcode}.pdf"`,

@@ -10,6 +10,13 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push("canvas", "@napi-rs/canvas");
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

@@ -34,7 +34,7 @@ const defaults: EmailSettings = {
   POSTAL_BASE_URL: "https://mail.studentalumni.ai",
   POSTAL_API_KEY: "",
   BREVO_API_KEY: "",
-  MAIL_FROM_NAME: "echo",
+  MAIL_FROM_NAME: "Echo",
   MAIL_FROM_EMAIL: "noreply@yourdomain.com",
   EMAIL_FROM: "",
 };
@@ -214,7 +214,7 @@ export default function EmailSettingsPage() {
             <Input
               value={settings.MAIL_FROM_NAME}
               onChange={(e) => update("MAIL_FROM_NAME", e.target.value)}
-              placeholder="echo"
+              placeholder="Echo"
               className={adminInput}
             />
           </div>

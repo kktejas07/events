@@ -229,6 +229,12 @@
   ring-color: #1539ee;
 }
 
+/* Override global input styles that hide text in shadcn inputs */
+.gt-admin-content input,
+.gt-admin-content input:focus {
+  color: #333 !important;
+}
+
 .gt-admin-content .gt-admin-tab-active {
   border-color: #1539ee;
   color: #1539ee;

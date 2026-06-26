@@ -22,85 +22,105 @@ export async function generateInvoicePdf(data: InvoiceData): Promise<Uint8Array>
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  const page = pdfDoc.addPage([400, 580]);
-  const { width, height } = page.getSize();
-  let y = height - 40;
+  const page = pdfDoc.addPage([420, 620]);
+  const { width } = page.getSize();
+  const ml = 35;
+  const mr = width - 35;
+  const brand = rgb(0.08, 0.22, 0.93);
+  const gray = rgb(0.45, 0.45, 0.45);
+  const dark = rgb(0.08, 0.08, 0.08);
 
-  function drawText(t: string, size = 11, opts?: { color?: number[]; font?: typeof font; x?: number }) {
-    const f = opts?.font || font;
-    page.drawText(t, {
-      x: opts?.x ?? 40,
-      y,
-      size,
-      font: f,
-      color: opts?.color ? rgb(opts.color[0], opts.color[1], opts.color[2]) : rgb(0.1, 0.1, 0.1),
-    });
-    y -= size + 6;
+  let y = 0;
+
+  function resetY(val: number) { y = val; }
+  function txt(t: string, size: number, opts?: { color?: typeof dark; font?: typeof font; x?: number }) {
+    page.drawText(t, { x: opts?.x ?? ml, y, size, font: opts?.font || font, color: opts?.color ?? dark });
+    return size + 4;
+  }
+  function lineY() {
+    page.drawLine({ start: { x: ml, y }, end: { x: mr, y }, thickness: 0.5, color: rgb(0.88, 0.88, 0.88) });
   }
 
-  // Header
-  drawText("echo — Voices Across Generations", 16, { font: bold, color: [0.08, 0.22, 0.93] });
-  y -= 4;
-  drawText("INVOICE", 16, { font: bold });
-  y -= 8;
+  // ── Header ──
+  resetY(585);
+  page.drawRectangle({ x: 0, y: y - 10, width, height: 40, color: brand });
+  page.drawText("Echo", { x: ml, y: y - 2, size: 18, font: bold, color: rgb(1, 1, 1) });
+  page.drawText("Voices Across Generations", { x: ml + 62, y: y - 1, size: 10, font, color: rgb(0.85, 0.88, 1) });
 
-  // Separator
-  page.drawLine({ start: { x: 40, y }, end: { x: width - 40, y }, thickness: 1.5, color: rgb(0.08, 0.22, 0.93) });
-  y -= 20;
+  resetY(555);
+  page.drawText("INVOICE", { x: mr - 70, y, size: 16, font: bold, color: brand });
+  resetY(565);
+  page.drawText(`#${data.orderId}`, { x: ml, y, size: 10, font, color: gray });
 
-  // Order info
-  drawText(`Order: ${data.orderId}`, 11, { font: bold });
-  drawText(`Event: ${data.eventName}`, 10);
-  drawText(`Payment: ${data.paymentMethod}`, 10);
-  drawText(`Date: ${data.paidAt}`, 10);
-  drawText(`Customer: ${data.customerName}`, 10);
-  y -= 12;
+  // ── Bill To ──
+  resetY(535);
+  page.drawText("BILL TO", { x: ml, y, size: 9, font: bold, color: gray });
+  resetY(520);
+  page.drawText(data.customerName, { x: ml, y, size: 12, font: bold, color: dark });
 
-  // Items header
-  page.drawRectangle({
-    x: 40, y: y - 22, width: width - 80, height: 24,
-    color: rgb(0.08, 0.22, 0.93),
-  });
+  // ── Order Info ──
+  resetY(535);
+  page.drawText("EVENT", { x: mr - 140, y, size: 9, font: bold, color: gray });
+  resetY(520);
+  page.drawText(data.eventName, { x: mr - 140, y, size: 12, font: bold, color: dark });
+  resetY(503);
+  page.drawText(`Payment: ${data.paymentMethod}`, { x: mr - 140, y, size: 10, font, color: dark });
+  resetY(488);
+  page.drawText(`Date: ${data.paidAt}`, { x: mr - 140, y, size: 10, font, color: dark });
 
-  page.drawText("Item", { x: 50, y: y - 16, size: 10, font: bold, color: rgb(1, 1, 1) });
-  page.drawText("Amount", { x: width - 120, y: y - 16, size: 10, font: bold, color: rgb(1, 1, 1) });
-  y -= 30;
+  // ── Items Table Header ──
+  resetY(455);
+  page.drawRectangle({ x: ml, y: y - 22, width: width - 70, height: 24, color: brand });
+  resetY(442);
+  page.drawText("#", { x: ml + 10, y, size: 10, font: bold, color: rgb(1, 1, 1) });
+  page.drawText("DESCRIPTION", { x: ml + 30, y, size: 10, font: bold, color: rgb(1, 1, 1) });
+  page.drawText("AMOUNT", { x: mr - 65, y, size: 10, font: bold, color: rgb(1, 1, 1) });
 
-  // Items
+  // ── Items ──
+  resetY(414);
+  let idx = 1;
   for (const item of data.items) {
-    page.drawText(item.description, { x: 50, y, size: 10, font, color: rgb(0.1, 0.1, 0.1) });
-    page.drawText(`Rs.${item.amount}`, { x: width - 130, y, size: 10, font, color: rgb(0.1, 0.1, 0.1) });
-    y -= 20;
+    page.drawText(`${idx}`, { x: ml + 12, y, size: 10, font, color: dark });
+    page.drawText(item.description, { x: ml + 32, y, size: 10, font, color: dark });
+    page.drawText(`Rs.${item.amount}`, { x: mr - 80, y, size: 10, font, color: dark });
+    y -= 22;
+    idx++;
   }
 
-  y -= 8;
-  page.drawLine({ start: { x: 40, y }, end: { x: width - 40, y }, thickness: 0.5, color: rgb(0.85, 0.85, 0.85) });
-  y -= 16;
-
-  // Totals
-  const labelX = width - 180;
-  const valueX = width - 120;
+  // ── Totals ──
+  const totY = y + 4;
+  lineY();
+  resetY(totY - 18);
 
   function totalLine(label: string, value: string, isBold = false) {
     const f = isBold ? bold : font;
     const sz = isBold ? 12 : 10;
-    page.drawText(label, { x: labelX, y, size: sz, font: f, color: rgb(0.3, 0.3, 0.3) });
-    page.drawText(value, { x: valueX, y, size: sz, font: f, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText(label, { x: mr - 140, y, size: sz, font: f, color: gray });
+    page.drawText(value, { x: mr - 60, y, size: sz, font: f, color: dark });
     y -= sz + 6;
   }
 
   totalLine("Subtotal", `Rs.${data.subtotal}`);
-  totalLine("Tax", `Rs.${data.tax}`);
-  page.drawLine({ start: { x: labelX, y: y - 2 }, end: { x: width - 40, y: y - 2 }, thickness: 0.5, color: rgb(0.85, 0.85, 0.85) });
+  totalLine("Tax (0%)", `Rs.${data.tax}`);
+  page.drawLine({ start: { x: mr - 145, y: y - 2 }, end: { x: mr, y: y - 2 }, thickness: 0.5, color: rgb(0.88, 0.88, 0.88) });
   y -= 10;
   totalLine("Total", `Rs.${data.total}`, true);
 
-  // Footer
-  y = 60;
-  page.drawLine({ start: { x: 40, y }, end: { x: width - 40, y }, thickness: 1, color: rgb(0.85, 0.85, 0.85) });
-  y -= 16;
-  drawText("Thank you for your purchase!", 10, { color: [0.5, 0.5, 0.5] });
-  drawText("echo — Voices Across Generations", 9, { color: [0.5, 0.5, 0.5] });
+  // ── Payment Status ──
+  resetY(totY - 140);
+  page.drawRectangle({ x: ml, y: y - 22, width: 120, height: 24, color: rgb(0.12, 0.68, 0.28) });
+  resetY(y - 15);
+  page.drawText("PAID", { x: ml + 45, y, size: 11, font: bold, color: rgb(1, 1, 1) });
+
+  // ── Footer ──
+  resetY(60);
+  lineY();
+  resetY(44);
+  page.drawText("Thank you for your business.", { x: ml, y, size: 9, font, color: gray });
+  resetY(32);
+  page.drawText("This is a computer-generated invoice.", { x: ml, y, size: 8, font, color: gray });
+  resetY(18);
+  page.drawText("Echo — Voices Across Generations", { x: ml, y, size: 8, font, color: gray });
 
   return pdfDoc.save();
 }

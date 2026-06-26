@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   const s = Object.fromEntries(dbSettings.map((s) => [s.key, s.value]));
 
   const provider = s.EMAIL_PROVIDER || process.env.EMAIL_PROVIDER || "smtp";
-  const fromName = s.MAIL_FROM_NAME || process.env.MAIL_FROM_NAME || "echo";
+  const fromName = s.MAIL_FROM_NAME || process.env.MAIL_FROM_NAME || "Echo";
   const fromEmail = s.MAIL_FROM_EMAIL || process.env.MAIL_FROM_EMAIL || "noreply@yourdomain.com";
 
   let emailProvider;

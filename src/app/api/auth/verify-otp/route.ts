@@ -22,6 +22,13 @@ export async function POST(req: NextRequest) {
       data: { emailVerified: new Date() },
     });
 
+    const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+    const memberSince = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
     // Send welcome notification
     const html = renderWelcomeEmail({ firstName: user.firstName || "User", email: user.email });
     await notify(
@@ -30,6 +37,21 @@ export async function POST(req: NextRequest) {
       "Welcome to echo",
       html,
       { firstName: user.firstName || "User", email: user.email }
+    );
+
+    // Send digital ID card via WhatsApp (no email)
+    await notify(
+      NotificationType.ID_CARD,
+      { phone: user.phone || undefined },
+      "Your Digital ID Card",
+      "",
+      {
+        firstName: name,
+        userId: user.id,
+        name,
+        email: user.email,
+        memberSince,
+      }
     );
 
     return NextResponse.json({ success: true });

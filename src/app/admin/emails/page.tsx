@@ -1,7 +1,7 @@
 "use client";
 
 import { emailTemplates } from "@/lib/email-templates";
-import { Mail, ExternalLink } from "lucide-react";
+import { Mail, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -41,10 +41,9 @@ export default function AdminEmailsPage() {
                   </div>
                   <Link
                     href={`/admin/emails/preview/${tmpl.id}`}
-                    target="_blank"
                     className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
-                    Preview <ExternalLink className="h-3.5 w-3.5" />
+                    Preview <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <h4 className="mt-4 font-semibold">{tmpl.name}</h4>

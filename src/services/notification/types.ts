@@ -1,6 +1,7 @@
 export enum NotificationType {
   OTP = "otp",
   WELCOME = "welcome",
+  ID_CARD = "id_card",
   TICKET_CONFIRMATION = "ticket",
   ORDER_RECEIPT = "receipt",
   EVENT_REMINDER = "reminder",
@@ -15,6 +16,7 @@ export enum NotificationChannel {
 export const ALL_NOTIFICATION_TYPES: NotificationType[] = [
   NotificationType.OTP,
   NotificationType.WELCOME,
+  NotificationType.ID_CARD,
   NotificationType.TICKET_CONFIRMATION,
   NotificationType.ORDER_RECEIPT,
   NotificationType.EVENT_REMINDER,
@@ -44,6 +46,7 @@ export function parseChannelSetting(key: string): { type: NotificationType; chan
 export const NOTIFICATION_LABELS: Record<NotificationType, string> = {
   [NotificationType.OTP]: "OTP Verification",
   [NotificationType.WELCOME]: "Welcome Message",
+  [NotificationType.ID_CARD]: "Digital ID Card",
   [NotificationType.TICKET_CONFIRMATION]: "Ticket Confirmation",
   [NotificationType.ORDER_RECEIPT]: "Order Receipt",
   [NotificationType.EVENT_REMINDER]: "Event Reminder",
@@ -60,6 +63,8 @@ export const DEFAULT_CHANNEL_CONFIG: Record<string, boolean> = {
   [channelKey(NotificationType.OTP, NotificationChannel.WHATSAPP)]: true,
   [channelKey(NotificationType.WELCOME, NotificationChannel.EMAIL)]: true,
   [channelKey(NotificationType.WELCOME, NotificationChannel.WHATSAPP)]: true,
+  [channelKey(NotificationType.ID_CARD, NotificationChannel.EMAIL)]: false,
+  [channelKey(NotificationType.ID_CARD, NotificationChannel.WHATSAPP)]: true,
   [channelKey(NotificationType.TICKET_CONFIRMATION, NotificationChannel.EMAIL)]: true,
   [channelKey(NotificationType.TICKET_CONFIRMATION, NotificationChannel.WHATSAPP)]: false,
   [channelKey(NotificationType.ORDER_RECEIPT, NotificationChannel.EMAIL)]: true,

@@ -44,6 +44,7 @@ interface Settings {
 const NOTIFICATION_TYPES = [
   { id: "otp", label: "OTP Verification" },
   { id: "welcome", label: "Welcome Message" },
+  { id: "id_card", label: "Digital ID Card" },
   { id: "ticket", label: "Ticket Confirmation" },
   { id: "receipt", label: "Order Receipt" },
   { id: "reminder", label: "Event Reminder" },
@@ -60,7 +61,7 @@ function notifyKey(type: string, channel: string) {
 }
 
 const defaults: Settings = {
-  NEXT_PUBLIC_APP_NAME: "echo",
+  NEXT_PUBLIC_APP_NAME: "Echo",
   LOGO_URL: "",
   FAVICON_URL: "",
   RAZORPAY_KEY_ID: "",

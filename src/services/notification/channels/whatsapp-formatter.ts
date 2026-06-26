@@ -1,5 +1,9 @@
 import { NotificationType } from "../types";
 
+const APP_NAME = "Echo";
+const TAGLINE = "Voices Across Generations";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://events.forgetechno.com";
+
 interface OTPData {
   firstName: string;
   otp: string;
@@ -48,25 +52,17 @@ interface EventReminderData {
   daysAway: number;
 }
 
+interface IdCardData {
+  firstName: string;
+}
+
 interface PasswordResetData {
   firstName: string;
   resetLink: string;
 }
 
-function bold(text: string): string {
+function b(text: string): string {
   return `*${text}*`;
-}
-
-function divider(): string {
-  return `\n─────────────────\n`;
-}
-
-function header(icon: string, title: string): string {
-  return `${icon} ${bold(title)}`;
-}
-
-function section(label: string, value: string): string {
-  return `${label}: ${value}`;
 }
 
 export function formatWhatsAppMessage(
@@ -78,6 +74,8 @@ export function formatWhatsAppMessage(
       return formatOTP(data as unknown as OTPData);
     case NotificationType.WELCOME:
       return formatWelcome(data as unknown as WelcomeData);
+    case NotificationType.ID_CARD:
+      return formatIdCard(data as unknown as IdCardData);
     case NotificationType.TICKET_CONFIRMATION:
       return formatTicketPurchase(data as unknown as TicketPurchaseData);
     case NotificationType.ORDER_RECEIPT:
@@ -94,123 +92,134 @@ export function formatWhatsAppMessage(
 function formatOTP(data: OTPData): string {
   const expiry = data.expiresInMinutes ?? 10;
   return [
-    header("🔐", "Your Verification Code"),
+    `${b("🔐 Verify Your Email")}`,
     "",
     `Hi ${data.firstName},`,
+    "",
     `Use the code below to verify your email address. It expires in ${expiry} minutes.`,
     "",
-    bold(data.otp),
+    `${b(data.otp)}`,
     "",
-    `If you didn't request this code, you can safely ignore this message.`,
+    "If you didn't request this, please ignore this message.",
     "",
-    `─ ${process.env.NEXT_PUBLIC_APP_NAME || "echo"}`,
+    `— ${APP_NAME} · ${TAGLINE}`,
   ].join("\n");
 }
 
 function formatWelcome(data: WelcomeData): string {
   return [
-    header("👋", `Welcome, ${data.firstName}!`),
+    `${b("👋 Welcome to " + APP_NAME + ", " + data.firstName + "!")}`,
     "",
-    `We're thrilled to have you join the echo community.`,
-    `Your account has been created successfully with ${data.email}.`,
+    "We're thrilled to have you on board. Your account has been created with " + data.email + ".",
     "",
-    "Explore upcoming events, grab your tickets, and be part of something extraordinary.",
-    "From AI summits to tech conferences, the future starts here.",
+    `${b("What's next?")}`,
+    "• Browse upcoming events",
+    "• Grab your tickets",
+    "• Receive event reminders on WhatsApp",
     "",
-    `👉 ${process.env.NEXT_PUBLIC_APP_URL || "https://events.forgetechno.com"}/events`,
+    `${APP_URL}/events`,
     "",
-    `─ ${process.env.NEXT_PUBLIC_APP_NAME || "echo"}`,
+    `— ${APP_NAME} · ${TAGLINE}`,
   ].join("\n");
 }
 
 function formatTicketPurchase(data: TicketPurchaseData): string {
-  const lines = [
-    header("🎫", "Purchase Confirmed!"),
-    "",
-    `Thanks ${data.firstName}! Your tickets for ${bold(data.eventName)} are confirmed.`,
-    "",
-    section("Order ID", data.orderId),
-    section("Date", data.eventDate),
-    section("Venue", data.eventVenue),
-    "",
-    divider(),
-  ];
+  const items = data.tickets.map((t) => `• ${t.name} × ${t.quantity} — Rs.${t.price}`).join("\n");
 
-  lines.push(`  ${bold("Ticket")}`.padEnd(25) + bold("Qty").padEnd(10) + bold("Price"));
-  for (const t of data.tickets) {
-    lines.push(
-      `  ${t.name}`.padEnd(25) + `${t.quantity}`.padEnd(10) + `₹${t.price}`
-    );
-  }
-  lines.push(divider());
-  lines.push(`  ${bold("Total")}`.padEnd(35) + `₹${data.total}`);
-  lines.push("");
-  lines.push("Your tickets and barcodes will be available in your dashboard. Present the QR code at the venue for entry.");
-  lines.push("");
-  lines.push(`👉 ${process.env.NEXT_PUBLIC_APP_URL || "https://events.forgetechno.com"}/my-tickets`);
-  lines.push("");
-  lines.push(`─ ${process.env.NEXT_PUBLIC_APP_NAME || "echo"}`);
-
-  return lines.join("\n");
+  return [
+    `${b("🎫 Tickets Confirmed")}`,
+    "",
+    `Hi ${data.firstName},`,
+    `Your purchase for ${b(data.eventName)} is confirmed.`,
+    "",
+    `${b("Order Summary")}`,
+    `Order ID: ${data.orderId}`,
+    `Date: ${data.eventDate}`,
+    `Venue: ${data.eventVenue}`,
+    "",
+    `${items}`,
+    "",
+    `${b("Total: Rs." + data.total)}`,
+    "",
+    `📎 Ticket PDF attached — present the barcode at the venue for entry.`,
+    "",
+    `— ${APP_NAME} · ${TAGLINE}`,
+  ].join("\n");
 }
 
 function formatOrderReceipt(data: OrderReceiptData): string {
-  const lines = [
-    header("🧾", "Payment Receipt"),
-    "",
-    `Thanks, ${data.firstName}! Here's your receipt for ${bold(data.eventName)}.`,
-    "",
-    section("Order", data.orderId),
-    section("Paid via", data.paymentMethod),
-    section("Date", data.paidAt),
-    "",
-    divider(),
-  ];
+  const items = data.items.map((i) => `• ${i.description} — Rs.${i.amount}`).join("\n");
 
-  lines.push(`  ${bold("Item")}`.padEnd(35) + bold("Amount"));
-  for (const item of data.items) {
-    lines.push(`  ${item.description}`.padEnd(35) + `₹${item.amount}`);
-  }
-  lines.push(divider());
-  lines.push(`  ${"Subtotal".padEnd(33)}₹${data.subtotal}`);
-  lines.push(`  ${"Tax".padEnd(33)}₹${data.tax}`);
-  lines.push(`  ${bold("Total")}`.padEnd(33) + `₹${data.total}`);
-  lines.push("");
-  lines.push(`─ ${process.env.NEXT_PUBLIC_APP_NAME || "echo"}`);
-
-  return lines.join("\n");
+  return [
+    `${b("🧾 Payment Receipt")}`,
+    "",
+    `Hi ${data.firstName},`,
+    `Your payment for ${b(data.eventName)} has been received.`,
+    "",
+    `${b("Receipt Summary")}`,
+    `Order: ${data.orderId}`,
+    `Paid via: ${data.paymentMethod}`,
+    `Date: ${data.paidAt}`,
+    "",
+    `${items}`,
+    "",
+    `Subtotal: Rs.${data.subtotal}`,
+    `Tax: Rs.${data.tax}`,
+    `${b("Total: Rs." + data.total)}`,
+    "",
+    `📎 Invoice PDF attached for your records.`,
+    "",
+    `— ${APP_NAME} · ${TAGLINE}`,
+  ].join("\n");
 }
 
 function formatEventReminder(data: EventReminderData): string {
   const urgency = data.daysAway <= 1 ? "tomorrow" : `in ${data.daysAway} days`;
+  const heading = data.daysAway <= 1 ? "Event Tomorrow" : "Event Reminder";
 
   return [
-    header("⏰", `Event ${data.daysAway <= 1 ? "Tomorrow!" : "Coming Soon"}`),
+    `${b("⏰ " + heading)}`,
     "",
-    `Hey ${data.firstName}, just a heads up that ${bold(data.eventName)} is ${urgency}!`,
+    `Hi ${data.firstName},`,
+    `This is a reminder that ${b(data.eventName)} is ${urgency}.`,
     "",
-    section("Date", data.eventDate),
-    section("Time", data.eventTime),
-    section("Venue", data.eventVenue),
+    `${b("Event Details")}`,
+    `Date: ${data.eventDate}`,
+    `Time: ${data.eventTime}`,
+    `Venue: ${data.eventVenue}`,
     "",
-    "Don't forget to bring your ticket with the QR code for a smooth check-in. See you there!",
+    "Don't forget to bring your ticket for a smooth check-in. We look forward to seeing you there!",
     "",
-    `─ ${process.env.NEXT_PUBLIC_APP_NAME || "echo"}`,
+    `— ${APP_NAME} · ${TAGLINE}`,
+  ].join("\n");
+}
+
+function formatIdCard(data: IdCardData): string {
+  return [
+    `${b("🪪 Your Digital ID Card")}`,
+    "",
+    `Hi ${data.firstName},`,
+    "",
+    "Your digital identity card is ready! 🎉",
+    "",
+    "📎 ID card PDF attached below.",
+    "Scan the QR code on the card to view your profile and tickets anytime.",
+    "",
+    `— ${APP_NAME} · ${TAGLINE}`,
   ].join("\n");
 }
 
 function formatPasswordReset(data: PasswordResetData): string {
   return [
-    header("🔑", "Reset Your Password"),
+    `${b("🔑 Password Reset")}`,
     "",
-    `Hi ${data.firstName}, we received a request to reset your password.`,
+    `Hi ${data.firstName},`,
+    "We received a request to reset your password.",
     "",
-    `Click here to reset: ${data.resetLink}`,
+    `${data.resetLink}`,
     "",
-    "This link expires in 1 hour.",
+    "This link expires in 1 hour. If you didn't request this, you can safely ignore this message.",
     "",
-    "If you didn't request a password reset, you can safely ignore this message.",
-    "",
-    `─ ${process.env.NEXT_PUBLIC_APP_NAME || "echo"}`,
+    `— ${APP_NAME} · ${TAGLINE}`,
   ].join("\n");
 }
