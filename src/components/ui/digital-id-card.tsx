@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import QRCode from "qrcode";
 
 interface DigitalIdCardProps {
   user: {
@@ -55,13 +56,11 @@ export default function DigitalIdCard({ user }: DigitalIdCardProps) {
   const profileUrl = `${appUrl}/id/${user.id}`;
 
   useEffect(() => {
-    import("qrcode").then((QRCode) => {
-      QRCode.toDataURL(profileUrl, {
-        width: 400,
-        margin: 2,
-        color: { dark: "#1f1107", light: "#ffffff00" },
-      }).then(setQrDataUrl).catch(() => {});
-    }).catch(() => {});
+    QRCode.toDataURL(profileUrl, {
+      width: 400,
+      margin: 2,
+      color: { dark: "#1f1107", light: "#ffffff00" },
+    }).then(setQrDataUrl).catch(() => {});
   }, [profileUrl]);
 
   const handleCopy = useCallback(() => {
