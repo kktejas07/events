@@ -1,9 +1,17 @@
 import { createCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
 import QRCode from "qrcode";
+import { existsSync } from "fs";
 
-GlobalFonts.registerFromPath("/System/Library/Fonts/Helvetica.ttc", "Helvetica");
-GlobalFonts.registerFromPath("/System/Library/Fonts/HelveticaNeue.ttc", "HelveticaNeue");
-GlobalFonts.registerFromPath("/System/Library/Fonts/ArialHB.ttc", "Arial");
+// Register fonts - try DejaVu (Alpine/Linux) first, fall back to macOS
+if (existsSync("/usr/share/fonts/TTF/DejaVuSans.ttf")) {
+  GlobalFonts.registerFromPath("/usr/share/fonts/TTF/DejaVuSans.ttf", "DejaVuSans");
+  GlobalFonts.registerFromPath("/usr/share/fonts/TTF/DejaVuSans-Bold.ttf", "DejaVuSans");
+  GlobalFonts.registerFromPath("/usr/share/fonts/TTF/DejaVuSansMono.ttf", "DejaVuMono");
+} else if (existsSync("/System/Library/Fonts/Helvetica.ttc")) {
+  GlobalFonts.registerFromPath("/System/Library/Fonts/Helvetica.ttc", "Helvetica");
+  GlobalFonts.registerFromPath("/System/Library/Fonts/HelveticaNeue.ttc", "HelveticaNeue");
+  GlobalFonts.registerFromPath("/System/Library/Fonts/ArialHB.ttc", "Arial");
+}
 
 interface IdCardImageData {
   userId: string;
@@ -38,7 +46,7 @@ export async function generateIdCardImage(data: IdCardImageData): Promise<Buffer
   const ctx = canvas.getContext("2d");
 
   const f = (size: number, bold = false) =>
-    `${bold ? "bold " : ""}${size}px Helvetica, HelveticaNeue, Arial, sans-serif`;
+    `${bold ? "bold " : ""}${size}px DejaVuSans, Helvetica, Arial, sans-serif`;
 
   // ── Gradient background ──
   const grad = ctx.createLinearGradient(0, 0, CW, CH);
