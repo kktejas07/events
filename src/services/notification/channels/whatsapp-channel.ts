@@ -3,7 +3,7 @@ import { NotificationChannel, NotificationType } from "../types";
 import { formatWhatsAppMessage } from "./whatsapp-formatter";
 import { generateTicketPdf } from "@/lib/pdf/ticket-pdf";
 import { generateInvoicePdf } from "@/lib/pdf/invoice-pdf";
-import { generateIdCardPdf } from "@/lib/pdf/id-card-pdf";
+import { generateIdCardImage } from "@/lib/image/id-card-image";
 
 
 export const WHATSAPP_CHANNEL_NAME = NotificationChannel.WHATSAPP;
@@ -163,7 +163,7 @@ export async function sendWhatsAppNotification(
     return;
   }
 
-  // For ID card on registration — send as PDF document
+  // For ID card — send as PNG image (renders inline)
   if (type === NotificationType.ID_CARD && waData) {
     try {
       const d = waData as {
@@ -172,15 +172,17 @@ export async function sendWhatsAppNotification(
         email: string;
         memberSince: string;
         phone?: string;
+        employeeId?: string;
       };
-      const pdfBytes = await generateIdCardPdf({
+      const pngBuffer = await generateIdCardImage({
         userId: d.userId,
         name: d.name,
         email: d.email,
         memberSince: d.memberSince,
         appUrl: baseUrl(),
+        employeeId: d.employeeId || null,
       });
-      const b64 = `data:application/pdf;base64,${toBase64(pdfBytes)}`;
+      const b64 = `data:image/png;base64,${toBase64(pngBuffer)}`;
       const caption = formatWhatsAppMessage(type, waData);
       await fetch(docUrl(apiUrl), {
         method: "POST",
@@ -188,13 +190,13 @@ export async function sendWhatsAppNotification(
         body: JSON.stringify({
           chatId,
           base64: b64,
-          mimetype: "application/pdf",
-          filename: `id-card-${d.userId}.pdf`,
+          mimetype: "image/png",
+          filename: `id-card-${d.userId}.png`,
           caption,
         }),
       });
     } catch (err) {
-      console.error("[WhatsApp] Failed to send ID card PDF, falling back to text:", err);
+      console.error("[WhatsApp] Failed to send ID card image, falling back to text:", err);
       const plainText = formatWhatsAppMessage(type, waData);
       await fetch(apiUrl, {
         method: "POST",
