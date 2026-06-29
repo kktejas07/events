@@ -729,7 +729,7 @@ export default function AdminSettingsPage() {
                 Assign Employee IDs
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Generate employee IDs for all users who don't have one yet. Existing IDs will not be overwritten.
+                Generate employee IDs for all users who don&apos;t have one yet. Existing IDs will not be overwritten.
               </p>
             </CardHeader>
             <CardContent>
