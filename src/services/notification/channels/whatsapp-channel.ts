@@ -186,8 +186,6 @@ export async function sendWhatsAppNotification(
     }
     return;
   }
-    return;
-  }
 
   // Default: send as text
   const plainText = waData
