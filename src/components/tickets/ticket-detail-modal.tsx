@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { QRCode } from "react-qr-code";
 import { Calendar, Clock, MapPin, User, X, CheckCircle2, XCircle, Clock4, ScanLine } from "lucide-react";
 import { formatDate } from "@/lib/utils";
@@ -41,10 +43,15 @@ function getTicketStatus(ticket: TicketDetail): { label: string; color: string; 
 }
 
 export default function TicketDetailModal({ ticket, onClose }: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const tierColor = ticket.ticketType.color || "#6C5CE7";
   const status = getTicketStatus(ticket);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(2px)" }}
@@ -133,6 +140,7 @@ export default function TicketDetailModal({ ticket, onClose }: Props) {
           Ticket ID: {ticket.id.slice(-8).toUpperCase()} · Echo — Voices Across Generations
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
