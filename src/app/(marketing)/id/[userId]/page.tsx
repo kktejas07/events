@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { Ticket, FileText, ShoppingBag, Clock } from "lucide-react";
+import { FileText, ShoppingBag, Clock } from "lucide-react";
 import Link from "next/link";
 import DigitalIdCard from "@/components/ui/digital-id-card";
+import TicketListClient from "@/components/tickets/ticket-list-client";
 import { formatDate } from "@/lib/utils";
 import { Metadata } from "next";
 
@@ -73,9 +74,16 @@ export default async function UserIdPage({ params }: Props) {
     where: { id: params.userId },
     include: {
       tickets: {
-        include: {
-          event: { select: { title: true, startDate: true } },
-          ticketType: { select: { name: true } },
+        select: {
+          id: true,
+          barcode: true,
+          status: true,
+          scanned: true,
+          scannedAt: true,
+          attendeeName: true,
+          attendeeEmail: true,
+          event: { select: { title: true, startDate: true, endDate: true } },
+          ticketType: { select: { name: true, price: true, color: true } },
           order: { select: { status: true } },
         },
         orderBy: { createdAt: "desc" },
@@ -131,35 +139,7 @@ export default async function UserIdPage({ params }: Props) {
         {hasData && (
           <div className="mt-6 space-y-4">
             {/* Tickets */}
-            {tickets.length > 0 && (
-              <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-                <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                  <Ticket className="h-4 w-4" />
-                  Tickets
-                </h3>
-                <div className="mt-3 space-y-2">
-                  {tickets.map((ticket) => (
-                    <div
-                      key={ticket.id}
-                      className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3 text-sm transition hover:border-blue-100 hover:bg-blue-50/30"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-gray-900">
-                          {ticket.event?.title || "Unknown Event"}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {ticket.ticketType?.name} &middot;{" "}
-                          {ticket.event?.startDate
-                            ? new Date(ticket.event.startDate).toLocaleDateString()
-                            : "TBA"}
-                        </p>
-                      </div>
-                      <StatusBadge status={ticket.order?.status || "PENDING"} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {tickets.length > 0 && <TicketListClient tickets={tickets as any} />}
 
             {/* Invoices */}
             {invoices.length > 0 && (
