@@ -39,8 +39,7 @@ export async function GET(_req: NextRequest, { params }: { params: { userId: str
     employeeId: user.employeeId,
   });
 
-  const body = new Uint8Array(pngBuffer.buffer, pngBuffer.byteOffset, pngBuffer.byteLength);
-  return new NextResponse(body, {
+  return new Response(pngBuffer as unknown as BodyInit, {
     headers: {
       "Content-Type": "image/png",
       "Cache-Control": "public, max-age=3600",
