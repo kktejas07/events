@@ -195,8 +195,9 @@ function formatEventReminder(data: EventReminderData): string {
   ].join("\n");
 }
 
-function formatIdCard(data: IdCardData): string {
-  const cardUrl = `${APP_URL}/id/${data.userId}`;
+function formatIdCard(data: IdCardData & { imageUrl?: string; cardUrl?: string }): string {
+  const cardUrl = data.cardUrl || `${APP_URL}/id/${data.userId}`;
+  const imageUrl = data.imageUrl || `${APP_URL}/api/public/id-card-image/${data.userId}`;
   return [
     `${b("🪪 Your Digital ID Card")}`,
     "",
@@ -204,10 +205,9 @@ function formatIdCard(data: IdCardData): string {
     "",
     "Your digital identity card is ready! 🎉",
     "",
-    `View your card online: ${cardUrl}`,
+    `${imageUrl}`,
     "",
-    "📎 ID card PDF attached below.",
-    "Scan the QR code on the card to view your profile and tickets anytime.",
+    `Interactive card: ${cardUrl}`,
     "",
     `— ${APP_NAME} · ${TAGLINE}`,
   ].join("\n");

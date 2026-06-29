@@ -3,7 +3,6 @@ import { NotificationChannel, NotificationType } from "../types";
 import { formatWhatsAppMessage } from "./whatsapp-formatter";
 import { generateTicketPdf } from "@/lib/pdf/ticket-pdf";
 import { generateInvoicePdf } from "@/lib/pdf/invoice-pdf";
-import { generateIdCardPdf } from "@/lib/pdf/id-card-pdf";
 
 
 export const WHATSAPP_CHANNEL_NAME = NotificationChannel.WHATSAPP;
@@ -163,7 +162,7 @@ export async function sendWhatsAppNotification(
     return;
   }
 
-  // For ID card — send as PDF document
+  // For ID card — send image URL as text (more reliable than document/media)
   if (type === NotificationType.ID_CARD && waData) {
     try {
       const d = waData as {
@@ -174,36 +173,19 @@ export async function sendWhatsAppNotification(
         phone?: string;
         employeeId?: string;
       };
-      const pdfBytes = await generateIdCardPdf({
-        userId: d.userId,
-        name: d.name,
-        email: d.email,
-        memberSince: d.memberSince,
-        appUrl: baseUrl(),
-        employeeId: d.employeeId || undefined,
-      });
-      const b64 = `data:application/pdf;base64,${toBase64(pdfBytes)}`;
-      const caption = formatWhatsAppMessage(type, waData);
-      await fetch(docUrl(apiUrl), {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
-        body: JSON.stringify({
-          chatId,
-          base64: b64,
-          mimetype: "application/pdf",
-          filename: `id-card-${d.userId}.pdf`,
-          caption,
-        }),
-      });
-    } catch (err) {
-      console.error("[WhatsApp] Failed to send ID card image, falling back to text:", err);
-      const plainText = formatWhatsAppMessage(type, waData);
+      const imageUrl = `${baseUrl()}/api/public/id-card-image/${d.userId}`;
+      const cardUrl = `${baseUrl()}/id/${d.userId}`;
+      const text = formatWhatsAppMessage(type, { firstName: d.name, userId: d.userId, imageUrl, cardUrl } as any);
       await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
-        body: JSON.stringify({ chatId, text: plainText }),
+        body: JSON.stringify({ chatId, text }),
       });
+    } catch (err) {
+      console.error("[WhatsApp] Failed to send ID card link:", err);
     }
+    return;
+  }
     return;
   }
 
