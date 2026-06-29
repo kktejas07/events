@@ -3,7 +3,7 @@ import { NotificationChannel, NotificationType } from "../types";
 import { formatWhatsAppMessage } from "./whatsapp-formatter";
 import { generateTicketPdf } from "@/lib/pdf/ticket-pdf";
 import { generateInvoicePdf } from "@/lib/pdf/invoice-pdf";
-import { generateIdCardImage } from "@/lib/image/id-card-image";
+import { generateIdCardPdf } from "@/lib/pdf/id-card-pdf";
 
 
 export const WHATSAPP_CHANNEL_NAME = NotificationChannel.WHATSAPP;
@@ -163,7 +163,7 @@ export async function sendWhatsAppNotification(
     return;
   }
 
-  // For ID card — send as PNG image (renders inline)
+  // For ID card — send as PDF document
   if (type === NotificationType.ID_CARD && waData) {
     try {
       const d = waData as {
@@ -174,15 +174,15 @@ export async function sendWhatsAppNotification(
         phone?: string;
         employeeId?: string;
       };
-      const pngBuffer = await generateIdCardImage({
+      const pdfBytes = await generateIdCardPdf({
         userId: d.userId,
         name: d.name,
         email: d.email,
         memberSince: d.memberSince,
         appUrl: baseUrl(),
-        employeeId: d.employeeId || null,
+        employeeId: d.employeeId || undefined,
       });
-      const b64 = `data:image/png;base64,${toBase64(pngBuffer)}`;
+      const b64 = `data:application/pdf;base64,${toBase64(pdfBytes)}`;
       const caption = formatWhatsAppMessage(type, waData);
       await fetch(docUrl(apiUrl), {
         method: "POST",
@@ -190,8 +190,8 @@ export async function sendWhatsAppNotification(
         body: JSON.stringify({
           chatId,
           base64: b64,
-          mimetype: "image/png",
-          filename: `id-card-${d.userId}.png`,
+          mimetype: "application/pdf",
+          filename: `id-card-${d.userId}.pdf`,
           caption,
         }),
       });

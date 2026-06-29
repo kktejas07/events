@@ -7,6 +7,7 @@ interface IdCardData {
   email: string;
   memberSince: string;
   appUrl: string;
+  employeeId?: string;
 }
 
 function toBuffer(dataUrl: string): Uint8Array {
@@ -54,7 +55,7 @@ export async function generateIdCardPdf(data: IdCardData): Promise<Uint8Array> {
   p1.drawText("MEMBER ID", {
     x: mr - 110, y: ph - 28, size: 7, font: bold, color: white,
   });
-  p1.drawText("#" + data.userId.slice(-8).toUpperCase(), {
+  p1.drawText("#" + (data.employeeId || data.userId.slice(-8).toUpperCase()), {
     x: mr - 110, y: ph - 42, size: 11, font: bold, color: white,
   });
 
@@ -81,7 +82,7 @@ export async function generateIdCardPdf(data: IdCardData): Promise<Uint8Array> {
   // Info rows
   const infoRows = [
     { label: "Member Since", value: data.memberSince },
-    { label: "Member ID", value: data.userId },
+    { label: "Member ID", value: data.employeeId || data.userId },
     { label: "Website", value: data.appUrl.replace(/^https?:\/\//, "") },
   ];
   infoRows.forEach((r, i) => {
