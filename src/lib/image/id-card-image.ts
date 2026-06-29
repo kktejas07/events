@@ -11,22 +11,17 @@ interface IdCardImageData {
   email: string;
   memberSince: string;
   appUrl: string;
+  employeeId?: string | null;
 }
 
-const CARD_W = 460;
-const CARD_H = 300;
-const GAP = 30;
-const W = CARD_W;
-const H = CARD_H * 2 + GAP;
-const R = 14;
+const CW = 540;
+const CH = 340;
+const R = 22;
 
-const BRAND = "#1539ee";
-const DARK = "#1a1a2e";
-const GRAY = "#64748b";
-const LIGHT_GRAY = "#e2e8f0";
-const WHITE = "#ffffff";
-const BG = "#f1f5f9";
-const GOLD = "#f59e0b";
+const BRAND = "#1539EE";
+const BRAND_END = "#6C5CE7";
+const WHITE = "#FFFFFF";
+const VERIFIED_GREEN = "#00B894";
 
 function getInitials(name: string): string {
   return name
@@ -38,247 +33,171 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-function roundRect(ctx: any, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
 export async function generateIdCardImage(data: IdCardImageData): Promise<Buffer> {
-  const canvas = createCanvas(W, H);
+  const canvas = createCanvas(CW, CH);
   const ctx = canvas.getContext("2d");
 
-  const font = (s: number, bold = false) =>
-    `${bold ? "bold " : ""}${s}px Helvetica, HelveticaNeue, Arial, sans-serif`;
+  const f = (size: number, bold = false) =>
+    `${bold ? "bold " : ""}${size}px Helvetica, HelveticaNeue, Arial, sans-serif`;
 
-  // ── Background ──
-  ctx.fillStyle = BG;
-  ctx.fillRect(0, 0, W, H);
-
-  function drawCard(yOff: number) {
-    // Card shadow
-    ctx.fillStyle = "rgba(0,0,0,0.08)";
-    roundRect(ctx, 6, yOff + 6, CARD_W - 12, CARD_H - 12, R);
-    ctx.fill();
-
-    // Card body
-    ctx.fillStyle = WHITE;
-    roundRect(ctx, 2, yOff + 2, CARD_W - 4, CARD_H - 4, R);
-    ctx.fill();
-    roundRect(ctx, 0, yOff, CARD_W, CARD_H, R);
-    ctx.fill();
-  }
-
-  // ════════════════════════════════════════════
-  //  FRONT
-  // ════════════════════════════════════════════
-  drawCard(0);
-
-  const ml = 24;
-  const mr = CARD_W - 24;
-
-  // Branded top strip
-  ctx.fillStyle = BRAND;
+  // ── Gradient background ──
+  const grad = ctx.createLinearGradient(0, 0, CW, CH);
+  grad.addColorStop(0, BRAND);
+  grad.addColorStop(1, BRAND_END);
+  ctx.fillStyle = grad;
   ctx.beginPath();
-  ctx.moveTo(0, R);
+  ctx.moveTo(R, 0);
+  ctx.lineTo(CW - R, 0);
+  ctx.quadraticCurveTo(CW, 0, CW, R);
+  ctx.lineTo(CW, CH - R);
+  ctx.quadraticCurveTo(CW, CH, CW - R, CH);
+  ctx.lineTo(R, CH);
+  ctx.quadraticCurveTo(0, CH, 0, CH - R);
+  ctx.lineTo(0, R);
   ctx.quadraticCurveTo(0, 0, R, 0);
-  ctx.lineTo(CARD_W - R, 0);
-  ctx.quadraticCurveTo(CARD_W, 0, CARD_W, R);
-  ctx.lineTo(CARD_W, 80);
-  ctx.lineTo(0, 80);
   ctx.closePath();
   ctx.fill();
 
-  // Brand name
-  ctx.fillStyle = WHITE;
-  ctx.font = font(22, true);
-  ctx.fillText("Echo", ml, 36);
-
-  ctx.fillStyle = "#b3c5ff";
-  ctx.font = font(11);
-  ctx.fillText("Voices Across Generations", ml + 82, 36);
-
-  // Member badge
-  ctx.fillStyle = "rgba(255,255,255,0.15)";
-  roundRect(ctx, mr - 120, 14, 108, 30, 6);
-  ctx.fill();
-
-  ctx.fillStyle = WHITE;
-  ctx.font = font(8);
-  ctx.fillText("MEMBER ID", mr - 110, 24);
-  ctx.font = font(11, true);
-  ctx.fillText("#" + data.userId.slice(-8).toUpperCase(), mr - 110, 39);
-
-  // ── Photo / Initials ──
-  const cx = ml + 44;
-  const cy = 140;
+  // ── Watermark "E" ──
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, 40, 0, Math.PI * 2);
-  ctx.clip();
-  ctx.fillStyle = BRAND;
-  ctx.fillRect(cx - 40, cy - 40, 80, 80);
-  ctx.fillStyle = WHITE;
-  ctx.font = font(28, true);
-  ctx.textAlign = "center";
-  ctx.fillText(getInitials(data.name), cx, cy + 10);
-  ctx.textAlign = "left";
+  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  ctx.font = `900 ${CH * 0.42}px Helvetica`;
+  ctx.textAlign = "right";
+  ctx.fillText("E", CW - 12, CH * 0.72);
   ctx.restore();
 
-  // Photo ring
-  ctx.strokeStyle = WHITE;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(cx, cy, 40, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // ── Name & Role ──
-  ctx.fillStyle = DARK;
-  ctx.font = font(18, true);
-  ctx.fillText(data.name, ml + 100, 130);
-
-  ctx.fillStyle = GRAY;
-  ctx.font = font(12);
-  ctx.fillText(data.email, ml + 100, 150);
-
-  ctx.fillStyle = BRAND;
-  ctx.font = font(10);
-  ctx.fillText("Member", ml + 100, 168);
-
-  // ── Divider ──
-  ctx.strokeStyle = LIGHT_GRAY;
+  // ── Glass card overlay ──
+  const ml = 20;
+  const mt = 16;
+  const gw = CW - ml * 2;
+  const gh = CH - mt * 2;
+  ctx.fillStyle = "rgba(255,255,255,0.10)";
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(ml, 192);
-  ctx.lineTo(mr, 192);
+  const gr = R - 4;
+  ctx.moveTo(ml + gr, mt);
+  ctx.lineTo(ml + gw - gr, mt);
+  ctx.quadraticCurveTo(ml + gw, mt, ml + gw, mt + gr);
+  ctx.lineTo(ml + gw, mt + gh - gr);
+  ctx.quadraticCurveTo(ml + gw, mt + gh, ml + gw - gr, mt + gh);
+  ctx.lineTo(ml + gr, mt + gh);
+  ctx.quadraticCurveTo(ml, mt + gh, ml, mt + gh - gr);
+  ctx.lineTo(ml, mt + gr);
+  ctx.quadraticCurveTo(ml, mt, ml + gr, mt);
+  ctx.closePath();
+  ctx.fill();
   ctx.stroke();
 
-  // ── Info rows ──
-  const rows = [
-    { label: "Member Since", value: data.memberSince },
-    { label: "Member ID", value: data.userId },
-    { label: "Website", value: data.appUrl.replace(/^https?:\/\//, "") },
-  ];
-
-  rows.forEach((r, i) => {
-    const y = 210 + i * 24;
-    ctx.fillStyle = GRAY;
-    ctx.font = font(8, true);
-    ctx.fillText(r.label, ml, y);
-    ctx.fillStyle = DARK;
-    ctx.font = font(11, true);
-    ctx.fillText(r.value, ml + 100, y);
-  });
-
-  // ── Footer strip ──
-  ctx.fillStyle = "#f8fafc";
-  ctx.beginPath();
-  ctx.moveTo(0, CARD_H - R);
-  ctx.quadraticCurveTo(0, CARD_H, R, CARD_H);
-  ctx.lineTo(CARD_W - R, CARD_H);
-  ctx.quadraticCurveTo(CARD_W, CARD_H, CARD_W, CARD_H - R);
-  ctx.lineTo(CARD_W, CARD_H - 40);
-  ctx.lineTo(0, CARD_H - 40);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.fillStyle = GRAY;
-  ctx.font = font(9);
-  ctx.fillText("Echo — Voices Across Generations", ml, CARD_H - 14);
-
-  ctx.fillStyle = BRAND;
-  ctx.font = font(10, true);
-  ctx.textAlign = "right";
-  ctx.fillText("events.forgetechno.com", mr, CARD_H - 14);
+  // ── Header: ECHO / OFFICIAL ID ──
+  const hx = ml + 20;
+  const hy = mt + 28;
+  ctx.fillStyle = "rgba(255,255,255,0.75)";
+  ctx.font = f(11, true);
   ctx.textAlign = "left";
-
-  // ════════════════════════════════════════════
-  //  BACK
-  // ════════════════════════════════════════════
-  const backY = CARD_H + GAP;
-  drawCard(backY);
-
-  // Brand bar at top of back
-  ctx.fillStyle = BRAND;
-  ctx.beginPath();
-  ctx.moveTo(0, backY + R);
-  ctx.quadraticCurveTo(0, backY, R, backY);
-  ctx.lineTo(CARD_W - R, backY);
-  ctx.quadraticCurveTo(CARD_W, backY, CARD_W, backY + R);
-  ctx.lineTo(CARD_W, backY + 50);
-  ctx.lineTo(0, backY + 50);
-  ctx.closePath();
-  ctx.fill();
+  ctx.fillText("ECHO", hx, hy - 16);
 
   ctx.fillStyle = WHITE;
-  ctx.font = font(16, true);
-  ctx.fillText("Scan to Access", ml, backY + 32);
+  ctx.font = f(24, true);
+  ctx.fillText("OFFICIAL ID", hx, hy + 16);
 
-  ctx.fillStyle = "#b3c5ff";
-  ctx.font = font(10);
-  ctx.fillText("Your digital profile & tickets", ml + 130, backY + 32);
+  // ── Avatar circle ──
+  const ax = hx + 38;
+  const ay = hy + 58;
+  ctx.beginPath();
+  ctx.arc(ax, ay, 28, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,255,255,0.20)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.45)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = WHITE;
+  ctx.font = f(18, true);
+  ctx.textAlign = "center";
+  const initials = getInitials(data.name);
+  ctx.fillText(initials, ax, ay + 7);
 
-  // ── QR Code ──
+  // ── Name + subtitle ──
+  const nx = ax + 48;
+  ctx.textAlign = "left";
+  ctx.fillStyle = WHITE;
+  ctx.font = f(17, true);
+  ctx.fillText(data.name.slice(0, 28), nx, ay - 6);
+
+  ctx.fillStyle = "rgba(255,255,255,0.70)";
+  ctx.font = f(12);
+  ctx.fillText("Platform Member", nx, ay + 14);
+
+  // ── Divider ──
+  const dy = ay + 52;
+  ctx.strokeStyle = "rgba(255,255,255,0.15)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(hx, dy);
+  ctx.lineTo(ml + gw - 20, dy);
+  ctx.stroke();
+
+  // ── Info rows (left column) ──
+  const ly = dy + 20;
+  const infoLeft = [
+    { label: "MEMBER ID", value: data.employeeId || data.userId.slice(-8).toUpperCase() },
+    { label: "EMAIL", value: data.email.slice(0, 30) },
+    { label: "ISSUED", value: data.memberSince },
+  ];
+  infoLeft.forEach((r, i) => {
+    const y = ly + i * 34;
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.font = f(9, true);
+    ctx.textAlign = "left";
+    ctx.fillText(r.label, hx, y);
+    ctx.fillStyle = WHITE;
+    ctx.font = f(13, true);
+    ctx.fillText(r.value, hx, y + 16);
+  });
+
+  // ── QR Code (right side) ──
   const profileUrl = `${data.appUrl}/id/${data.userId}`;
   const qrDataUrl = await QRCode.toDataURL(profileUrl, {
-    width: 400,
+    width: 300,
     margin: 2,
     color: { dark: BRAND, light: "#ffffff" },
   });
   const qrImg = await loadImage(qrDataUrl);
-  const qrSize = 160;
-  const qrX = (CARD_W - qrSize) / 2;
-  const qrY = backY + 70;
 
-  // White background for QR
-  ctx.fillStyle = WHITE;
-  roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 8);
+  const qrSize = 90;
+  const qrX = ml + gw - qrSize - 24;
+  const qrY = ly - 14;
+
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.beginPath();
+  ctx.moveTo(qrX - 8 + 8, qrY - 8);
+  ctx.lineTo(qrX + qrSize + 8 - 8, qrY - 8);
+  ctx.quadraticCurveTo(qrX + qrSize + 8, qrY - 8, qrX + qrSize + 8, qrY - 8 + 8);
+  ctx.lineTo(qrX + qrSize + 8, qrY + qrSize + 8 - 8);
+  ctx.quadraticCurveTo(qrX + qrSize + 8, qrY + qrSize + 8, qrX + qrSize + 8 - 8, qrY + qrSize + 8);
+  ctx.lineTo(qrX - 8 + 8, qrY + qrSize + 8);
+  ctx.quadraticCurveTo(qrX - 8, qrY + qrSize + 8, qrX - 8, qrY + qrSize + 8 - 8);
+  ctx.lineTo(qrX - 8, qrY - 8 + 8);
+  ctx.quadraticCurveTo(qrX - 8, qrY - 8, qrX - 8 + 8, qrY - 8);
+  ctx.closePath();
   ctx.fill();
 
   ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-  // Scan text
-  ctx.fillStyle = DARK;
-  ctx.font = font(11);
+  ctx.fillStyle = "rgba(255,255,255,0.50)";
+  ctx.font = f(8);
   ctx.textAlign = "center";
-  ctx.fillText("Scan with your phone camera", CARD_W / 2, qrY + qrSize + 22);
-  ctx.fillStyle = GRAY;
-  ctx.font = font(9);
-  ctx.fillText("or visit link below", CARD_W / 2, qrY + qrSize + 36);
-  ctx.textAlign = "left";
+  ctx.fillText("Scan me", qrX + qrSize / 2, qrY + qrSize + 16);
 
-  // URL
-  ctx.fillStyle = BRAND;
-  ctx.font = font(9);
-  ctx.textAlign = "center";
-  ctx.fillText(profileUrl, CARD_W / 2, qrY + qrSize + 54);
+  // ── Footer ──
+  const fy = CH - 24;
+  ctx.fillStyle = "rgba(255,255,255,0.50)";
+  ctx.font = f(10);
   ctx.textAlign = "left";
+  ctx.fillText("Tap for verification →", hx, fy);
 
-  // ── Footer strip on back ──
-  ctx.fillStyle = "#f8fafc";
-  ctx.beginPath();
-  ctx.moveTo(0, backY + CARD_H - R);
-  ctx.quadraticCurveTo(0, backY + CARD_H, R, backY + CARD_H);
-  ctx.lineTo(CARD_W - R, backY + CARD_H);
-  ctx.quadraticCurveTo(CARD_W, backY + CARD_H, CARD_W, backY + CARD_H - R);
-  ctx.lineTo(CARD_W, backY + CARD_H - 36);
-  ctx.lineTo(0, backY + CARD_H - 36);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.fillStyle = GRAY;
-  ctx.font = font(8);
-  ctx.textAlign = "center";
-  ctx.fillText("This is a digital identity card issued by Echo. Scan QR to verify.", CARD_W / 2, backY + CARD_H - 12);
-  ctx.textAlign = "left";
+  ctx.textAlign = "right";
+  ctx.fillText("events.forgetechno.com", ml + gw - 20, fy);
 
   return canvas.toBuffer("image/png");
 }
