@@ -6,6 +6,24 @@ import { createOTP } from "@/lib/otp";
 import { renderOTPEmail } from "@/lib/email-templates/otp";
 import { notify, NotificationType } from "@/services/notification";
 
+async function getNextEmployeeId(): Promise<string | null> {
+  const prefixRow = await db.platformSetting.findUnique({ where: { key: "EMP_ID_PREFIX" } });
+  const nextRow = await db.platformSetting.findUnique({ where: { key: "EMP_ID_NEXT" } });
+
+  const prefix = prefixRow?.value || "SA";
+  const next = parseInt(nextRow?.value || "1", 10);
+  const year = new Date().getFullYear().toString();
+  const empId = `${prefix}-${year}-${String(next).padStart(6, "0")}`;
+
+  await db.platformSetting.upsert({
+    where: { key: "EMP_ID_NEXT" },
+    update: { value: String(next + 1) },
+    create: { key: "EMP_ID_NEXT", value: String(next + 1), category: "id-cards" },
+  });
+
+  return empId;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -39,6 +57,7 @@ export async function POST(req: NextRequest) {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
+    const empId = await getNextEmployeeId();
     const user = await db.user.create({
       data: {
         email,
@@ -50,7 +69,8 @@ export async function POST(req: NextRequest) {
         graduationYear: graduationYear || null,
         gender: gender || null,
         organizationId: organizationId || null,
-        emailVerified: null, // unverified until OTP is confirmed
+        emailVerified: null,
+        employeeId: empId,
       },
     });
 

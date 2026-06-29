@@ -16,12 +16,13 @@ interface DigitalIdCardProps {
     jobTitle?: string | null;
     createdAt: Date | string;
     studentalumniUserId?: string | null;
+    employeeId?: string | null;
   };
 }
 
-function formatUserId(userId: string, index?: number): string {
-  if (index) return `ECHO-${String(index).padStart(6, "0")}`;
-  const short = userId.replace(/[^a-zA-Z0-9]/g, "").slice(-6).toUpperCase();
+function getDisplayId(user: DigitalIdCardProps["user"]): string {
+  if (user.employeeId) return user.employeeId;
+  const short = user.id.replace(/[^a-zA-Z0-9]/g, "").slice(-6).toUpperCase();
   return `ECHO-${short}`;
 }
 
@@ -47,7 +48,7 @@ export default function DigitalIdCard({ user }: DigitalIdCardProps) {
 
   const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
   const initials = getInitials(user.firstName, user.lastName);
-  const displayId = formatUserId(user.id);
+  const displayId = getDisplayId(user);
   const issuedDate = new Date(user.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

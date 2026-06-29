@@ -36,6 +36,8 @@ const SETTING_KEYS = [
   "SOCIAL_INSTAGRAM_URL",
   "SOCIAL_YOUTUBE_URL",
   "SOCIAL_LINKEDIN_URL",
+  "EMP_ID_PREFIX",
+  "EMP_ID_NEXT",
 ];
 
 function getNotificationKeys(): string[] {

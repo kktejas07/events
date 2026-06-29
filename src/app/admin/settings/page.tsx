@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/forms/password-input";
 import { toast } from "sonner";
-import { CreditCard, Shield, Link2, Settings2, Mail, Bell, ChevronRight, Upload } from "lucide-react";
+import { CreditCard, Shield, Link2, Settings2, Mail, Bell, ChevronRight, Upload, QrCode, Users } from "lucide-react";
 
 interface Settings {
   NEXT_PUBLIC_APP_NAME: string;
@@ -89,7 +89,7 @@ const defaults: Settings = {
   SOCIAL_LINKEDIN_URL: "",
 };
 
-type TabId = "general" | "payments" | "auth" | "integrations" | "notifications";
+type TabId = "general" | "payments" | "auth" | "integrations" | "notifications" | "id-cards";
 
 const tabs: { id: TabId; label: string; icon: typeof Settings2 }[] = [
   { id: "general", label: "General", icon: Settings2 },
@@ -97,6 +97,7 @@ const tabs: { id: TabId; label: string; icon: typeof Settings2 }[] = [
   { id: "auth", label: "Authentication", icon: Shield },
   { id: "integrations", label: "Integrations", icon: Link2 },
   { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "id-cards", label: "ID Cards", icon: QrCode },
 ];
 
 function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -142,6 +143,10 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("general");
+  const [empPrefix, setEmpPrefix] = useState("SA");
+  const [empNext, setEmpNext] = useState("1");
+  const [assigningIds, setAssigningIds] = useState(false);
+  const [idStats, setIdStats] = useState<{ usersWithoutEmployeeId: number } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -162,6 +167,15 @@ export default function AdminSettingsPage() {
       })
       .catch(() => toast.error("Failed to load settings"))
       .finally(() => setLoading(false));
+
+    fetch("/api/admin/settings/assign-emp-ids")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.prefix) setEmpPrefix(data.prefix);
+        if (data.nextSequence !== undefined) setEmpNext(String(data.nextSequence));
+        if (data.usersWithoutEmployeeId !== undefined) setIdStats({ usersWithoutEmployeeId: data.usersWithoutEmployeeId });
+      })
+      .catch(() => {});
   }, []);
 
   function update(key: keyof Settings, value: string) {
@@ -175,10 +189,30 @@ export default function AdminSettingsPage() {
 
   const hasValue = (key: keyof Settings) => settings[key]?.length > 0;
 
+  async function handleAssignEmpIds() {
+    setAssigningIds(true);
+    try {
+      const res = await fetch("/api/admin/settings/assign-emp-ids", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Assigned ${data.assigned} employee IDs`);
+        setEmpNext(String(data.nextSequence));
+        setIdStats({ usersWithoutEmployeeId: 0 });
+        router.refresh();
+      } else {
+        toast.error(data.error || "Failed");
+      }
+    } catch {
+      toast.error("Failed to assign IDs");
+    }
+    setAssigningIds(false);
+  }
+
   async function handleSave() {
     setSaving(true);
     try {
       const payload = { ...settings };
+      payload["EMP_ID_PREFIX" as keyof Settings] = empPrefix as any;
       for (const type of NOTIFICATION_TYPES) {
         for (const ch of CHANNELS) {
           const key = notifyKey(type.id, ch.id);
@@ -632,6 +666,84 @@ export default function AdminSettingsPage() {
                 <li><strong>WhatsApp</strong> — uses the configured WhatsApp API. Requires a valid phone number with country code (e.g., +919876543210).</li>
               </ul>
               <p className="mt-2">Email templates are automatically converted to plain text for WhatsApp delivery. Both channels receive the same content.</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ID Cards */}
+      {activeTab === "id-cards" && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <QrCode className="h-4 w-4" />
+                Employee ID Format
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Configure how employee IDs are generated. Format: <code className="bg-muted px-1 rounded">{empPrefix || "SA"}-YYYY-000001</code>
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-1">
+                <Label>ID Prefix</Label>
+                <Input
+                  value={empPrefix}
+                  onChange={(e) => setEmpPrefix(e.target.value)}
+                  placeholder="SA"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Prefix for all employee IDs (e.g., SA, EMP, ECHO)
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <Label>Next Sequence Number</Label>
+                <Input
+                  value={empNext}
+                  onChange={(e) => setEmpNext(e.target.value)}
+                  placeholder="1"
+                  type="number"
+                />
+                <p className="text-xs text-muted-foreground">
+                  The next number in the sequence. IDs are padded to 6 digits.
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-muted/50 p-4 space-y-1">
+                <p className="text-sm font-medium">Preview</p>
+                <code className="text-lg font-bold text-primary">
+                  {`${empPrefix || "SA"}-${new Date().getFullYear()}-${String(parseInt(empNext || "1")).padStart(6, "0")}`}
+                </code>
+                <p className="text-xs text-muted-foreground">
+                  This is what the next assigned ID will look like.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Assign Employee IDs
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Generate employee IDs for all users who don't have one yet. Existing IDs will not be overwritten.
+              </p>
+            </CardHeader>
+            <CardContent>
+              {idStats && (
+                <p className="text-sm mb-4">
+                  <strong>{idStats.usersWithoutEmployeeId}</strong> user(s) without an employee ID.
+                </p>
+              )}
+              <Button
+                onClick={handleAssignEmpIds}
+                disabled={assigningIds || (idStats?.usersWithoutEmployeeId ?? 0) === 0}
+              >
+                {assigningIds ? "Assigning..." : "Generate IDs for All Users"}
+              </Button>
             </CardContent>
           </Card>
         </div>
