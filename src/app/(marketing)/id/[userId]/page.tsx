@@ -4,9 +4,47 @@ import { Ticket, FileText, ShoppingBag, Clock } from "lucide-react";
 import Link from "next/link";
 import DigitalIdCard from "@/components/ui/digital-id-card";
 import { formatDate } from "@/lib/utils";
+import { Metadata } from "next";
 
 interface Props {
   params: { userId: string };
+}
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://events.forgetechno.com";
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const user = await db.user.findUnique({
+    where: { id: params.userId },
+    select: { firstName: true, lastName: true, email: true, employeeId: true },
+  });
+  if (!user) return { title: "Not Found" };
+
+  const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+  const title = `${name}${user.employeeId ? ` · ${user.employeeId}` : ""}`;
+
+  return {
+    title: `${title} — Echo Digital ID`,
+    description: `Digital ID Card for ${name} · Echo — Voices Across Generations`,
+    openGraph: {
+      title: `${title} — Echo Digital ID`,
+      description: `Digital ID Card for ${name}. Scan to verify identity and view profile.`,
+      images: [
+        {
+          url: `${APP_URL}/api/public/id-card-image/${params.userId}`,
+          width: 540,
+          height: 340,
+          alt: `${name} ID Card`,
+        },
+      ],
+      type: "profile",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} — Echo Digital ID`,
+      description: `Digital ID Card for ${name}`,
+      images: [`${APP_URL}/api/public/id-card-image/${params.userId}`],
+    },
+  };
 }
 
 const statusColor: Record<string, string> = {

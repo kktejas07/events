@@ -162,7 +162,7 @@ export async function sendWhatsAppNotification(
     return;
   }
 
-  // For ID card — send image URL as text (more reliable than document/media)
+  // For ID card — send page URL (OG tags provide image preview)
   if (type === NotificationType.ID_CARD && waData) {
     try {
       const d = waData as {
@@ -173,9 +173,8 @@ export async function sendWhatsAppNotification(
         phone?: string;
         employeeId?: string;
       };
-      const imageUrl = `${baseUrl()}/api/public/id-card-image/${d.userId}`;
       const cardUrl = `${baseUrl()}/id/${d.userId}`;
-      const text = formatWhatsAppMessage(type, { firstName: d.name, userId: d.userId, imageUrl, cardUrl } as any);
+      const text = formatWhatsAppMessage(type, { firstName: d.name, userId: d.userId, cardUrl } as any);
       await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
