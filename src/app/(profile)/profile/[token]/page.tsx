@@ -2,18 +2,12 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { verifyQrToken } from "@/lib/qr-token";
 import { formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DigitalIdCard from "@/components/ui/digital-id-card";
 
 interface Props {
   params: { token: string };
 }
-
-const typeBadgeVariant: Record<string, "default" | "secondary" | "outline"> = {
-  EMPLOYEE: "default",
-  VISITOR: "secondary",
-  VOLUNTEER: "outline",
-};
 
 const statusColor: Record<string, string> = {
   PAID: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -80,16 +74,6 @@ export default async function PublicProfilePage({ params }: Props) {
   const user = await db.user.findUnique({
     where: { id: decoded.userId },
     include: {
-      idCards: {
-        select: {
-          idNumber: true,
-          type: true,
-          designation: true,
-          department: true,
-          isActive: true,
-          issuedAt: true,
-        },
-      },
       tickets: {
         include: {
           event: { select: { title: true, startDate: true, endDate: true } },
@@ -131,7 +115,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
   if (!user) notFound();
 
-  const { idCards, tickets, invoices, purchases, attendance } = user;
+  const { tickets, invoices, purchases, attendance } = user;
 
   const totalTickets = tickets.length;
   const activeTickets = tickets.filter((t) => t.order.status === "PAID").length;
@@ -173,37 +157,9 @@ export default async function PublicProfilePage({ params }: Props) {
           <StatCard label="Attendance" value={attendanceCount} />
         </div>
 
-        {idCards.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>ID Cards</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {idCards.map((card, i) => (
-                <div
-                  key={i}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-4"
-                >
-                  <div className="space-y-1">
-                    <p className="font-medium">{card.idNumber}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {[card.designation, card.department].filter(Boolean).join(" - ")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Issued: {formatDate(card.issuedAt)}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Badge variant={typeBadgeVariant[card.type] || "outline"}>
-                      {card.type}
-                    </Badge>
-                    <StatusBadge status={card.isActive ? "ACTIVE" : "CANCELLED"} />
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+        <div className="flex justify-center">
+          <DigitalIdCard user={user} />
+        </div>
 
         {tickets.length > 0 && (
           <Card>

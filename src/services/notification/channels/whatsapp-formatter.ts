@@ -54,6 +54,7 @@ interface EventReminderData {
 
 interface IdCardData {
   firstName: string;
+  userId: string;
 }
 
 interface PasswordResetData {
@@ -195,12 +196,15 @@ function formatEventReminder(data: EventReminderData): string {
 }
 
 function formatIdCard(data: IdCardData): string {
+  const cardUrl = `${APP_URL}/id/${data.userId}`;
   return [
     `${b("🪪 Your Digital ID Card")}`,
     "",
     `Hi ${data.firstName},`,
     "",
     "Your digital identity card is ready! 🎉",
+    "",
+    `View your card online: ${cardUrl}`,
     "",
     "📎 ID card PDF attached below.",
     "Scan the QR code on the card to view your profile and tickets anytime.",
