@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
     try {
-      const emailService = getEmailService();
+      const emailService = await getEmailService();
       const html = renderPasswordResetEmail({
         firstName: user.firstName || user.email,
         resetLink: resetUrl,

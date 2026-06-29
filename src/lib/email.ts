@@ -1,43 +1,71 @@
+import { db } from "@/lib/db";
 import { EmailService, PostalApiProvider, SmtpProvider } from "@/services/email";
 import { BrevoProvider } from "@/services/email/providers/brevo-provider";
 
 let emailServiceInstance: EmailService | null = null;
+let initPromise: Promise<void> | null = null;
 
-function buildProvider() {
-  const provider = process.env.EMAIL_PROVIDER || "smtp";
+async function loadSettings(): Promise<Record<string, string>> {
+  const keys = [
+    "EMAIL_PROVIDER", "SMTP_HOST", "SMTP_PORT", "SMTP_SECURE",
+    "SMTP_USER", "SMTP_PASS", "POSTAL_BASE_URL", "POSTAL_API_KEY",
+    "BREVO_API_KEY", "MAIL_FROM_NAME", "MAIL_FROM_EMAIL", "EMAIL_FROM",
+  ];
+  try {
+    const rows = await db.platformSetting.findMany({ where: { key: { in: keys } } });
+    return Object.fromEntries(rows.map((r) => [r.key, r.value]));
+  } catch {
+    return {};
+  }
+}
+
+function get(key: string, dbSettings: Record<string, string>, fallback: string): string {
+  return dbSettings[key] || process.env[key] || fallback;
+}
+
+async function buildProvider() {
+  const dbSettings = await loadSettings();
+  const provider = get("EMAIL_PROVIDER", dbSettings, "smtp");
 
   if (provider === "brevo") {
     return new BrevoProvider({
-      apiKey: process.env.BREVO_API_KEY || "",
+      apiKey: get("BREVO_API_KEY", dbSettings, ""),
       defaultSender: {
-        name: process.env.MAIL_FROM_NAME || "Echo",
-        email: process.env.MAIL_FROM_EMAIL || "noreply@echo-platform.com",
+        name: get("MAIL_FROM_NAME", dbSettings, "Echo"),
+        email: get("MAIL_FROM_EMAIL", dbSettings, "noreply@echo-platform.com"),
       },
     });
   }
 
   if (provider === "postal") {
     return new PostalApiProvider(
-      process.env.POSTAL_BASE_URL || "https://mail.studentalumni.ai",
-      process.env.POSTAL_API_KEY || ""
+      get("POSTAL_BASE_URL", dbSettings, "https://mail.studentalumni.ai"),
+      get("POSTAL_API_KEY", dbSettings, "")
     );
   }
 
   return new SmtpProvider({
-    host: process.env.SMTP_HOST || "",
-    port: Number(process.env.SMTP_PORT || "587"),
-    secure: (process.env.SMTP_SECURE || "false") === "true",
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASS || "",
+    host: get("SMTP_HOST", dbSettings, ""),
+    port: Number(get("SMTP_PORT", dbSettings, "587")),
+    secure: get("SMTP_SECURE", dbSettings, "false") === "true",
+    user: get("SMTP_USER", dbSettings, ""),
+    pass: get("SMTP_PASS", dbSettings, ""),
   });
 }
 
-export function getEmailService(): EmailService {
+async function initEmailService() {
   if (!emailServiceInstance) {
-    const provider = buildProvider();
+    const provider = await buildProvider();
     emailServiceInstance = new EmailService(provider);
   }
-  return emailServiceInstance;
+}
+
+export async function getEmailService(): Promise<EmailService> {
+  if (!initPromise) {
+    initPromise = initEmailService();
+  }
+  await initPromise;
+  return emailServiceInstance!;
 }
 
 export async function sendEmail({
@@ -51,11 +79,11 @@ export async function sendEmail({
   html: string;
   attachments?: { filename: string; content: Buffer; contentType?: string }[];
 }) {
-  const service = getEmailService();
+  const service = await getEmailService();
   return service.sendEmail({ to, subject, html, attachments });
 }
 
 export async function sendEmailWithProvider(options: Parameters<EmailService["sendEmail"]>[0]) {
-  const service = getEmailService();
+  const service = await getEmailService();
   return service.sendEmail(options);
 }
