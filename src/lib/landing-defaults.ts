@@ -125,6 +125,66 @@ export const defaultContent: Record<string, unknown> = {
       { name: "Platinum package", price: "09$", highlighted: false, features: ["DEFAULT (Unlimited tickets)", "Lunch & Coffee: Yes", "Certificate: Yes"] },
     ],
   },
+  "event-intro": {
+    shapeImage: themeAssets.intro.shape,
+    textImage: themeAssets.intro.text,
+    videoUrl: "https://www.youtube.com/watch?v=Cn4G2lZ_g2I",
+    heading: "conference",
+  },
+  schedule: {
+    days: [
+      {
+        day: "day 01",
+        date: "25 april, 2025",
+        sessions: [
+          { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
+          { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
+          { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
+          { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
+        ],
+      },
+      {
+        day: "day 02",
+        date: "26 april, 2025",
+        sessions: [
+          { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
+          { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
+          { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
+          { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
+        ],
+      },
+      {
+        day: "day 03",
+        date: "27 april, 2025",
+        sessions: [
+          { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
+          { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
+          { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
+          { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
+        ],
+      },
+      {
+        day: "day 04",
+        date: "28 april, 2025",
+        sessions: [
+          { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
+          { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
+          { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
+          { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
+        ],
+      },
+    ],
+  },
+  "video-gallery": {
+    videoUrl: themeAssets.video,
+    years: [
+      { id: "technic", label: "2005" },
+      { id: "worker", label: "2010" },
+      { id: "ambitions", label: "2015" },
+      { id: "skills", label: "2020" },
+      { id: "year", label: "2025" },
+    ],
+  },
   "contact-page": {
     phones: [{ label: "+880 123 427 00" }, { label: "+000 938 809 12" }],
     address: "4233 w. 65th st. chicago il 60629",

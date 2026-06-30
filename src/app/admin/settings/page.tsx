@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/forms/password-input";
 import { toast } from "sonner";
-import { CreditCard, Shield, Link2, Settings2, Mail, Bell, ChevronRight, Upload, QrCode, Users } from "lucide-react";
+import { CreditCard, Shield, Link2, Settings2, Mail, Bell, QrCode, Users } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 interface Settings {
   NEXT_PUBLIC_APP_NAME: string;
@@ -285,91 +284,17 @@ export default function AdminSettingsPage() {
               />
             </div>
 
-            <div className="space-y-1">
-              <Label>Logo</Label>
-              <div className="flex items-center gap-4">
-                <Input
-                  placeholder="Paste logo URL or upload below"
-                  value={settings.LOGO_URL}
-                  onChange={(e) => update("LOGO_URL", e.target.value)}
-                  className="flex-1"
-                />
-                <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (ev) => {
-                        const dataUrl = ev.target?.result as string;
-                        update("LOGO_URL", dataUrl);
-                      };
-                      reader.readAsDataURL(file);
-                    }}
-                  />
-                </label>
-              </div>
-              {settings.LOGO_URL && (
-                <div className="mt-2 inline-block rounded-md border bg-card p-2">
-                  <Image
-                    src={settings.LOGO_URL}
-                    alt="Logo preview"
-                    width={160}
-                    height={40}
-                    className="h-10 w-auto object-contain"
-                    unoptimized
-                  />
-                </div>
-              )}
-            </div>
+            <ImageUpload
+              label="Logo"
+              value={settings.LOGO_URL}
+              onChange={(v) => update("LOGO_URL", v)}
+            />
 
-            <div className="space-y-1">
-              <Label>Favicon</Label>
-              <div className="flex items-center gap-4">
-                <Input
-                  placeholder="Paste favicon URL or upload below"
-                  value={settings.FAVICON_URL}
-                  onChange={(e) => update("FAVICON_URL", e.target.value)}
-                  className="flex-1"
-                />
-                <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (ev) => {
-                        const dataUrl = ev.target?.result as string;
-                        update("FAVICON_URL", dataUrl);
-                      };
-                      reader.readAsDataURL(file);
-                    }}
-                  />
-                </label>
-              </div>
-              {settings.FAVICON_URL && (
-                <div className="mt-2 inline-block rounded-md border bg-card p-2">
-                  <Image
-                    src={settings.FAVICON_URL}
-                    alt="Favicon preview"
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 object-contain"
-                    unoptimized
-                  />
-                </div>
-              )}
-            </div>
+            <ImageUpload
+              label="Favicon"
+              value={settings.FAVICON_URL}
+              onChange={(v) => update("FAVICON_URL", v)}
+            />
 
             <div className="border-t pt-6">
               <h4 className="mb-4 text-sm font-semibold">Social Media Links</h4>

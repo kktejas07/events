@@ -57,49 +57,6 @@ function CountdownTimer({ target }: { target?: string }) {
   );
 }
 
-const schedData = [
-  {
-    day: "day 01",
-    date: "25 april, 2025",
-    sessions: [
-      { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
-      { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
-      { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
-      { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
-    ],
-  },
-  {
-    day: "day 02",
-    date: "26 april, 2025",
-    sessions: [
-      { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
-      { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
-      { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
-      { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
-    ],
-  },
-  {
-    day: "day 03",
-    date: "27 april, 2025",
-    sessions: [
-      { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
-      { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
-      { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
-      { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
-    ],
-  },
-  {
-    day: "day 04",
-    date: "28 april, 2025",
-    sessions: [
-      { title: "Everyday Intelligence Research Rewired events", room: "Room 2024" },
-      { title: "Major Digital Design Conferences in 2025 Adobe MAX", room: "Room 2024" },
-      { title: "Figma's Annual digital Conference site develop", room: "Room 2024" },
-      { title: "UXDX USA 2025 digital awards show 2025, in new york", room: "Room 2024" },
-    ],
-  },
-];
-
 export default function HomePageClient({
   initialContent = {},
 }: {
@@ -146,6 +103,11 @@ export default function HomePageClient({
   const dbSponsors = (initialContent._dbSponsors as Record<string, string>[]) || [];
   const featuredEvent = initialContent._featuredEvent as Record<string, unknown> | undefined;
   const blogPosts = (initialContent._blogPosts as Record<string, string>[]) || [];
+  const eventIntro = (initialContent["event-intro"] as Record<string, string>) || {};
+  const scheduleSection = (initialContent.schedule as Record<string, unknown>) || {};
+  const schedData = (scheduleSection.days as Record<string, unknown>[]) || [];
+  const videoGallery = (initialContent["video-gallery"] as Record<string, unknown>) || {};
+  const galleryYears = (videoGallery.years as { id: string; label: string }[]) || [];
 
   return (
     <>
@@ -204,7 +166,7 @@ export default function HomePageClient({
       {/* ════════ EVENT INTRO ════════ */}
       <section className="gt-event-intro-section section-padding pb-0">
         <div className="gt-blur-shape">
-          <img src={themeAssets.intro.shape} alt="" />
+          <img src={eventIntro.shapeImage || themeAssets.intro.shape} alt="" />
         </div>
         <div className="container">
           <div className="row">
@@ -216,11 +178,11 @@ export default function HomePageClient({
                     data-wow-duration="1.3s"
                     data-wow-delay="0.3s"
                   >
-                    <img src={themeAssets.intro.text} alt="Conference" />
+                    <img src={eventIntro.textImage || themeAssets.intro.text} alt="Conference" />
                   </div>
                   <div className="video-icon">
                     <a
-                      href="https://www.youtube.com/watch?v=Cn4G2lZ_g2I"
+                      href={eventIntro.videoUrl || "https://www.youtube.com/watch?v=Cn4G2lZ_g2I"}
                       className="video-btn ripple video-popup"
                     >
                       <i className="fa-solid fa-play"></i>
@@ -228,7 +190,7 @@ export default function HomePageClient({
                   </div>
                 </div>
                 <div className="gt-intro-content wow fadeInUp" data-wow-delay=".3s">
-                  <h2>conference</h2>
+                  <h2>{eventIntro.heading || "conference"}</h2>
                 </div>
               </div>
             </div>
@@ -248,35 +210,37 @@ export default function HomePageClient({
                 Schedule
               </h2>
             </div>
-            <ul className="gt-nav" role="tablist">
-              {schedData.map((d, i) => (
-                <li key={i} className="nav-item wow fadeInUp" data-wow-delay={`.${2 + i * 2}s`}>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setActiveTab(d.day);
-                    }}
-                    className={`nav-link ${activeTab === d.day ? "active" : ""}`}
-                    role="tab"
-                  >
-                    {d.day}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="tab-content">
-            {schedData
-              .filter((d) => d.day === activeTab)
-              .map((d) => (
-              <div
-                key={d.day}
-                className="tab-pane fade active show"
-                role="tabpanel"
-              >
-                <div className="row g-4">
-                  {d.sessions.map((s, i) => (
+              {schedData.length > 0 && (
+                <ul className="gt-nav" role="tablist">
+                  {schedData.map((d: Record<string, unknown>, i: number) => (
+                    <li key={i} className="nav-item wow fadeInUp" data-wow-delay={`.${2 + i * 2}s`}>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setActiveTab(d.day as string);
+                        }}
+                        className={`nav-link ${activeTab === d.day ? "active" : ""}`}
+                        role="tab"
+                      >
+                        {d.day as string}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="tab-content">
+              {schedData
+                .filter((d: Record<string, unknown>) => (d.day as string) === activeTab)
+                .map((d: Record<string, unknown>) => (
+                <div
+                  key={d.day as string}
+                  className="tab-pane fade active show"
+                  role="tabpanel"
+                >
+                  <div className="row g-4">
+                    {(d.sessions as Record<string, string>[]).map((s, i) => (
                     <div key={i} className="col-xl-3 col-lg-6 col-md-6">
                       <div className="event-schedule-box-items-3">
                         <div className="event-schedule-image">
@@ -288,7 +252,7 @@ export default function HomePageClient({
                           <ul className="gt-event-post">
                             <li>
                               <i className="fa-regular fa-calendar-days"></i>
-                              {d.date}
+                              {(d as Record<string, string>).date}
                             </li>
                           </ul>
                         </div>
@@ -329,15 +293,15 @@ export default function HomePageClient({
             <div className="col-xl-12">
               <div className="gt-event-video-item">
                 <div className="tab-content">
-                  {["technic", "worker", "ambitions", "skills", "year"].map((tab) => (
+                  {galleryYears.map((tab) => (
                     <div
-                      key={tab}
-                      className={`tab-pane fade ${activeVideo === tab ? "active show" : ""}`}
+                      key={tab.id}
+                      className={`tab-pane fade ${activeVideo === tab.id ? "active show" : ""}`}
                       role="tabpanel"
                     >
                       <div className="gt-event-video-image">
                         <video
-                          src={themeAssets.video}
+                          src={videoGallery.videoUrl as string || themeAssets.video}
                           autoPlay
                           muted
                           loop
@@ -350,13 +314,7 @@ export default function HomePageClient({
                 <div className="gt-gallery-items">
                   <h2>previous events gallery</h2>
                   <ul className="gt-nav" role="tablist">
-                    {[
-                      { id: "technic", label: "2005" },
-                      { id: "worker", label: "2010" },
-                      { id: "ambitions", label: "2015" },
-                      { id: "skills", label: "2020" },
-                      { id: "year", label: "2025" },
-                    ].map((v, i) => (
+                    {galleryYears.map((v, i) => (
                       <li key={v.id} className="nav-item">
                         <a
                           href="#"
@@ -364,7 +322,7 @@ export default function HomePageClient({
                             e.preventDefault();
                             setActiveVideo(v.id);
                           }}
-                          className={`nav-link ${activeVideo === v.id ? "active" : ""} ${i === 4 ? "gt-style-2" : ""}`}
+                          className={`nav-link ${activeVideo === v.id ? "active" : ""} ${i === galleryYears.length - 1 ? "gt-style-2" : ""}`}
                           role="tab"
                         >
                           {v.label}

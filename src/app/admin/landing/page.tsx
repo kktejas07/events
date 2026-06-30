@@ -26,6 +26,9 @@ const sections: { key: LandingSectionKey; label: string }[] = [
   { key: "about-page", label: "About Page" },
   { key: "pricing-page", label: "Pricing Page" },
   { key: "contact-page", label: "Contact Page" },
+  { key: "event-intro", label: "Event Intro" },
+  { key: "schedule", label: "Schedule" },
+  { key: "video-gallery", label: "Video Gallery" },
 ];
 
 type SectionKey = LandingSectionKey;
@@ -604,6 +607,129 @@ export default function AdminLandingPage() {
               items={(d.emails as Record<string, unknown>[]) || []}
               fields={[{ key: "label", label: "Email Address" }]}
               onChange={(items) => updateNested("contact-page", "emails", items)}
+            />
+          </div>
+        );
+
+      case "event-intro":
+        return (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field
+              label="Heading"
+              value={d.heading}
+              onChange={(v) => updateNested("event-intro", "heading", v)}
+            />
+            <Field
+              label="Video URL (YouTube)"
+              value={d.videoUrl}
+              onChange={(v) => updateNested("event-intro", "videoUrl", v)}
+            />
+            <ImageUpload
+              label="Shape Image"
+              value={String(d.shapeImage || "")}
+              onChange={(v) => updateNested("event-intro", "shapeImage", v)}
+            />
+            <ImageUpload
+              label="Text Image"
+              value={String(d.textImage || "")}
+              onChange={(v) => updateNested("event-intro", "textImage", v)}
+            />
+          </div>
+        );
+
+      case "schedule":
+        return (
+          <div className="space-y-6">
+            <p className="text-xs text-gray-500">
+              Edit schedule days and sessions. Each day can have multiple sessions with a title and room.
+            </p>
+            <ListEditor
+              items={(d.days as Record<string, unknown>[]) || []}
+              fields={[
+                { key: "day", label: "Day Label (e.g. day 01)" },
+                { key: "date", label: "Date (e.g. 25 april, 2025)" },
+              ]}
+              onChange={(items) => updateNested("schedule", "days", items)}
+              renderExtra={(item, _i, update) => {
+                const sessions = (item.sessions as Record<string, unknown>[]) || [];
+                return (
+                  <div className="mt-3 border-t pt-3">
+                    <Label className="gt-admin-field-label text-xs mb-2 block">Sessions</Label>
+                    <div className="space-y-2">
+                      {sessions.map((s, si) => (
+                        <div key={si} className="flex gap-2 items-start">
+                          <div className="flex-1 space-y-1">
+                            <Input
+                              placeholder="Title"
+                              value={String(s.title || "")}
+                              onChange={(e) => {
+                                const updated = [...sessions];
+                                updated[si] = { ...updated[si], title: e.target.value };
+                                update("sessions", updated);
+                              }}
+                              className="text-sm"
+                            />
+                          </div>
+                          <div className="w-40 space-y-1">
+                            <Input
+                              placeholder="Room"
+                              value={String(s.room || "")}
+                              onChange={(e) => {
+                                const updated = [...sessions];
+                                updated[si] = { ...updated[si], room: e.target.value };
+                                update("sessions", updated);
+                              }}
+                              className="text-sm"
+                            />
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const updated = sessions.filter((_, j) => j !== si);
+                              update("sessions", updated);
+                            }}
+                            className="mt-0.5"
+                          >
+                            X
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const updated = [...sessions, { title: "", room: "" }];
+                          update("sessions", updated);
+                        }}
+                      >
+                        + Add Session
+                      </Button>
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          </div>
+        );
+
+      case "video-gallery":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+              <Field
+                label="Video URL (MP4/WebM)"
+                value={d.videoUrl}
+                onChange={(v) => updateNested("video-gallery", "videoUrl", v)}
+              />
+            </div>
+            <ListEditor
+              items={(d.years as Record<string, unknown>[]) || []}
+              fields={[
+                { key: "id", label: "Tab ID (e.g. technic, worker)" },
+                { key: "label", label: "Display Label (e.g. 2005, 2010)" },
+              ]}
+              onChange={(items) => updateNested("video-gallery", "years", items)}
             />
           </div>
         );

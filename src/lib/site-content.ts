@@ -58,6 +58,9 @@ export const landingSectionKeys = [
   "about-page",
   "pricing-page",
   "contact-page",
+  "event-intro",
+  "schedule",
+  "video-gallery",
 ] as const;
 
 export type LandingSectionKey = (typeof landingSectionKeys)[number];
