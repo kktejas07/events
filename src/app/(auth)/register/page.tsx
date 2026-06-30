@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { signInWithGoogle, signInWithGithub } from "@/lib/firebase-auth";
+import { Logo } from "@/components/ui/logo";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -109,7 +110,7 @@ export default function RegisterPage() {
       <div className="gt-auth-wrapper">
         <div className="gt-auth-card" style={{ maxWidth: "440px" }}>
           <div className="gt-auth-logo">
-            <Link href="/"><img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "40px" }} /></Link>
+            <Link href="/"><Logo height={40} /></Link>
           </div>
           <h1 className="gt-auth-title">Verify Your Account</h1>
           <p className="gt-auth-subtitle">
@@ -177,7 +178,7 @@ export default function RegisterPage() {
     <div className="gt-auth-wrapper">
       <div className="gt-auth-card">
         <div className="gt-auth-logo">
-          <Link href="/"><img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "40px" }} /></Link>
+          <Link href="/"><Logo height={40} /></Link>
         </div>
         <h1 className="gt-auth-title">Create Account</h1>
         <p className="gt-auth-subtitle">Join us and start booking events</p>

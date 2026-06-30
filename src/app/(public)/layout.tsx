@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ThemeInit } from "@/components/ui/theme-init";
 import { themeAssets } from "@/lib/theme-images";
+import { Logo } from "@/components/ui/logo";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -48,7 +49,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <div className="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
                 <div className="offcanvas__logo">
                   <a href="/">
-                    <img src="/assets/img/logo/blue-logo.svg" alt="logo-img" />
+                    <Logo />
                   </a>
                 </div>
                 <div className="offcanvas__close">

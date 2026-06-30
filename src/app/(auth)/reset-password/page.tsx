@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Logo } from "@/components/ui/logo";
 
 function ResetForm() {
   const searchParams = useSearchParams();
@@ -49,7 +50,7 @@ export default function ResetPasswordPage() {
     <div className="gt-auth-wrapper">
       <div className="gt-auth-card">
         <div className="gt-auth-logo">
-          <Link href="/"><img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "40px" }} /></Link>
+          <Link href="/"><Logo height={40} /></Link>
         </div>
         <h1 className="gt-auth-title">Reset Password</h1>
         <Suspense fallback={<p className="gt-auth-subtitle">Loading...</p>}>

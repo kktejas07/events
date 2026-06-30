@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/ui/logo";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -36,9 +37,9 @@ export function Sidebar() {
             <div className="offcanvas__content">
               <div className="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
                 <div className="offcanvas__logo">
-                  <Link href="/">
-                    <img src="/assets/img/logo/blue-logo.svg" alt="logo-img" />
-                  </Link>
+                    <Link href="/">
+                      <Logo />
+                    </Link>
                 </div>
                 <div className="offcanvas__close">
                   <button onClick={() => setIsOpen(false)} aria-label="Close">

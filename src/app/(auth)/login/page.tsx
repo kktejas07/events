@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { Logo } from "@/components/ui/logo";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -34,7 +35,7 @@ export default function LoginPage() {
       <div className="gt-auth-card">
         <div className="gt-auth-logo">
           <Link href="/">
-            <img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "40px" }} />
+            <Logo height={40} />
           </Link>
         </div>
         <h1 className="gt-auth-title">Welcome Back</h1>

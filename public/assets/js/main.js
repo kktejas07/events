@@ -427,6 +427,8 @@
       const minEl = container.querySelector(".gt-min");
       const secEl = container.querySelector(".gt-sec");
 
+      let timer;
+
       const updateCountdown = () => {
         const now = new Date().getTime();
         const diff = eventTime - now;
@@ -448,8 +450,8 @@
         secEl.textContent = String(seconds).padStart(2, "0");
       };
 
+      timer = setInterval(updateCountdown, 1000);
       updateCountdown(); // Initial call
-      const timer = setInterval(updateCountdown, 1000);
     });
 
 

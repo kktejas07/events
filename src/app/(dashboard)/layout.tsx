@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/ui/logo";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,7 +7,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="gt-admin-sidebar" id="dashboardSidebar">
         <div className="gt-admin-brand">
           <Link href="/" className="d-flex align-items-center gap-2 text-decoration-none">
-            <img src="/assets/img/logo/white-logo.svg" alt="logo" style={{ height: "28px" }} />
+            <Logo height={28} />
           </Link>
         </div>
         <nav className="gt-admin-nav">
@@ -33,7 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <i className="fas fa-bars"></i>
             </button>
             <Link href="/" className="gt-admin-header-brand">
-              <img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "28px" }} />
+              <Logo height={28} />
             </Link>
           </div>
           <div className="gt-admin-header-right">

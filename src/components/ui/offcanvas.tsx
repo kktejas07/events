@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { publicNav } from "@/lib/site-nav";
+import { Logo } from "@/components/ui/logo";
 
 export function Offcanvas() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,9 +61,9 @@ export function Offcanvas() {
           <div className="offcanvas__content">
             <div className="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
               <div className="offcanvas__logo">
-                <Link href="/">
-                  <img src="/assets/img/logo/blue-logo.svg" alt="logo-img" />
-                </Link>
+                  <Link href="/">
+                    <Logo />
+                  </Link>
               </div>
               <div className="offcanvas__close">
                 <button>

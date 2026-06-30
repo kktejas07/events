@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { NewsletterForm } from "@/components/ui/newsletter-form";
 import { themeAssets } from "@/lib/theme-images";
+import { Logo } from "@/components/ui/logo";
 
 const SOCIAL_ICONS: { key: string; icon: string }[] = [
   { key: "SOCIAL_FACEBOOK_URL", icon: "fab fa-facebook-f" },
@@ -34,7 +35,7 @@ export async function Footer() {
             <div className="col-xl-10">
               <div className="gt-widget-head-logo wow fadeInUp" data-wow-delay=".3s">
                 <Link href="/" className="gt-footer-logo">
-                  <img src="/assets/img/logo/white-logo.svg" alt="img" />
+                  <Logo height={50} />
                 </Link>
               </div>
               <ul className="gt-footer-list wow fadeInUp" data-wow-delay=".5s">

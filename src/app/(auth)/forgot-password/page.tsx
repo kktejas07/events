@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/ui/logo";
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function ForgotPasswordPage() {
     <div className="gt-auth-wrapper">
       <div className="gt-auth-card">
         <div className="gt-auth-logo">
-          <Link href="/"><img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "40px" }} /></Link>
+          <Link href="/"><Logo height={40} /></Link>
         </div>
         <h1 className="gt-auth-title">Forgot Password</h1>
         <p className="gt-auth-subtitle">

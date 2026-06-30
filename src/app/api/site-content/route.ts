@@ -10,6 +10,9 @@ export async function GET() {
     const rows = await db.siteContent.findMany();
     const result = mergeSiteContent(rows);
 
+    const logoSetting = await db.platformSetting.findUnique({ where: { key: "LOGO_URL" } });
+    (result as Record<string, string>)._logoUrl = logoSetting?.value || "";
+
     return NextResponse.json(result, {
       headers: {
         "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -17,6 +20,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Site content fetch error:", error);
-    return NextResponse.json(defaultContent);
+    return NextResponse.json({ ...defaultContent, _logoUrl: "" });
   }
 }

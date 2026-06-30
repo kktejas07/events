@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { NewsletterForm } from "@/components/ui/newsletter-form";
 import { themeAssets } from "@/lib/theme-images";
+import { Logo } from "@/components/ui/logo";
 
 function CountdownTimer({ target }: { target: string }) {
   const [time, setTime] = useState({ days: "00", hours: "00", mins: "00", secs: "00" });
@@ -54,7 +55,7 @@ export default function ComingSoonPage() {
           <div className="col-lg-8">
             <div className="gt-coming-soon-items">
               <Link href="/" className="gt-footer-logo">
-                <img src="/assets/img/logo/blue-logo.svg" alt="Events logo" />
+                <Logo />
               </Link>
               <div className="gt-coming-soon-image">
                 <img

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import "./admin.css";
+import { Logo } from "@/components/ui/logo";
 
 const sidebarLinks = [
   { href: "/admin", label: "Dashboard", icon: "fa-grip" },
@@ -23,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="gt-admin-sidebar" id="adminSidebar">
         <div className="gt-admin-brand">
           <Link href="/" className="d-flex align-items-center gap-2 text-decoration-none">
-            <img src="/assets/img/logo/white-logo.svg" alt="logo" style={{ height: "32px" }} />
+            <Logo height={32} />
             <span className="text-white fw-bold fs-5">Admin</span>
           </Link>
         </div>
@@ -50,7 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <i className="fas fa-bars"></i>
             </button>
             <Link href="/" className="gt-admin-header-brand">
-              <img src="/assets/img/logo/blue-logo.svg" alt="logo" style={{ height: "28px" }} />
+              <Logo height={28} />
             </Link>
           </div>
           <div className="gt-admin-header-right">

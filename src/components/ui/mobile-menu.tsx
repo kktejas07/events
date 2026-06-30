@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/ui/logo";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -79,7 +80,7 @@ export function MobileMenu() {
             <div className="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
               <div className="offcanvas__logo">
                 <Link href="/" onClick={() => setIsOpen(false)}>
-                  <img src="/assets/img/logo/blue-logo.svg" alt="logo-img" style={{ height: "40px" }} />
+                  <Logo />
                 </Link>
               </div>
               <div className="offcanvas__close">

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { defaultContent } from "@/lib/landing-defaults";
 import { NavLinks } from "@/components/layout/nav-links";
+import { Logo } from "@/components/ui/logo";
 
 type SiteSettings = {
   headerAddress: string;
@@ -43,7 +44,6 @@ export function Header() {
 
   const ticketHref = session ? "/dashboard" : site.ticketButtonLink;
   const ticketLabel = session ? "dashboard" : site.ticketButtonText;
-  const logoSrc = isHome ? "/assets/img/logo/blue-logo.svg" : "/assets/img/logo/black-logo.svg";
   const navId = isHome ? "mobile-menus" : "mobile-menu";
 
   return (
@@ -63,7 +63,7 @@ export function Header() {
             )}
             <div className="logo">
               <Link href="/" className="header-logo">
-                <img src={logoSrc} alt="logo-img" />
+                <Logo />
               </Link>
             </div>
             <div className="header-right d-flex justify-content-end align-items-center mt-0">
