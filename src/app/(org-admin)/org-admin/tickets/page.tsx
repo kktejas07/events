@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { Ticket } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default async function OrgTicketsPage() {
   const session = await auth();
@@ -19,49 +20,49 @@ export default async function OrgTicketsPage() {
     },
   });
 
+  const statusBadge = (s: string, scanned: boolean) => {
+    if (scanned) return "info";
+    return s === "ACTIVE" ? "success" : "neutral";
+  };
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-white">Tickets</h2>
-      {tickets.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.02] py-16">
-          <Ticket className="mb-3 h-10 w-10 text-gray-600" />
-          <p className="text-sm text-gray-500">No tickets sold yet</p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
-          <table className="w-full text-left text-sm">
+    <div>
+      <div className="mb-4">
+        <h2 className="gt-admin-section-title">Tickets</h2>
+        <p className="gt-admin-section-subtitle">All tickets sold for your events</p>
+      </div>
+
+      <div className="gt-admin-card">
+        {tickets.length === 0 ? (
+          <div className="gt-admin-empty">
+            <i className="fa-regular fa-ticket-simple"></i>
+            <h3>No tickets sold yet</h3>
+            <p>Tickets will appear here once attendees start purchasing.</p>
+          </div>
+        ) : (
+          <table className="gt-admin-table">
             <thead>
-              <tr className="border-b border-white/[0.06] text-xs text-gray-500">
-                <th className="px-4 py-3 font-medium">Attendee</th>
-                <th className="px-4 py-3 font-medium">Event</th>
-                <th className="px-4 py-3 font-medium">Type</th>
-                <th className="px-4 py-3 font-medium">Barcode</th>
-                <th className="px-4 py-3 font-medium">Status</th>
+              <tr>
+                <th>Attendee</th>
+                <th>Event</th>
+                <th>Type</th>
+                <th>Barcode</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {tickets.map((t) => (
-                <tr
-                  key={t.id}
-                  className="border-b border-white/[0.04] text-white last:border-0 hover:bg-white/[0.02]"
-                >
-                  <td className="px-4 py-3">
-                    <p className="font-medium">{t.attendeeName}</p>
-                    <p className="text-xs text-gray-500">{t.attendeeEmail}</p>
+                <tr key={t.id}>
+                  <td>
+                    <strong>{t.attendeeName}</strong>
+                    <br />
+                    <small style={{ color: "#888" }}>{t.attendeeEmail}</small>
                   </td>
-                  <td className="px-4 py-3 text-gray-400">{t.event.title}</td>
-                  <td className="px-4 py-3 text-gray-400">{t.ticketType.name}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-gray-500">{t.barcode}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                        t.status === "ACTIVE"
-                          ? "bg-purple-500/10 text-purple-400"
-                          : t.scanned
-                            ? "bg-blue-500/10 text-blue-400"
-                            : "bg-gray-500/10 text-gray-400"
-                      }`}
-                    >
+                  <td>{t.event.title}</td>
+                  <td>{t.ticketType.name}</td>
+                  <td style={{ fontFamily: "monospace", fontSize: "12px", color: "#888" }}>{t.barcode}</td>
+                  <td>
+                    <span className={`gt-admin-badge ${statusBadge(t.status, t.scanned)}`}>
                       {t.scanned ? "Scanned" : t.status}
                     </span>
                   </td>
@@ -69,8 +70,8 @@ export default async function OrgTicketsPage() {
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

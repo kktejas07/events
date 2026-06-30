@@ -173,82 +173,80 @@ export default function OrgEventEditPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+      <div className="d-flex align-items-center justify-content-center" style={{ padding: "80px 0" }}>
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#8B5CF6" }} />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/org-admin/events">
-          <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+    <div>
+      <div className="d-flex align-items-center gap-3 mb-4">
+        <Link href="/org-admin/events" className="gt-admin-btn gt-admin-btn-outline gt-admin-btn-sm">
+          <i className="fa-regular fa-arrow-left"></i> Back
         </Link>
         <div>
-          <h2 className="text-2xl font-bold text-white">Edit Event</h2>
-          <p className="text-gray-400">Editing: {form.title || "Untitled"}</p>
+          <h2 className="gt-admin-section-title">Edit Event</h2>
+          <p className="gt-admin-section-subtitle">Editing: {form.title || "Untitled"}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-xl">
-          <h3 className="mb-4 text-sm font-semibold text-white">Event Details</h3>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label className="text-gray-300">Event Title</Label>
+        <div className="gt-admin-card">
+          <div className="gt-admin-card-header">
+            <h3 className="gt-admin-card-title">Event Details</h3>
+          </div>
+          <div style={{ padding: 24 }}>
+            <div className="mb-4">
+              <Label>Event Title</Label>
               <Input
                 placeholder="Enter event title"
                 value={form.title}
                 onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label className="text-gray-300">Slug</Label>
+            <div className="row mb-4">
+              <div className="col-md-6 mb-3 mb-md-0">
+                <Label>Slug</Label>
                 <Input
                   value={form.slug}
                   onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] font-mono text-xs text-white"
+                  className="font-monospace"
                 />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Category</Label>
+              <div className="col-md-6">
+                <Label>Category</Label>
                 <Input
                   placeholder="Technology, Business..."
                   value={form.category}
                   onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
                 />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Start Date</Label>
+            </div>
+            <div className="row mb-4">
+              <div className="col-md-3 mb-3 mb-md-0">
+                <Label>Start Date</Label>
                 <Input
                   type="datetime-local"
                   value={form.startDate}
                   onChange={(e) => setForm((prev) => ({ ...prev, startDate: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white"
                 />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">End Date</Label>
+              <div className="col-md-3 mb-3 mb-md-0">
+                <Label>End Date</Label>
                 <Input
                   type="datetime-local"
                   value={form.endDate}
                   onChange={(e) => setForm((prev) => ({ ...prev, endDate: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white"
                 />
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Status</Label>
+              <div className="col-md-3 mb-3 mb-md-0">
+                <Label>Status</Label>
                 <Select
                   value={form.status}
                   onValueChange={(v) => setForm((prev) => ({ ...prev, status: v }))}
                 >
-                  <SelectTrigger className="border-white/10 bg-white/[0.03] text-white">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -259,141 +257,124 @@ export default function OrgEventEditPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1">
-                <Label className="text-gray-300">Timezone</Label>
+              <div className="col-md-3">
+                <Label>Timezone</Label>
                 <Input
                   value={form.timezone}
                   onChange={(e) => setForm((prev) => ({ ...prev, timezone: e.target.value }))}
-                  className="border-white/10 bg-white/[0.03] text-white"
                 />
               </div>
             </div>
-            <div className="space-y-1">
-              <Label className="text-gray-300">Short Description</Label>
+            <div className="mb-3">
+              <Label>Short Description</Label>
               <Input
                 placeholder="Brief description for cards"
                 value={form.shortDescription}
                 onChange={(e) => setForm((prev) => ({ ...prev, shortDescription: e.target.value }))}
-                className="border-white/10 bg-white/[0.03] text-white placeholder:text-gray-600"
               />
             </div>
-            <div className="space-y-1">
-              <Label className="text-gray-300">Full Description</Label>
+            <div className="mb-3">
+              <Label>Full Description</Label>
               <textarea
                 placeholder="Detailed event description..."
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                className="min-h-[100px] w-full resize-y rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-gray-600"
+                className="gt-admin-input-field w-100"
+                style={{ minHeight: 100, resize: "vertical" }}
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-xl">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-white">Ticket Types / Passes</h3>
-              <p className="mt-1 text-xs text-gray-500">
-                Define pass categories with name, price, perks, and quantity
-              </p>
-            </div>
+        <div className="gt-admin-card">
+          <div className="gt-admin-card-header">
+            <h3 className="gt-admin-card-title">Ticket Types / Passes</h3>
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={() => setTicketTypes((prev) => [...prev, emptyTicket()])}
-              className="border-white/10 text-gray-300 hover:bg-white/10"
             >
               <Plus className="mr-1 h-4 w-4" /> Add Pass
             </Button>
           </div>
-          {ticketTypes.length === 0 ? (
-            <p className="py-4 text-center text-sm text-gray-500">No ticket types yet.</p>
-          ) : (
-            <div className="space-y-4">
-              {ticketTypes.map((tt, i) => (
-                <div key={i} className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-400">Pass #{i + 1}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-red-400 hover:text-red-300"
-                      onClick={() => setTicketTypes((prev) => prev.filter((_, j) => j !== i))}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+          <div style={{ padding: 24 }}>
+            {ticketTypes.length === 0 ? (
+              <p style={{ color: "#888", textAlign: "center", padding: "16px 0" }}>No ticket types yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {ticketTypes.map((tt, i) => (
+                  <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: 16 }}>
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                      <span style={{ fontWeight: 500, color: "#555" }}>Pass #{i + 1}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        style={{ color: "#EF4444" }}
+                        onClick={() => setTicketTypes((prev) => prev.filter((_, j) => j !== i))}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    <div className="row g-3">
+                      <div className="col-md-3">
+                        <Label className="text-xs">Name</Label>
+                        <Input
+                          placeholder="VIP, Standard..."
+                          value={tt.name}
+                          onChange={(e) => updateTicket(i, "name", e.target.value)}
+                        />
+                      </div>
+                      <div className="col-md-3">
+                        <Label className="text-xs">Price (₹)</Label>
+                        <Input
+                          type="number"
+                          placeholder="699"
+                          value={tt.price}
+                          onChange={(e) => updateTicket(i, "price", e.target.value)}
+                        />
+                      </div>
+                      <div className="col-md-3">
+                        <Label className="text-xs">Quantity</Label>
+                        <Input
+                          type="number"
+                          placeholder="100"
+                          value={tt.quantityLimit}
+                          onChange={(e) => updateTicket(i, "quantityLimit", e.target.value)}
+                        />
+                      </div>
+                      <div className="col-md-3">
+                        <Label className="text-xs">Color</Label>
+                        <Input
+                          type="color"
+                          value={tt.color}
+                          onChange={(e) => updateTicket(i, "color", e.target.value)}
+                          style={{ height: 36, cursor: "pointer", padding: 2 }}
+                        />
+                      </div>
+                      <div className="col-12">
+                        <Label className="text-xs">Perks (comma-separated)</Label>
+                        <Input
+                          placeholder="Keynote access, Exhibition entry, Networking..."
+                          value={tt.perks}
+                          onChange={(e) => updateTicket(i, "perks", e.target.value)}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Name</Label>
-                      <Input
-                        placeholder="VIP, Standard..."
-                        value={tt.name}
-                        onChange={(e) => updateTicket(i, "name", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Price (₹)</Label>
-                      <Input
-                        type="number"
-                        placeholder="699"
-                        value={tt.price}
-                        onChange={(e) => updateTicket(i, "price", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Quantity</Label>
-                      <Input
-                        type="number"
-                        placeholder="100"
-                        value={tt.quantityLimit}
-                        onChange={(e) => updateTicket(i, "quantityLimit", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-500">Color</Label>
-                      <Input
-                        type="color"
-                        value={tt.color}
-                        onChange={(e) => updateTicket(i, "color", e.target.value)}
-                        className="h-9 w-full cursor-pointer rounded-md border border-white/10 bg-white/[0.03]"
-                      />
-                    </div>
-                    <div className="col-span-full space-y-1">
-                      <Label className="text-xs text-gray-500">Perks (comma-separated)</Label>
-                      <Input
-                        placeholder="Keynote access, Exhibition entry, Networking..."
-                        value={tt.perks}
-                        onChange={(e) => updateTicket(i, "perks", e.target.value)}
-                        className="border-white/10 bg-white/[0.03] text-sm text-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
-            onClick={() => router.back()}
-          >
+        <div className="d-flex justify-content-end gap-3">
+          <Button type="button" variant="outline" onClick={() => router.back()}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={saving}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30"
-          >
+          <Button type="submit" disabled={saving}>
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...

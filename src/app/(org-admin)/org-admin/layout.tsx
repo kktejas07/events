@@ -59,7 +59,7 @@ export default function OrgAdminLayout({ children }: { children: React.ReactNode
             </div>
           </div>
         </header>
-        <main className="gt-admin-content" style={{ background: "#0a0a1a", color: "#fff" }}>{children}</main>
+        <main className="gt-admin-content">{children}</main>
       </div>
     </div>
   );
