@@ -1,6 +1,6 @@
 # Events Platform — Multi-Tenant College Events SaaS
 
-A full-stack multi-tenant events management platform powered by the **Pixvent** theme (Bootstrap 5 + jQuery on public pages, Tailwind + shadcn/ui on admin/auth pages). Colleges/institutions manage their own events, tickets, and attendees.
+A full-stack multi-tenant events management platform powered by the **ECHO** theme (Bootstrap 5 + jQuery on public pages, Tailwind + shadcn/ui on admin/auth pages). Colleges/institutions manage their own events, tickets, and attendees.
 
 ---
 
@@ -9,7 +9,7 @@ A full-stack multi-tenant events management platform powered by the **Pixvent** 
 | Layer | Technology | Why |
 |-------|-----------|-----|
 | **Frontend** | Next.js 14 (App Router) + TypeScript | SSR, SEO, API routes, React Server Components |
-| **Public UI** | Pixvent Theme (Bootstrap 5 + jQuery + 11 plugins) | Pre-built event/music theme with Swiper, Magnific Popup, CounterUp, WOW animations |
+| **Public UI** | ECHO Theme (Bootstrap 5 + jQuery + 11 plugins) | Pre-built event/music theme with Swiper, Magnific Popup, CounterUp, WOW animations |
 | **Admin UI** | TailwindCSS + shadcn/ui | Dark theme, utility-first, accessible |
 | **Database** | PostgreSQL (Supabase) + Prisma ORM | Type-safe queries, migrations |
 | **Auth** | NextAuth.js v5 (LinkedIn, Email/Password) with JWT | 6 roles: ADMIN, ORG_ADMIN, SCANNER, USER, etc. |
@@ -48,10 +48,10 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Architecture: Hybrid Theming
 
 ```
-Public Pages (Pixvent Bootstrap + jQuery)
-├── CSS: 8 Pixvent stylesheets (Bootstrap 5, Swiper, Magnific Popup, WOW, MeanMenu, NiceSelect, main)
+Public Pages (ECHO Bootstrap + jQuery)
+├── CSS: 8 theme stylesheets (Bootstrap 5, Swiper, Magnific Popup, WOW, MeanMenu, NiceSelect, main)
 ├── JS: 11 scripts loaded via next/script (jQuery 3.7, Bootstrap bundle, Swiper, CounterUp, etc.)
-├── HTML: Exact Pixvent classes from index-3.html, about.html, event.html, etc.
+├── HTML: ECHO theme classes from index-3.html, about.html, event.html, etc.
 └── Layout: Preloader + scroll-to-top + Header (jQuery-controlled toggles) + Footer
 
 Admin Pages (Tailwind + shadcn/ui)
@@ -117,11 +117,11 @@ DB (PostgreSQL + Prisma)
 | `/colleges/[slug]` | Custom (Org detail + events) | `organization` with events | N/A |
 | `/404` | 404.html (Illustration + back-home) | Static | N/A |
 
-### Pixvent Features Implemented
+### ECHO Features Implemented
 
 - [x] Preloader (spinner)
 - [x] Scroll-to-top button
-- [x] Mobile hamburger menu (meanmenu) — Pixvent CSS/JS handles it
+- [x] Mobile hamburger menu (meanmenu) — ECHO theme CSS/JS handles it
 - [x] Hero countdown timer
 - [x] WOW scroll animations
 - [x] Swiper sliders (testimonials, sponsors, blog)
@@ -214,7 +214,7 @@ EMAIL_FROM=events@yourdomain.com
 ```
 src/
 ├── app/
-│   ├── (public)/              # Public Pixvent-themed pages
+│   ├── (public)/              # Public ECHO-themed pages
 │   │   ├── page.tsx           # Landing (CMS-driven)
 │   │   ├── _HomePageClient.tsx# Landing interactive components
 │   │   ├── about/             # CMS-driven about page
@@ -255,5 +255,5 @@ src/
 │   ├── auth.ts                # NextAuth config (6 roles)
 │   ├── db.ts                  # Prisma client singleton
 │   └── landing-defaults.ts    # 16-section CMS defaults
-└── public/assets/             # Pixvent CSS, JS, images
+└── public/assets/             # ECHO CSS, JS, images
 ```

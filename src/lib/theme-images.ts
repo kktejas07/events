@@ -1,6 +1,6 @@
 import { resolveThemeImage } from "./resolve-theme-image";
 
-/** Theme asset paths — local Pixvent assets only */
+/** Theme asset paths — local theme assets only */
 export const themeAssets = {
   breadcrumb: {
     bg: "/assets/img/inner-page/breadcrumb/bg.png",

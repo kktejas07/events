@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { toast } from "sonner";
 import { Save, RotateCcw } from "lucide-react";
 import { defaultContent } from "@/lib/landing-defaults";
@@ -225,14 +226,14 @@ export default function AdminLandingPage() {
               value={d.venueAddress}
               onChange={(v) => updateNested("hero", "venueAddress", v)}
             />
-            <Field
-              label="Background Image URL"
-              value={d.backgroundImage}
+            <ImageUpload
+              label="Background Image"
+              value={String(d.backgroundImage || "")}
               onChange={(v) => updateNested("hero", "backgroundImage", v)}
             />
-            <Field
-              label="Shape Image URL"
-              value={d.heroImage}
+            <ImageUpload
+              label="Shape Image"
+              value={String(d.heroImage || "")}
               onChange={(v) => updateNested("hero", "heroImage", v)}
             />
             <div className="col-span-full space-y-1">
@@ -267,9 +268,9 @@ export default function AdminLandingPage() {
                 className="gt-admin-textarea min-h-[80px] text-sm"
               />
             </div>
-            <Field
-              label="Image URL"
-              value={d.image}
+            <ImageUpload
+              label="Image"
+              value={String(d.image || "")}
               onChange={(v) => updateNested("about", "image", v)}
             />
           </div>
@@ -329,9 +330,17 @@ export default function AdminLandingPage() {
               fields={[
                 { key: "name", label: "Name" },
                 { key: "role", label: "Role" },
-                { key: "photoUrl", label: "Photo URL" },
               ]}
               onChange={(items) => updateNested("speakers", "items", items)}
+              renderExtra={(item, _i, update) => (
+                <div className="mt-2">
+                  <ImageUpload
+                    label="Photo"
+                    value={String(item.photoUrl || "")}
+                    onChange={(v) => update("photoUrl", v)}
+                  />
+                </div>
+              )}
             />
           </div>
         );
@@ -414,9 +423,9 @@ export default function AdminLandingPage() {
                 value={d.title}
                 onChange={(v) => updateNested("faq", "title", v)}
               />
-              <Field
-                label="Side Image URL"
-                value={d.image}
+              <ImageUpload
+                label="Side Image"
+                value={String(d.image || "")}
                 onChange={(v) => updateNested("faq", "image", v)}
               />
             </div>
@@ -487,9 +496,9 @@ export default function AdminLandingPage() {
                 value={d.phoneNumber}
                 onChange={(v) => updateNested("about-page", "phoneNumber", v)}
               />
-              <Field
-                label="Image URL"
-                value={d.image}
+              <ImageUpload
+                label="Image"
+                value={String(d.image || "")}
                 onChange={(v) => updateNested("about-page", "image", v)}
               />
               <div className="col-span-full space-y-1">

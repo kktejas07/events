@@ -1,4 +1,4 @@
-/** Public site navigation — matches Pixvent index-3 pages we actually ship. */
+/** Public site navigation — matches ECHO theme pages. */
 
 export type NavItem = {
   label: string;

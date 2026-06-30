@@ -1,4 +1,4 @@
-/** Reject external/placeholder URLs and fall back to local Pixvent theme assets. */
+/** Reject external/placeholder URLs and fall back to local ECHO theme assets. */
 export function resolveThemeImage(url: string | null | undefined, fallback: string): string {
   if (!url) return fallback;
   const trimmed = url.trim();
