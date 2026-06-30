@@ -36,55 +36,33 @@
   margin-bottom: 28px;
 }
 
-.gt-auth-social-buttons {
+.gt-auth-quick-login {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
-.gt-auth-social-btn {
+.gt-auth-quick-btn {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border: 2px solid #e5e7eb;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1.5px solid #e5e7eb;
   border-radius: 10px;
   background: #fff;
   color: #555;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.gt-auth-social-btn:hover {
-  background: #f8f9fe;
-  border-color: #d0d5dd;
-}
-
-.gt-auth-social-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.gt-auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-  color: #bbb;
-  font-size: 12px;
-  text-transform: uppercase;
-}
-
-.gt-auth-divider::before,
-.gt-auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #e5e7eb;
+.gt-auth-quick-btn:hover {
+  background: #f0f2ff;
+  border-color: #1539EE;
+  color: #1539EE;
 }
 
 .gt-auth-footer {
