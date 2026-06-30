@@ -1,75 +1,65 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Toaster } from "sonner";
-import {
-  LayoutDashboard,
-  Calendar,
-  Ticket,
-  ShoppingCart,
-  ScanLine,
-  LogOut,
-  Settings,
-  Users,
-} from "lucide-react";
+import "../../admin/admin.css";
+import { Logo } from "@/components/ui/logo";
 
 const sidebarLinks = [
-  { href: "/org-admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/org-admin/events", label: "Events", icon: Calendar },
-  { href: "/org-admin/tickets", label: "Tickets", icon: Ticket },
-  { href: "/org-admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/org-admin/scanners", label: "Scanner Users", icon: ScanLine },
-  { href: "/org-admin/settings", label: "Settings", icon: Settings },
+  { href: "/org-admin", label: "Dashboard", icon: "fa-grip" },
+  { href: "/org-admin/events", label: "Events", icon: "fa-calendar-days" },
+  { href: "/org-admin/tickets", label: "Tickets", icon: "fa-ticket-simple" },
+  { href: "/org-admin/orders", label: "Orders", icon: "fa-cart-shopping" },
+  { href: "/org-admin/scanners", label: "Scanner Users", icon: "fa-qrcode" },
+  { href: "/org-admin/settings", label: "Settings", icon: "fa-gear" },
 ];
 
 export default function OrgAdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-[#050508]">
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-white/10 bg-[#050508] lg:block">
-        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-6">
-          <Link href="/org-admin" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-600/30">
-              <span className="text-lg font-bold text-white">O</span>
-            </div>
-            <span className="text-lg font-bold text-white">Org Admin</span>
+    <div className="gt-admin-wrapper">
+      <aside className="gt-admin-sidebar" id="orgAdminSidebar">
+        <div className="gt-admin-brand">
+          <Link href="/" className="d-flex align-items-center gap-2 text-decoration-none">
+            <Logo height={32} />
+            <span className="text-white fw-bold fs-5">Org Admin</span>
           </Link>
         </div>
-        <nav
-          className="flex flex-col gap-1 overflow-y-auto p-3"
-          style={{ height: "calc(100vh - 64px)" }}
-        >
+        <nav className="gt-admin-nav">
           {sidebarLinks.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 text-gray-400 hover:bg-white/10 hover:text-white"
-              >
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Button>
+            <Link key={link.href} href={link.href} className="gt-admin-nav-link">
+              <i className={`fa-regular ${link.icon}`}></i>
+              <span>{link.label}</span>
             </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-64 border-t border-white/10 bg-[#050508] p-3">
-          <Link href="/api/auth/signout">
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
+        <div className="gt-admin-signout">
+          <Link href="/api/auth/signout" className="gt-admin-signout-btn">
+            <i className="fa-regular fa-right-from-bracket"></i>
+            <span>Sign Out</span>
           </Link>
         </div>
       </aside>
-      <div className="flex-1 lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/10 bg-[#050508]/80 px-6 backdrop-blur-xl">
-          <h1 className="text-lg font-semibold text-white">Organization Dashboard</h1>
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600">
-            <span className="text-sm font-bold text-white">O</span>
+
+      <div className="gt-admin-main">
+        <header className="gt-admin-header">
+          <div className="gt-admin-header-left">
+            <button className="gt-admin-menu-toggle" id="orgAdminMenuToggle">
+              <i className="fas fa-bars"></i>
+            </button>
+            <Link href="/" className="gt-admin-header-brand">
+              <Logo height={28} />
+            </Link>
+          </div>
+          <div className="gt-admin-header-right">
+            <Link href="/" className="gt-admin-header-icon" title="View Site">
+              <i className="fa-regular fa-arrow-up-right-from-square"></i>
+            </Link>
+            <Link href="/org-admin/settings" className="gt-admin-header-icon" title="Settings">
+              <i className="fa-regular fa-gear"></i>
+            </Link>
+            <div className="gt-admin-avatar">
+              <i className="fa-solid fa-user"></i>
+            </div>
           </div>
         </header>
-        <main className="p-6">{children}</main>
-        <Toaster richColors />
+        <main className="gt-admin-content">{children}</main>
       </div>
     </div>
   );
